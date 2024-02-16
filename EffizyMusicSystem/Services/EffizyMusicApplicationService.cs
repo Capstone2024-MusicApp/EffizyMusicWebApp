@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.Services
 {
-    internal class EffizyMusicApplicationService
+    public class EffizyMusicApplicationService
     {
     }
 }
