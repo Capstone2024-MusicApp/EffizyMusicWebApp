@@ -1,8 +1,12 @@
+using EffizyMusicSystem.DAL;
 using EffizyMusicWebApp.Components;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<EffizyMusicContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr") ?? throw new InvalidOperationException("Connection string 'ConnStr' not found.")));
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
