@@ -1,4 +1,7 @@
+using EffizyMusicSystem.DAL;
 using EffizyMusicWebApp.Components;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,12 @@ builder.Services.AddRazorComponents()
 
 var app = builder.Build();
 
+// Add services to the container.
+var services = builder.Services;
+
+// Add your DbContext configuration
+services.AddDbContext<EffizyMusicContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
