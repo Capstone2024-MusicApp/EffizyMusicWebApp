@@ -50,6 +50,8 @@
         </div>
         <ValidationMessage For="@(() => model.CorrectChoice)" />
     </div>
+    <input type="hidden" @bind-value="model.QuestionId" name="model.QuestionId" />
+    <input type="hidden" @bind-value="model.QuizId" name="model.QuizId" />
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
         <a class="btn btn-light" href="/questions/@model.QuizId">
@@ -62,15 +64,20 @@
     [Parameter]
     public int questionId { get; set; }
 
-    //[SupplyParameterFromForm]
-    //protected QuestionChoiceViewModel model { get; set; }
+    [SupplyParameterFromForm]
+    protected QuestionChoiceViewModel model { get; set; }
 
-    QuestionChoiceViewModel model = new QuestionChoiceViewModel();
+    //QuestionChoiceViewModel model = new QuestionChoiceViewModel();
+
+    protected override void OnInitialized() => model ??= new();
 
     protected override async Task OnParametersSetAsync()
     {
-        string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
-        model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
+        if (model.QuestionId == 0 && model.QuizId == 0)
+        {
+            string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
+            model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
+        }
     }
 
     // protected override async Task OnInitializedAsync()
