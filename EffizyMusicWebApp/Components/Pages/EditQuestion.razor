@@ -1,0 +1,98 @@
+﻿@page "/question/edit/{questionId:int}"
+@using MusicWebApi.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Edit Question</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="SaveQuestion" FormName="editquestion">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label">Question Text</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.QuestionText" />
+        </div>
+        <ValidationMessage For="@(() => model.QuestionText)" />
+    </div>
+    <b>Add multiple choices for the question</b>
+    <div class="mb-3">
+        <label class="form-label">Choice A:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText1" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText1)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice B:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText2" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText2)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice C:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText3" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText3)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice D:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText4" />
+        </div>
+    </div>
+    <b style="background-color:aliceblue; color:darkolivegreen">Please select correct choice</b>
+    <div class="mb-3">
+        <label class="form-label">Correct Choice</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.CorrectChoice" />
+        </div>
+        <ValidationMessage For="@(() => model.CorrectChoice)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn btn-light" href="/questions/@model.QuizId">
+            Cancel
+        </a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int questionId { get; set; }
+
+    //[SupplyParameterFromForm]
+    //protected QuestionChoiceViewModel model { get; set; }
+
+    QuestionChoiceViewModel model = new QuestionChoiceViewModel();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
+        model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
+    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
+    //     model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
+    // }
+
+    protected async Task SaveQuestion()
+    {
+        if (!string.IsNullOrEmpty(model.QuestionText))
+        {
+            string apiUrl = "https://localhost:7164/api/Questions";
+            //question.QuizId = quizId;
+            await Http.PutAsJsonAsync(apiUrl, model);
+            //var ques = await Http.GetFromJsonAsync<Question>(result);
+            Cancel();
+        }
+    }
+
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/questions/" + model.QuizId);
+    }
+}

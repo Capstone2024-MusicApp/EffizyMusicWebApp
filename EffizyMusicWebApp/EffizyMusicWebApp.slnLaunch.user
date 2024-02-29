@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Name": "EffizyMusicWebApp.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\MusicWebApi\\MusicWebApi.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

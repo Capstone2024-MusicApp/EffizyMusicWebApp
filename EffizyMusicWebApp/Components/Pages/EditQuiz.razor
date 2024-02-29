@@ -1,0 +1,63 @@
+﻿@page "/quiz/edit/{quizId:int}"
+@using MusicWebApi.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h3>Edit Quiz</h3>
+<hr />
+<EditForm Model="@quiz" OnValidSubmit="SaveQuiz" FormName="quiz">
+    @* <AntiforgeryToken /> *@
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label">Quiz Title</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="quiz.QuizTitle" />
+        </div>
+        <ValidationMessage For="@(() => quiz.QuizTitle)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="quiz.Description"></InputText>
+        </div>
+        <ValidationMessage For="@(() => quiz.Description)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+         <a class="btn btn-light" href="/quizes/@quiz.ModuleId">
+            Cancel
+        </a> 
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int quizId { get; set; }
+
+    //[SupplyParameterFromForm]
+    protected Quiz quiz = new Quiz();
+
+    // [SupplyParameterFromForm(FormName = "quiz")]
+    // public Quiz? quiz { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string apiUrl = "https://localhost:7164/api/Quiz/GetQuizById/" + quizId;
+        quiz = await Http.GetFromJsonAsync<Quiz>(apiUrl);
+    }
+   
+    protected async Task SaveQuiz()
+    {
+        if (!string.IsNullOrEmpty(quiz.QuizTitle) && !string.IsNullOrEmpty(quiz.Description))
+        {
+            string apiUrl = "https://localhost:7164/api/Quiz/";
+            //quiz.ModuleId = moduleId;
+            await Http.PutAsJsonAsync(apiUrl, quiz);
+            Cancel();
+        }
+    }
+
+     public void Cancel()
+     {
+         NavigationManager.NavigateTo("/quizes/" + quiz.ModuleId);
+     }
+}

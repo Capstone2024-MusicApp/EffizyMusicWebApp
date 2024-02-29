@@ -16,8 +16,5 @@ namespace EffizyMusicSystem.DAL
         {
         }
         //public DbSet<Lessons> Lessons { get; set; }
-
-        public DbSet<Quiz> Quizes { get; set; }
     }
-
 }

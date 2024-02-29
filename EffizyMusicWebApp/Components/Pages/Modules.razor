@@ -1,0 +1,59 @@
+﻿@page "/modules"
+
+@using EffizyMusicSystem.DAL
+@using MusicWebApi.Models
+@inject HttpClient Http
+<h3>Modules</h3>
+
+<br />
+@if (moduleList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>ID</th>
+                <th>Module Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var module in moduleList)
+            {
+                <tr>
+                    <td>@module.Id</td>
+                    <td>@module.ModuleName</td>
+                    <td>@module.Description</td>
+                    <td>
+                        <a href='/quizes/@module.Id' class="btn btn-outline-dark" role="button">
+                            Quizes
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    protected List<Module> moduleList = new();
+    //protected List<User> searchUserData = new();
+    //protected Module module = new();
+    //protected string SearchString { get; set; } = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetModules();
+    }
+
+    protected async Task GetModules()
+    {
+        //var res1 = await Http.GetStringAsync("api/Modules");
+        //var baseuri = Http.BaseAddress.AbsoluteUri;
+        //ModuleManager moduleManager = new ModuleManager();
+        string apiUrl = "https://localhost:7164/api/Modules/";
+        moduleList = await Http.GetFromJsonAsync<List<Module>>(apiUrl);
+    }
+}
