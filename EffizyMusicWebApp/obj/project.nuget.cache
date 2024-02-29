@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "U7UoRgtkB/qYeraeDxziaj9sLPOZdT7NPfOBPEst6QeZyx0wOBujj4DAmDiQxuLrRrTcYm6oNKdvrWZTTW4b1w==",
+  "dgSpecHash": "HYiQfWsUmkPTC1vEilVFVwJAaAJpDsr0u+X9LS2QM1omVr9iWEOiCYAa+i4Wb7tCFfDbrp2xy31a3Ntfa5L2+Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\rmarwaha\\OneDrive - phgic.com\\Documents\\GitHub\\EffizyMusicWebApp\\EffizyMusicWebApp\\EffizyMusicWebApp.csproj",
   "expectedPackageFiles": [
@@ -81,12 +81,5 @@
     "C:\\Users\\rmarwaha\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\rmarwaha\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\rmarwaha\\OneDrive - phgic.com\\Documents\\GitHub\\EffizyMusicWebApp\\EffizyMusicWebApp\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  "logs": []
 }
