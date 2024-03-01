@@ -4,26 +4,27 @@
 @inject NavigationManager NavigationManager
 <h3>Edit Quiz</h3>
 <hr />
-<EditForm Model="@quiz" OnValidSubmit="SaveQuiz" FormName="quiz">
-    @* <AntiforgeryToken /> *@
+<EditForm Model="@model" OnValidSubmit="UpdateQuiz" FormName="editquiz">
     <DataAnnotationsValidator />
     <div class="mb-3">
         <label class="form-label">Quiz Title</label>
         <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="quiz.QuizTitle" />
+            <InputText class="form-control" @bind-Value="model.QuizTitle" />
         </div>
-        <ValidationMessage For="@(() => quiz.QuizTitle)" />
+        <ValidationMessage For="@(() => model.QuizTitle)" />
     </div>
     <div class="mb-3">
         <label class="form-label">Description</label>
         <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="quiz.Description"></InputText>
+            <InputText class="form-control" @bind-Value="model.Description"></InputText>
         </div>
-        <ValidationMessage For="@(() => quiz.Description)" />
+        <ValidationMessage For="@(() => model.Description)" />
     </div>
+    <input type="hidden" @bind-value="model.Id" name="model.Id" />
+    <input type="hidden" @bind-value="model.ModuleId" name="model.ModuleId" />
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
-         <a class="btn btn-light" href="/quizes/@quiz.ModuleId">
+        <a class="btn btn-light" href="/quizes/@model.ModuleId">
             Cancel
         </a> 
     </div>
@@ -33,31 +34,33 @@
     [Parameter]
     public int quizId { get; set; }
 
-    //[SupplyParameterFromForm]
-    protected Quiz quiz = new Quiz();
+    [SupplyParameterFromForm]
+    protected Quiz model { get; set; }
 
-    // [SupplyParameterFromForm(FormName = "quiz")]
-    // public Quiz? quiz { get; set; }
+    protected override void OnInitialized() => model ??= new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        string apiUrl = "https://localhost:7164/api/Quiz/GetQuizById/" + quizId;
-        quiz = await Http.GetFromJsonAsync<Quiz>(apiUrl);
-    }
-   
-    protected async Task SaveQuiz()
-    {
-        if (!string.IsNullOrEmpty(quiz.QuizTitle) && !string.IsNullOrEmpty(quiz.Description))
+        if (model.Id == 0 && model.ModuleId == 0)
         {
-            string apiUrl = "https://localhost:7164/api/Quiz/";
-            //quiz.ModuleId = moduleId;
-            await Http.PutAsJsonAsync(apiUrl, quiz);
+            string apiUrl = "https://localhost:7164/api/Quiz/GetQuizById/" + quizId;
+            model = await Http.GetFromJsonAsync<Quiz>(apiUrl);
+        }
+    }
+
+    protected async Task UpdateQuiz()
+    {
+        if (!string.IsNullOrEmpty(model.QuizTitle) && !string.IsNullOrEmpty(model.Description))
+        {
+            string apiUrl = "https://localhost:7164/api/Quiz";
+            var response = await Http.PutAsJsonAsync(apiUrl, model);
+           
             Cancel();
         }
     }
 
      public void Cancel()
      {
-         NavigationManager.NavigateTo("/quizes/" + quiz.ModuleId);
+        NavigationManager.NavigateTo("/quizes/" + model.ModuleId);
      }
 }

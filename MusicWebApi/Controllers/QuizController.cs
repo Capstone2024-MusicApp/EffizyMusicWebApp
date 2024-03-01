@@ -40,6 +40,13 @@ namespace MusicWebApi.Controllers
             quizManager.UpdateQuiz(quiz);
         }
 
+        [HttpPost]
+        [Route("UpdateQuiz")]
+        public void UpdateQuiz(Quiz quiz)
+        {
+            quizManager.UpdateQuiz(quiz);
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

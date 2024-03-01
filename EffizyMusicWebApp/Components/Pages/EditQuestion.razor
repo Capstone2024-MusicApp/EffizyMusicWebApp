@@ -80,12 +80,6 @@
         }
     }
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
-    //     model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
-    // }
-
     protected async Task SaveQuestion()
     {
         if (!string.IsNullOrEmpty(model.QuestionText))

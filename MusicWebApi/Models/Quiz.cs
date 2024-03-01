@@ -18,6 +18,6 @@ namespace MusicWebApi.Models
         [JsonIgnore]
         public virtual Module? Module { get; set; } = null!;
 
-        public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<Question>? Questions { get; set; }
     }
 }
