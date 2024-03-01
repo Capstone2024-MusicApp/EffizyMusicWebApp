@@ -54,8 +54,10 @@
         {
             string apiUrl = "https://localhost:7164/api/Quiz";
             var response = await Http.PutAsJsonAsync(apiUrl, model);
-           
-            Cancel();
+            if(response.IsSuccessStatusCode)
+            {
+                Cancel();
+            }
         }
     }
 
