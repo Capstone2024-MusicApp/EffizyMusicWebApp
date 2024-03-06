@@ -4,6 +4,7 @@ using EffizyMusicSystem.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EffizyMusicSystem.Migrations
 {
     [DbContext(typeof(EffizyMusicContext))]
-    partial class EffizyMusicContextModelSnapshot : ModelSnapshot
+    [Migration("20240306010225_Changes Test")]
+    partial class ChangesTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,15 +34,15 @@ namespace EffizyMusicSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseID"));
 
-                    b.Property<string>("CourseDescription")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CourseMode")
+                    b.Property<string>("CourseModel")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Desception")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("InstructorID")
                         .HasColumnType("int");
@@ -153,11 +156,6 @@ namespace EffizyMusicSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InstrumentID"));
-
-                    b.Property<string>("InstrumentType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("InstrumentID");
 

@@ -21,6 +21,6 @@ namespace EffizyMusicSystem.Models
         public string ModuleID { get; set; }
 
         
-        public virtual Module Module { get; set; }
+        public Module Module { get; set; }
     }
 }
