@@ -4779,11 +4779,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
-              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
-            },
-            "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
-              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
+            "C:\\Users\\rmarwaha\\OneDrive - phgic.com\\Documents\\GitHub\\EffizyMusicWebApp\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
+              "projectPath": "C:\\Users\\rmarwaha\\OneDrive - phgic.com\\Documents\\GitHub\\EffizyMusicWebApp\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
             }
           }
         }
