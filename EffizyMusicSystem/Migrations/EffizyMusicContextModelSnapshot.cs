@@ -58,7 +58,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasIndex("InstrumentID");
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Feedback", b =>
@@ -81,7 +81,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("FeedbackID");
 
-                    b.ToTable("Feedbacks", (string)null);
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Instructor", b =>
@@ -117,7 +117,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("InstructorID");
 
-                    b.ToTable("Instructors", (string)null);
+                    b.ToTable("Instructors");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.InstructorRating", b =>
@@ -143,7 +143,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("RatingID");
 
-                    b.ToTable("InstructorRatings", (string)null);
+                    b.ToTable("InstructorRatings");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Instrument", b =>
@@ -161,7 +161,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("InstrumentID");
 
-                    b.ToTable("Instruments", (string)null);
+                    b.ToTable("Instruments");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Lesson", b =>
@@ -195,7 +195,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasIndex("ModuleID1");
 
-                    b.ToTable("Lessons", (string)null);
+                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Module", b =>
@@ -221,7 +221,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasIndex("CourseID1");
 
-                    b.ToTable("Modules", (string)null);
+                    b.ToTable("Modules");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Payment", b =>
@@ -251,7 +251,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("PaymentID");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Student", b =>
@@ -282,7 +282,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("StudentID");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.User", b =>
@@ -324,7 +324,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("UserID");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.UserType", b =>
@@ -340,7 +340,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("UserTypeID");
 
-                    b.ToTable("UserTypes", (string)null);
+                    b.ToTable("UserTypes");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.ViewLesson", b =>
@@ -366,7 +366,7 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("LessonViewID");
 
-                    b.ToTable("ViewLessons", (string)null);
+                    b.ToTable("ViewLessons");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Course", b =>
