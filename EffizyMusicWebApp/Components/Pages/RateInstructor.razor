@@ -1,0 +1,46 @@
+﻿@page "/RateInstructor/"
+@using EffizyMusicSystem.Controllers
+@using EffizyMusicSystem.Models
+<h2 class="display-2 text-align-center">Lesson List</h2>
+
+@* @if (LessonList == null)
+{
+    <p><em>Loading...</em></p>
+} *@
+@* <form>
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" @bind="RatingData.Feedback" />
+    </div>
+    <div class="row">
+    </div>
+    <div class="row">
+    </div>
+    <input type="submit" class="btn btn-primary" id="submit" value="Submit FeedBack">
+    <div>
+      @*   @if (IsError)
+        {
+            <p class="text-warning">@Message</p>
+        } *@
+   @*  </div>
+
+</form> *@ 
+
+
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = "";
+    [Parameter]
+    public bool IsError { get; set; } = false;
+
+    public InstructorRating RatingData { get; set; }
+
+    private LessonController LessonController { get; set; }
+    public List<Lesson> LessonList { get; set; }
+    private async Task OnInitializedAsync()
+    {
+        IsError = false;
+        LessonList = LessonController.GetLessons();
+    }
+}
