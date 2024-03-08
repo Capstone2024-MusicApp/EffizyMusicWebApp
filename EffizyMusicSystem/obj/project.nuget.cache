@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LYIv/EhWyw1vfwc7VOGsoDBzZY7gk6oHT+dpcJaFcWqiGYqs7NH1U9AEPv9FJ3ZBrpavL/yqW/8c1eumwaWjnA==",
+  "dgSpecHash": "BLrw4KKgWiZsCx1abepUKN/uEDL6aW8GzmIoJ3QWwbXXjHnkfH5C7cMM5frf8+4RczV5HN45uC28/hxAa2Z2Sw==",
   "success": true,
-  "projectFilePath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj",
+  "projectFilePath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mushi\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\Mushi\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
