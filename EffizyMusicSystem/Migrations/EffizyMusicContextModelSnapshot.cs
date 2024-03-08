@@ -285,64 +285,6 @@ namespace EffizyMusicSystem.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("EffizyMusicSystem.Models.User", b =>
-                {
-                    b.Property<int>("UserID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
-
-                    b.Property<string>("ConfirmPassword")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Phone")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserTypeID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserID");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("EffizyMusicSystem.Models.UserType", b =>
-                {
-                    b.Property<int>("UserTypeID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserTypeID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserTypeID");
-
-                    b.ToTable("UserTypes");
-                });
-
             modelBuilder.Entity("EffizyMusicSystem.Models.ViewLesson", b =>
                 {
                     b.Property<int>("LessonViewID")
