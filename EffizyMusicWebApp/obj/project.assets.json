@@ -4779,11 +4779,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
-              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
+            "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
+              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
             },
-            "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
-              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
+            "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
+              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
             }
           }
         }

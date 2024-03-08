@@ -118,11 +118,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
-                "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
+              "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
+                "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
               },
-              "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
-                "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
+              "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
+                "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
               }
             }
           }
@@ -172,14 +172,14 @@
         }
       }
     },
-    "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
+    "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj",
+        "projectUniqueName": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj",
         "projectName": "MusicWebApi",
-        "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj",
+        "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj",
         "packagesPath": "C:\\Users\\Mushi\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\obj\\",
+        "outputPath": "D:\\Projects\\Fiever\\2024\\Feb\\27-Feb Quiz App Blazor\\MusicWebApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
