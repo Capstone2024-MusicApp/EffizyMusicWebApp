@@ -1,5 +1,6 @@
 ﻿@page "/question/edit/{questionId:int}"
 @using MusicWebApi.Models
+@using static MusicWebApi.Enums.MusicEnums
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
@@ -45,10 +46,25 @@
     <b style="background-color:aliceblue; color:darkolivegreen">Please select correct choice</b>
     <div class="mb-3">
         <label class="form-label">Correct Choice</label>
-        <div class="col-md-4">
+        @* <div class="col-md-4">
             <InputText class="form-control" @bind-Value="model.CorrectChoice" />
         </div>
-        <ValidationMessage For="@(() => model.CorrectChoice)" />
+        <ValidationMessage For="@(() => model.CorrectChoice)" /> *@
+        <div class="col-md-4">
+            <InputSelect @bind-Value="model.Choices" class="form-select" name="model.Choices">
+                @foreach (var choice in Enum.GetValues(typeof(Choices)))
+                {
+                    if(choice.ToString() == model.CorrectChoice)
+                    {
+                        <option value="@choice" selected="selected">@choice</option>
+                    }
+                    else
+                    {
+                        <option value="@choice">@choice</option>
+                    }
+                }
+            </InputSelect>
+        </div>
     </div>
     <input type="hidden" @bind-value="model.QuestionId" name="model.QuestionId" />
     <input type="hidden" @bind-value="model.QuizId" name="model.QuizId" />

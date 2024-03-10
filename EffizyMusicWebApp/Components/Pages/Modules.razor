@@ -15,9 +15,9 @@ else
     <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
-                <th>ID</th>
+               @*  <th>ID</th> *@
                 <th>Module Name</th>
-                <th>Description</th>
+                @* <th>Description</th> *@
                 <th></th>
             </tr>
         </thead>
@@ -25,11 +25,11 @@ else
             @foreach (var module in moduleList)
             {
                 <tr>
-                    <td>@module.Id</td>
-                    <td>@module.ModuleName</td>
-                    <td>@module.Description</td>
+                    @* <td>@module.ModuleID</td> *@
+                    <td>@module.Title</td>
+                    @* <td>@module.Description</td> *@
                     <td>
-                        <a href='/quizes/@module.Id' class="btn btn-outline-dark" role="button">
+                        <a href='/quizes/@module.ModuleID' class="btn btn-outline-dark" role="button">
                             Quizes
                         </a>
                     </td>

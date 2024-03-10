@@ -25,6 +25,17 @@ namespace MusicWebApi.Data
 
         public virtual DbSet<QuestionChoice> QuestionChoices { get; set; } = null!;
 
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserType> UserTypes { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
+
+        public DbSet<Instrument> Instruments { get; set; }
+
+        public DbSet<Payment> Payments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

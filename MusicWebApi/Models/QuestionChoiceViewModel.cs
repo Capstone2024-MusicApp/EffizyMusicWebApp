@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static MusicWebApi.Enums.MusicEnums;
 
 namespace MusicWebApi.Models
 {
@@ -28,10 +29,11 @@ namespace MusicWebApi.Models
         [Display(Name = "Choice D:")]
         public string? ChoiceText4 { get; set; }
 
-        [Required]
+        //[Required]
         [Display(Name = "Correct Choice")]
-        public string CorrectChoice { get; set; }
+        public string? CorrectChoice { get; set; } = string.Empty;
 
+        public Choices Choices { get; set; }
 
         public int QuestionId { get; set; }
     }

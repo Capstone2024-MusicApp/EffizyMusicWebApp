@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using MusicWebApi.Data;
 using MusicWebApi.Models;
 
@@ -97,6 +98,7 @@ namespace MusicWebApi.Services
                 if(answers.Count > 0)
                 {
                    model.CorrectChoice = answers[0].AnswerText;
+                    //model.Choices = answers[0].AnswerText;
                 }
 
                 return model;
@@ -187,11 +189,12 @@ namespace MusicWebApi.Services
                     _dbContext.SaveChanges();
                 }
 
-                if (!string.IsNullOrEmpty(entity.CorrectChoice))
+                if (!string.IsNullOrEmpty(entity.Choices.ToString()))
                 {
                     //Add answer.
                     Answer answer = new Answer();
-                    answer.AnswerText = entity.CorrectChoice;
+                    //answer.AnswerText = entity.CorrectChoice;
+                    answer.AnswerText = entity.Choices.ToString();
                     answer.QuestionId = questionId;
                     _dbContext.Answers.Add(answer);
                     _dbContext.SaveChanges();
