@@ -11,5 +11,8 @@ namespace EffizyMusicSystem.Models
     {
         [Key]
         public int InstrumentID { get; set; }
+
+        [StringLength(30)]
+        public string InstrumentType { get; set; }
     }
 }
