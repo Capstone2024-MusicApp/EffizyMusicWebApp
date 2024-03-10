@@ -19,5 +19,7 @@ namespace EffizyMusicSystem.Models
         public double Grades { get; set; }
         public bool TermsAndConditions {  get; set; }
         public int UserID {  get; set; }
+
+        public User User { get; set; }
     }
 }

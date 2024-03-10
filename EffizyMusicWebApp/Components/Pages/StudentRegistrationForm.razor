@@ -1,0 +1,38 @@
+﻿@page "/studentRegistrationForm"
+@using EffizyMusicSystem.Models
+
+@if (UserType != null && UserType.Description == "Student")
+{
+    <h4>Student Registration Form</h4>
+
+    <form>
+        <label>Instrument:</label>
+        <input type="text" @bind="Student.Instrument" />
+
+        <label>Skill Level:</label>
+        <input type="text" @bind="Student.SkillLevel" />
+
+        <!-- Other student fields -->
+
+        <button type="submit">Register</button>
+    </form>
+}
+
+@code {
+    private Student Student { get; set; } = new Student();
+    private UserType UserType { get; set; }
+
+    [Parameter]
+    public UserType UserTypeParameter
+    {
+        get => UserType;
+        set
+        {
+            UserType = value;
+            if (UserType.Description == "Student")
+            {
+                Student = new Student();
+            }
+        }
+    }
+}

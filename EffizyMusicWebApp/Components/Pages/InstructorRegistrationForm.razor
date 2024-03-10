@@ -1,0 +1,38 @@
+﻿@page "/instructorRegistrationForm"
+@using EffizyMusicSystem.Models
+
+@if (UserType != null && UserType.Description == "Instructor")
+{
+    <h4>Instructor Registration Form</h4>
+
+    <form>
+        <label>Location:</label>
+        <input type="text" @bind="Instructor.Location" />
+
+        <label>Highest Music Qualification:</label>
+        <input type="text" @bind="Instructor.HighestMusicQualification" />
+
+        <!-- Other instructor fields -->
+
+        <button type="submit">Register</button>
+    </form>
+}
+
+@code {
+    private Instructor Instructor { get; set; } = new Instructor();
+    private UserType UserType { get; set; }
+
+    [Parameter]
+    public UserType UserTypeParameter
+    {
+        get => UserType;
+        set
+        {
+            UserType = value;
+            if (UserType.Description == "Instructor")
+            {
+                Instructor = new Instructor();
+            }
+        }
+    }
+}

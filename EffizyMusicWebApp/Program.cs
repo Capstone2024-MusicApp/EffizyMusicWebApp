@@ -1,4 +1,5 @@
 using EffizyMusicSystem.DAL;
+using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,9 @@ var services = builder.Services;
 services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
+// Register UserService
+builder.Services.AddScoped<IUserService, UserService>();
+
 var app = builder.Build();
 
 
@@ -30,6 +34,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
