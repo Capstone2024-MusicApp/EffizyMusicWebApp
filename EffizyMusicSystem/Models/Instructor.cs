@@ -13,11 +13,15 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column(Order = 1)]
         public int InstructorID { get; set; }
-        public string Location {  get; set; }
+
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+        public string Location {  get; set; } = string.Empty;
         public string HighestMusicQualification { get; set; } = string.Empty;
         public int YearsOfExperience {  get; set; }
-        public string ReferenceEmail {  get; set; }
-        public string ReferencePhone { get; set; }
+        public string ReferenceEmail {  get; set; } = string.Empty;
+        public string ReferencePhone { get; set; } = string.Empty;
         public int UserID {  get; set; }
 
 
