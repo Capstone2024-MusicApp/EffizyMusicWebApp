@@ -1,0 +1,67 @@
+﻿@page "/feedback"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@rendermode InteractiveServer
+
+<div class="feedback-container">
+<h3>FeedbackPage</h3>
+    <table class="feedback-table">
+        @foreach (var feedback in feedbacks)
+        {
+            <tr>
+                <td>@feedback.UserID</td>
+            </tr>
+            <tr>
+                <td>@feedback.FeedbackDate</td>
+            </tr>
+            <tr>
+                <td>@feedback.Comments</td>
+            </tr>
+        }
+    </table>
+    <!--<form method="post" @onsubmit="Submit" @formname="feedback-form">
+        <AntiforgeryToken />
+        <div>
+            <InputTextArea class="feedback-input" @bind-Value="feedbackInput" placeholder="Enter feedback here."></InputTextArea>
+            <br />
+            <button class="btn btn-primary">Submit</button>
+        </div>
+    </form> -->
+  <table class="feedback-post">
+        <tr>
+            <td>
+                <InputTextArea class="feedback-input" @bind-Value="feedbackInput" placeholder="Enter feedback here."/>
+                <br />
+                <button class="btn btn-primary" @onclick="InsertFeedback">Submit</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                
+            </td>
+        </tr>
+    </table>
+</div>
+
+@code {
+    private List<Feedback> feedbacks;
+    private string? feedbackInput { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        feedbacks =  EffizyService.GetFeedback();
+    }
+
+    private  async Task InsertFeedback()
+    {
+        var feedback = new Feedback();
+        feedback.UserID = 123;
+        feedback.FeedbackDate = DateTime.Now;
+        feedback.Comments = feedbackInput;
+
+        await EffizyService.InsertFeedbackAsync(feedback);
+        feedbackInput = String.Empty;
+        feedbacks = EffizyService.GetFeedback();
+    }
+
+}

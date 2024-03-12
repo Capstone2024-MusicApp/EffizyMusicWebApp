@@ -12,18 +12,32 @@ namespace EffizyMusicSystem.Services
     public interface IEffizyMusicApplicationService
     {
         List<Lesson> GetLessons();
+
+
     }
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
     {
         private readonly EffizyMusicContext _context;
 
-        internal EffizyMusicApplicationService(EffizyMusicContext context)
+        public  EffizyMusicApplicationService(EffizyMusicContext context)
         {
             _context = context;
         }
         public List<Lesson> GetLessons()
         {
             return _context.Lessons.ToList();
+        }
+
+        public  List<Feedback> GetFeedback()
+        {
+            return _context.Feedbacks.ToList();
+        }
+
+        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
+        {
+            await _context.Feedbacks.AddAsync(feedback);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         //Add your methods here that directly connects to the dtabase
