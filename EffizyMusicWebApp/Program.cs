@@ -1,27 +1,26 @@
 using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MusicWebApi.Services;
-using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<EffizyMusicContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr") ?? throw new InvalidOperationException("Connection string 'ConnStr' not found.")));
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7106/") });
+builder.Services.AddScoped<EffizyMusicApplicationService>();
 
-builder.Services.AddHttpClient();
+// Add services to the container.
+var services = builder.Services;
 
-//builder.Services.AddTransient<ModuleManager>();
-//builder.Services.AddTransient<QuizManager>();
+// Add your DbContext configuration
+services.AddDbContext<EffizyMusicContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -32,7 +31,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.MapControllers();
+
 app.UseStaticFiles();
 app.UseAntiforgery();
 

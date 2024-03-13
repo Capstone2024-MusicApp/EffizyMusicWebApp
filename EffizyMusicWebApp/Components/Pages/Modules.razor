@@ -1,8 +1,9 @@
 ﻿@page "/modules"
 
 @using EffizyMusicSystem.DAL
-@using MusicWebApi.Models
-@inject HttpClient Http
+@using EffizyMusicSystem.Models
+@* @inject HttpClient Http *@
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 <h3>Modules</h3>
 
 <br />
@@ -45,15 +46,13 @@ else
     //protected string SearchString { get; set; } = string.Empty;
     protected override async Task OnInitializedAsync()
     {
-        await GetModules();
+        moduleList = await EffizyService.GetModules();
+        //await GetModules();
     }
 
-    protected async Task GetModules()
-    {
-        //var res1 = await Http.GetStringAsync("api/Modules");
-        //var baseuri = Http.BaseAddress.AbsoluteUri;
-        //ModuleManager moduleManager = new ModuleManager();
-        string apiUrl = "https://localhost:7164/api/Modules/";
-        moduleList = await Http.GetFromJsonAsync<List<Module>>(apiUrl);
-    }
+    // protected async Task GetModules()
+    // {
+    //     string apiUrl = "https://localhost:7164/api/Modules/";
+    //     moduleList = await Http.GetFromJsonAsync<List<Module>>(apiUrl);
+    // }
 }

@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MusicWebApi.Enums.MusicEnums;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EffizyMusicSystem.Enum;
 
-namespace MusicWebApi.Models
+namespace EffizyMusicSystem.Models
 {
     [NotMapped]
     public class QuestionChoiceViewModel
