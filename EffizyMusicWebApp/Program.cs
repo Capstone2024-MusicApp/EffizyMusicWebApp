@@ -1,4 +1,6 @@
+using EffizyMusicSystem.Controllers;
 using EffizyMusicSystem.DAL;
+using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +17,7 @@ var services = builder.Services;
 // Add your DbContext configuration
 services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
-
+services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
 var app = builder.Build();
 
 
