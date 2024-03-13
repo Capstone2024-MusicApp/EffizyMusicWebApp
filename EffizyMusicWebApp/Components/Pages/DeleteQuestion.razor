@@ -1,6 +1,6 @@
 ﻿@page "/question/delete/{questionId:int}"
-@using MusicWebApi.Models
-@inject HttpClient Http
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
 <h3>Delete Question</h3>
 <hr />
@@ -28,7 +28,7 @@
     </table>
 </div>
 <div class="form-group">
-    <input type="submit" value="Delete" class="btn btn-danger" />
+    <input type="submit" value="Confirm Delete" class="btn btn-danger" />
         <a class="btn btn-light" href="/questions/@model.QuizId">
             Cancel
         </a>
@@ -42,19 +42,16 @@
     List<QuestionChoice> questionChoices = new List<QuestionChoice>();
     protected override async Task OnInitializedAsync()
     {
-        string apiUrl = "https://localhost:7164/api/Questions/GetQuestion/" + questionId;
-        model = await Http.GetFromJsonAsync<Question>(apiUrl);
-
-        apiUrl = "https://localhost:7164/api/Questions/GetQuestionChoices/" + questionId;
-        questionChoices = await Http.GetFromJsonAsync<List<QuestionChoice>>(apiUrl);
+        model = EffizyService.GetQuestion(questionId);
+        questionChoices = EffizyService.GetQuestionChoices(questionId);
     }
+
     protected async Task RemoveQuestion()
     {
-        string apiUrl = "https://localhost:7164/api/Questions/" + questionId;
-        await Http.DeleteAsync(apiUrl);
-        //await Http.DeleteAsync("api/User/" + question_id);
+        EffizyService.DeleteQuestion(questionId);
         NavigationManager.NavigateTo("/questions/" + model.QuizId);
     }
+
     void Cancel()
     {
         NavigationManager.NavigateTo("/questions/" + model.QuizId);

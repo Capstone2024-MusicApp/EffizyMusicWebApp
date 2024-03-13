@@ -1,9 +1,9 @@
 ﻿@page "/quiz/add/{moduleId:int}"
 @*@page "/quiz/edit/{quizId:int}" *@
-@using MusicWebApi.Models
-@inject HttpClient Http
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
-<h3>@Title Quiz</h3>
+<h3>Add Quiz</h3>
 <hr />
  <EditForm Model="@quiz" OnValidSubmit="SaveQuiz" FormName="quiz">
     @* <AntiforgeryToken /> *@
@@ -34,31 +34,17 @@
     [Parameter]
     public int moduleId { get; set; }
 
-    //[Parameter]
-    //public int quizId { get; set; }
-
-    public string Title = "Add";
-
     [SupplyParameterFromForm]
     protected Quiz quiz { get; set; }
 
     protected override void OnInitialized() => quiz ??= new();
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     if (quizId != 0)
-    //     {
-    //         Title = "Edit";
-    //         quiz = await Http.GetFromJsonAsync<Quiz>("api/Quiz/GetQuizById/" + quizId);
-    //     }
-    // }
 
     protected async Task SaveQuiz()
     {
         if (!string.IsNullOrEmpty(quiz.QuizTitle) && !string.IsNullOrEmpty(quiz.Description))
         {
-            string apiUrl = "https://localhost:7164/api/Quiz/";
-            quiz.ModuleId = moduleId;
-            await Http.PostAsJsonAsync(apiUrl, quiz);
+            quiz.ModuleID = moduleId;
+            EffizyService.AddQuiz(quiz);
             Cancel();
         }
     }

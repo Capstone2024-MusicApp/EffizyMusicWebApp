@@ -1871,23 +1871,6 @@
         "runtime": {
           "bin/placeholder/EffizyMusicSystem.dll": {}
         }
-      },
-      "MusicWebApi/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.2",
-          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.2"
-        },
-        "compile": {
-          "bin/placeholder/MusicWebApi.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/MusicWebApi.dll": {}
-        },
-        "frameworkReferences": [
-          "Microsoft.AspNetCore.App"
-        ]
       }
     }
   },
@@ -4732,18 +4715,12 @@
       "type": "project",
       "path": "../EffizyMusicSystem/EffizyMusicSystem.csproj",
       "msbuildProject": "../EffizyMusicSystem/EffizyMusicSystem.csproj"
-    },
-    "MusicWebApi/1.0.0": {
-      "type": "project",
-      "path": "../MusicWebApi/MusicWebApi.csproj",
-      "msbuildProject": "../MusicWebApi/MusicWebApi.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
       "EffizyMusicSystem >= 1.0.0",
-      "Microsoft.EntityFrameworkCore.Design >= 8.0.2",
-      "MusicWebApi >= 1.0.0"
+      "Microsoft.EntityFrameworkCore.Design >= 8.0.2"
     ]
   },
   "packageFolders": {
@@ -4781,9 +4758,6 @@
           "projectReferences": {
             "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj": {
               "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\EffizyMusicSystem\\EffizyMusicSystem.csproj"
-            },
-            "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj": {
-              "projectPath": "D:\\Projects\\Fiever\\2024\\Feb\\EffizyMusicWebApp\\27-Feb Quiz App Blazor\\MusicWebApi\\MusicWebApi.csproj"
             }
           }
         }

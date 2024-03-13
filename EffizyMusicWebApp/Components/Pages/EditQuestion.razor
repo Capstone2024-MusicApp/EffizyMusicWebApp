@@ -1,7 +1,7 @@
 ﻿@page "/question/edit/{questionId:int}"
-@using MusicWebApi.Models
-@using static MusicWebApi.Enums.MusicEnums
-@inject HttpClient Http
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using EffizyMusicSystem.Enum
 @inject NavigationManager NavigationManager
 
 <h3>Edit Question</h3>
@@ -83,16 +83,13 @@
     [SupplyParameterFromForm]
     protected QuestionChoiceViewModel model { get; set; }
 
-    //QuestionChoiceViewModel model = new QuestionChoiceViewModel();
-
     protected override void OnInitialized() => model ??= new();
 
     protected override async Task OnParametersSetAsync()
     {
         if (model.QuestionId == 0 && model.QuizId == 0)
         {
-            string apiUrl = "https://localhost:7164/api/Questions/GetQuestionWithChoices/" + questionId;
-            model = await Http.GetFromJsonAsync<QuestionChoiceViewModel>(apiUrl);
+            model = EffizyService.GetQuestionWithChoices(questionId);
         }
     }
 
@@ -100,10 +97,9 @@
     {
         if (!string.IsNullOrEmpty(model.QuestionText))
         {
-            string apiUrl = "https://localhost:7164/api/Questions";
-            //question.QuizId = quizId;
-            await Http.PutAsJsonAsync(apiUrl, model);
-            //var ques = await Http.GetFromJsonAsync<Question>(result);
+            EffizyService.UpdateQuestion(model);
+            //string apiUrl = "https://localhost:7164/api/Questions";
+            //await Http.PutAsJsonAsync(apiUrl, model);
             Cancel();
         }
     }

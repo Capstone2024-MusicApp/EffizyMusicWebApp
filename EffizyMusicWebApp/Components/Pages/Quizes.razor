@@ -1,6 +1,6 @@
 ﻿@page "/quizes/{moduleId:int}"
-@using MusicWebApi.Models
-@inject HttpClient Http
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 <h3>Quizes</h3>
 <div class="col-md-6">
     <a href='/quiz/add/@moduleId' class="btn btn-primary" role="button">
@@ -42,6 +42,9 @@ else
                         <a href='/quiz/edit/@quiz.Id' class="btn btn-success" role="button">
                             Edit
                         </a>
+                        <a href='/quiz/delete/@quiz.Id' class="btn btn-warning" role="button">
+                            Delete
+                        </a>
                         <a href='/questions/@quiz.Id' class="btn btn-dark" role="button">
                             Questions
                         </a>
@@ -55,13 +58,7 @@ else
     protected List<Quiz> moduleQuizList = new();
     protected override async Task OnInitializedAsync()
     {
-        await GetModuleQuizes();
-    }
-
-    protected async Task GetModuleQuizes()
-    {
-        string apiUrl = "https://localhost:7164/api/Quiz/GetQuiz/" + moduleId;
-        moduleQuizList = await Http.GetFromJsonAsync<List<Quiz>>(apiUrl);
+        moduleQuizList = EffizyService.GetQuizes(moduleId);
     }
 }
 @code {

@@ -1,7 +1,7 @@
 ﻿@page "/question/add/{quizId:int}"
-@using MusicWebApi.Models
-@using static MusicWebApi.Enums.MusicEnums
-@inject HttpClient Http
+@using EffizyMusicSystem.Enum
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
 <h3>Add Question</h3>
 <hr />
@@ -71,7 +71,7 @@
 @code {
     [Parameter]
     public int quizId { get; set; }
-    
+
     [SupplyParameterFromForm]
     protected QuestionChoiceViewModel question { get; set; }
 
@@ -81,10 +81,9 @@
     {
         if (!string.IsNullOrEmpty(question.QuestionText))
         {
-            string apiUrl = "https://localhost:7164/api/Questions/PostQuestion";
+            //string apiUrl = "https://localhost:7164/api/Questions/PostQuestion";
             question.QuizId = quizId;
-            await Http.PostAsJsonAsync(apiUrl, question);
-            //var ques = await Http.GetFromJsonAsync<Question>(result);
+            EffizyService.AddQuestionWithChoices(question);
             Cancel();
         }
     }
