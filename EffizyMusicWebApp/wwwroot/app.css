@@ -47,5 +47,29 @@ h1:focus {
     }
 
 .darker-border-checkbox.form-check-input {
-    border-color: #929292;
+    border-color: #929295;
+}
+
+
+.student-course-list{
+    margin:0px;
+    border: 3px solid gray;
+
+}
+
+.student-course-list th{
+    padding: 10px 10px 10px 20px;
+    font-size: 15px;
+    border-bottom: 2px solid black;
+    background-color: #043d78;
+    color: white;
+}
+
+    .student-course-list tr:nth-child(odd) {
+        background-color: #eeeeee;
+    }
+
+.student-course-list td{
+    padding: 8px 20px 8px 20px;
+    
 }

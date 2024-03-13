@@ -1,11 +1,6 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace EffizyMusicSystem.Services
 {
@@ -17,13 +12,18 @@ namespace EffizyMusicSystem.Services
     {
         private readonly EffizyMusicContext _context;
 
-        internal EffizyMusicApplicationService(EffizyMusicContext context)
+        public EffizyMusicApplicationService(EffizyMusicContext context)
         {
             _context = context;
         }
-        public List<Lesson> GetLessons()
+        public  List<Lesson> GetLessons()
         {
             return _context.Lessons.ToList();
+        }
+
+        public async Task<List<Course>> GetCoursesAsync()
+        {
+            return await _context.Courses.ToListAsync();
         }
 
         //Add your methods here that directly connects to the dtabase

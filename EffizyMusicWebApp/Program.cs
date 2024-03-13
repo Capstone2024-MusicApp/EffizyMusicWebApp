@@ -2,6 +2,7 @@ using EffizyMusicSystem.DAL;
 using EffizyMusicWebApp.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using EffizyMusicSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<EffizyMusicApplicationService>();
 // Add services to the container.
 var services = builder.Services;
 

@@ -1,0 +1,12 @@
+﻿@page "/StudentCourse/AccessCourse/{CourseID:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@rendermode InteractiveServer
+
+<h3>AccessCourse</h3>
+
+@CourseID
+@code {
+    [Parameter]
+    public int CourseID { get; set; }
+}

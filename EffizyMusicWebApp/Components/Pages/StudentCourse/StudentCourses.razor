@@ -1,0 +1,81 @@
+﻿@page "/StudentCourse/StudentCourses"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+<h2>Courses</h2>
+<br />
+@if (courses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main-student-course">
+        <h3>Your Enrolled Courses</h3>
+        <br />
+        <table class="student-course-list">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Course Mode</th>
+                    <th>Access</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @foreach (var course in courses)
+                    {
+                    <tr>
+                        <td>@course.Title</td>
+                        <td>@course.CourseDescription</td>
+                        <td>@course.CourseMode</td>
+                        <td><a href="\StudentCourse\AccessCourse\@course.CourseID">Access Course</a></td>
+                    </tr>
+                    }
+                </tr>
+            </tbody>
+        </table>
+
+        <br />
+        <br />
+        <br />
+        <h3>Available Courses</h3>
+        <br />
+        <table class="student-course-list">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Course Mode</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @foreach (var course in courses)
+                    {
+                    <tr>
+                        <td>@course.Title</td>
+                        <td>@course.CourseDescription</td>
+                        <td>@course.CourseMode</td>
+                        <td><a href="">View Course</a></td>
+                    </tr>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Course> courses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        courses = await EffizyService.GetCoursesAsync();
+    }
+
+    
+
+}
