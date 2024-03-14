@@ -1,0 +1,62 @@
+﻿<style>
+    /* Styles.css */
+    .rating {
+        display: inline-block;
+        font-size: 24px;
+    }
+
+    .star {
+        cursor: pointer;
+        color: gray;
+        transition: color 0.3s; 
+    }
+
+        .star:hover {
+            color: gold; 
+        }
+
+    .selected {
+        color: gold;
+    }
+
+</style>
+<!-- RatingComponent.razor -->
+<div class="rating">
+    @for (int i = 0; i < 5; i++)
+    {
+        <span class="star @(i < CurrentRating ? "selected" : "") @(i <= hoveredRating ? "hovered" : "")"
+              @onclick="()=>SetRating(i + 1)"
+              @onmouseover="()=>SetHoveredRating(i)"
+              @onmouseleave="()=>ClearHoveredRating()">
+            &#9733;
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public double CurrentRating { get; set; }
+
+    [Parameter]
+    public EventCallback<int> RatingChanged { get; set; }
+
+    private int hoveredRating = 0;
+
+    private async Task SetRating(int rating)
+    {
+        CurrentRating = rating;
+        hoveredRating = rating;
+        await RatingChanged.InvokeAsync(rating);
+    }
+
+    private void SetHoveredRating(int rating)
+    {
+        hoveredRating = rating;
+    }
+
+    private void ClearHoveredRating()
+    {
+        hoveredRating = CurrentRating;
+    }
+}
+
