@@ -1,7 +1,6 @@
-using EffizyMusicSystem.AuthProviders;
 using EffizyMusicSystem.DAL;
+using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -11,10 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddAuthorizationCore();
-
-builder.Services.AddScoped<AuthenticationStateProvider, TestAuthStateProvider>();
-
+builder.Services.AddScoped<EffizyMusicApplicationService>();
 
 // Add services to the container.
 var services = builder.Services;
