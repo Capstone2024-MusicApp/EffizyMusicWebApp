@@ -12,4 +12,12 @@ namespace EffizyMusicSystem.Enum
         Guitar = 2,
         Voilin = 3
     }
+
+    public enum Choices
+    {
+        A,
+        B,
+        C,
+        D
+    }
 }
