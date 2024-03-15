@@ -31,14 +31,7 @@ namespace EffizyMusicSystem.DAL
 
         public DbSet<Quiz> Quizes { get; set; }
 
-        public DbSet<Question> Questions { get; set; }
 
-        public DbSet<QuestionChoice> QuestionChoices { get; set; }
-
-        public DbSet<Answer> Answers { get; set; }
-
-        public DbSet<Enrollment> Enrollments { get; set; }
-    }
 
         public DbSet<Question> Questions { get; set; }
 
@@ -98,3 +91,4 @@ namespace EffizyMusicSystem.DAL
             });
         }
     }
+}
