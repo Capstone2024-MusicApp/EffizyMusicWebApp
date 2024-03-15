@@ -65,8 +65,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         model = EffizyService.GetPayments();
-        //string apiUrl = "https://localhost:7164/api/Payments/GetPayments/";
-        //model = await Http.GetFromJsonAsync<List<Payment>>(apiUrl);
+        
     }
 }
 @code {
