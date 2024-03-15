@@ -1,0 +1,88 @@
+﻿@page "/editcourse/{CourseID}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+
+<h3>Edit Course</h3>
+
+@if (Course != null)
+{
+    <EditForm Model="@Course" OnValidSubmit="UpdateCourse">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Title</label>
+            <InputText @bind-Value="Course.Title" class="form-control" />
+            <ValidationMessage For="@(() => Course.Title)" />
+        </div>
+
+        <div class="form-group">
+            <label>Course Code</label>
+            <InputText @bind-Value="Course.CourseCode" class="form-control" />
+            <ValidationMessage For="@(() => Course.CourseCode)" />
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <InputTextArea @bind-Value="Course.CourseDescription" class="form-control" />
+            <ValidationMessage For="@(() => Course.CourseDescription)" />
+        </div>
+
+        <div class="form-group">
+            <label>Instrument ID</label>
+            <InputNumber @bind-Value="Course.InstrumentID" class="form-control" />
+            <ValidationMessage For="@(() => Course.InstrumentID)" />
+        </div>
+
+        <div class="form-group">
+            <label>Instructor ID</label>
+            <InputNumber @bind-Value="Course.InstructorID" class="form-control" />
+            <ValidationMessage For="@(() => Course.InstructorID)" />
+        </div>
+
+        <div class="form-group">
+            <label>Skill Level</label>
+            <InputText @bind-Value="Course.SkillLevel" class="form-control" />
+            <ValidationMessage For="@(() => Course.SkillLevel)" />
+        </div>
+
+        <div class="form-group">
+            <label>Estimated Time</label>
+            <InputText @bind-Value="Course.EstimatedTime" class="form-control" />
+            <ValidationMessage For="@(() => Course.EstimatedTime)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int CourseID { get; set; }
+
+    private Course Course;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Course = await CourseService.GetCourseByIdAsync(CourseID);
+    }
+
+    private async Task UpdateCourse()
+    {
+        await CourseService.UpdateCourseAsync(Course);
+        NavigationManager.NavigateTo("/courses");
+    }
+
+    private void CancelEdit()
+    {
+        NavigationManager.NavigateTo("/courses");
+    }
+}

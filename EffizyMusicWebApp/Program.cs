@@ -24,6 +24,9 @@ services.AddDbContext<EffizyMusicContext>(options =>
 // Register UserService
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Register ICourseService
+builder.Services.AddScoped<ICourseService, CourseService>();
+
 // Register UserTypeService
 builder.Services.AddScoped<UserTypeService>();
 
