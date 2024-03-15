@@ -27,16 +27,14 @@ namespace EffizyMusicSystem.Services
             return _context.Lessons.ToList();
         }
 
-        //public List<Payment> GetPayments()
-        //{
-        //    return _context.Payments.ToList();
-        //}
-        readonly EffizyMusicContext _dbContext;
-        public List<Payment> GetPayments()
+        //Add your methods here that directly connects to the dtabase
+
+        public void AddCourse(Course entity)
         {
             try
             {
-                return _dbContext.Payments.ToList();
+                _context.Courses.Add(entity);
+                _context.SaveChanges();
             }
             catch
             {
@@ -44,6 +42,40 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        //Add your methods here that directly connects to the dtabase
+        public List<Instrument> GetInstruments()
+        {
+            try
+            {
+                return _context.Instruments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public List<Instructor> GetInstructors()
+        {
+            try
+            {
+                return _context.Instructors.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public List<Payment> GetPayments()
+        {
+            try
+            {
+                return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }
