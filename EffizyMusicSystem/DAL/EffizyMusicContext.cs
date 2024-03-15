@@ -1,4 +1,5 @@
 ﻿using EffizyMusicSystem.Models;
+using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,7 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Answer> Answers { get; set; }
 
         public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,6 +91,9 @@ namespace EffizyMusicSystem.DAL
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Answer_Question");
             });
+
+
+            modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);
         }
     }
 }
