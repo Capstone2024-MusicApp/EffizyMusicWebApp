@@ -261,10 +261,10 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         <h3>Student Registration Payment</h3>
         <p>Please make a payment of $XX for student registration.</p>
         <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
-        <button type="button" @onclick="MakePayment" class="btn btn-primary">Make Payment</button>
+        <button type="button" @onclick="RegisterStudent" class="btn btn-primary">Make Payment</button>
     </div>
 }
-else if (user.UserTypeID == 12 && CurrentStep == 4 && paymentSuccessful == true)
+else if (user.UserTypeID == 12 && CurrentStep == 4) //&& paymentSuccessful == true)
 {
     <div class="container mt-4 mb-4">
         <h3>Payment Confirmation</h3>

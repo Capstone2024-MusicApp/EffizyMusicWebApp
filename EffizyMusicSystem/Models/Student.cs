@@ -13,7 +13,6 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column(Order = 1)]
         public int StudentID { get; set; }
-        public int InstructorID { get; set; }
         // [Required (ErrorMessage = "First Name is required")]
         public string? FirstName { get; set; }
 
