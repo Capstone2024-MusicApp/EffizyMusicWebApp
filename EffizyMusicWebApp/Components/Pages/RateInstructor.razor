@@ -1,0 +1,116 @@
+﻿@page "/RateInstructor/"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@rendermode InteractiveServer
+<PageTitle>Rate Instructor</PageTitle>
+<h2 class="display-3 text-center">Rate Instructor</h2>
+
+ @if (InstructorList == null)
+{
+    <p class="text-center"><em>Loading...</em></p>
+} 
+
+<EditForm FormName="Submit-Rating" method="post" Model="@RatingData" OnValidSubmit="SaveRating" class="form mt-4">    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+    <div class="form-outline mt-2">
+        <label for="instructor" class="form-label">Instructor:</label>
+        <InputSelect class="form-control" @bind-Value="RatingData.InstructorID" required>
+            <option value="">[Please Choose the Instructor...]</option>
+            @foreach (var inst in InstructorList)
+            {
+                <option value="@inst.InstructorID">@inst.FirstName @inst.LastName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => RatingData.InstructorID)" class="row" />
+    </div>
+  @*   <div class="form-outline mt-2">
+        <label>Rate this:</label>
+        <div class="rating">
+            <InputRadioGroup @bind-Value="RatingData.Rating" class="form-control">
+                        <InputRadio Value="1" /> <label for="star5" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
+                        <InputRadio Value="2" /> <label for="star4" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
+                        <InputRadio Value="3" /> <label for="star3" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
+                        <InputRadio Value="4" /> <label for="star2" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
+                        <InputRadio Value="5" /> <label for="star1" class="form-label"><i class="fa fa-info-circle fa-2x" aria-hidden="true"></i></label>
+            </InputRadioGroup>
+        </div>
+    </div> *@
+
+            <div class="form-outline mt-2">
+                <label>Rate the Instructor:</label>
+                <RatingComponent CurrentRating="@RatingData.Rating" RatingChanged="@HandleRatingChange" />                
+            </div>
+   
+    <div class="form-outline mt-2">
+                <label for="Feedback" class="form-label">Feedback:</label>
+        <InputTextArea @bind-Value="RatingData.Feedback" class="form-control" id="Feedback" style="min-height: 150px"  />
+    </div>    
+    <button type="submit" class="btn btn-primary mt-4">Submit Feedback</button>
+
+    @* <input type="submit" class="btn btn-primary m-2" id="submit" value="Submit FeedBack"> *@
+    <div class="mt-2">
+        @if (IsRatingAdded || IsError)
+        {
+            <p class="text-primary h4">@Message</p> //TO DO: Confirm
+        }
+    </div>
+    </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = "";
+    [Parameter]
+    public bool IsRatingAdded { get; set; }
+    [Parameter]
+    public bool IsError { get; set; } = false;
+
+    int currentRating = 0;
+    [SupplyParameterFromForm]
+    public InstructorRating RatingData { get; set; } = new();
+
+    public List<Instructor> InstructorList = new();
+
+
+    protected override void OnInitialized()
+    {
+        // InstructorList = EffizyService.GetInstructors();
+    }
+
+    private void HandleRatingChange(int newRating)
+    {
+        currentRating = newRating;
+    }
+
+    private async Task SaveRating()
+    {
+        try
+        {
+            var tt = RatingData.InstructorID;
+            IsRatingAdded = await EffizyService.AddRating(RatingData);
+            if (IsRatingAdded)
+            {
+                Message = "Your Rating has been added";
+                ResetForm();
+            }
+            else
+            {
+                IsError = true;
+                Message = "Error in Adding Rating";
+            }
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+        }
+    }
+    private void ResetForm()
+    {
+        RatingData = new();
+        InstructorList = new();
+    }
+}

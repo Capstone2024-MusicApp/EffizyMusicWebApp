@@ -1,3 +1,4 @@
+using EffizyMusicSystem.Controllers;
 using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
@@ -11,8 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-
-builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddBlazorBootstrap();
 
 
