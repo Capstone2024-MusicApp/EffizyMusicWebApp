@@ -1,0 +1,60 @@
+﻿@page "/questions/{quizId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+<h3>Quizes</h3>
+<div class="col-md-6">
+    <a href='/question/add/@quizId' class="btn btn-primary" role="button">
+        <i class="fas fa-user-plus"></i>
+        Add Question
+    </a>
+</div>
+<br />
+@if (questionsList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Question Text</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (questionsList == null || questionsList.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">No record found.</td>
+                </tr>
+            }
+
+            @foreach (var entity in questionsList)
+            {
+                <tr>
+                    <td>@entity.QuestionText</td>
+                    <td>
+                        <a href='/question/edit/@entity.Id' class="btn btn-success" role="button">
+                            Edit
+                        </a>
+                        <a href='/question/delete/@entity.Id' class="btn btn-dark" role="button">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    protected List<Question> questionsList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        questionsList = EffizyService.GetQuizQuestions(quizId);
+    }
+}
+@code {
+    [Parameter]
+    public int quizId { get; set; }
+}

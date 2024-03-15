@@ -1,6 +1,68 @@
-﻿@page "/quizes"
+﻿@page "/quizes/{moduleId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 <h3>Quizes</h3>
+<div class="col-md-6">
+    <a href='/quiz/add/@moduleId' class="btn btn-primary" role="button">
+        <i class="fas fa-user-plus"></i>
+        Add Quiz
+    </a>
+</div>
+<br />
+@if (moduleQuizList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                @* <th>ID</th> *@
+                <th>Quiz Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (moduleQuizList == null || moduleQuizList.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">No record found.</td>
+                </tr>
+            }
 
+            @foreach (var quiz in moduleQuizList)
+            {
+                <tr>
+                    @* <td>@quiz.Id</td> *@
+                    <td>@quiz.QuizTitle</td>
+                    <td>@quiz.Description</td>
+                    <td>
+                        <a href='/quiz/edit/@quiz.Id' class="btn btn-success" role="button">
+                            Edit
+                        </a>
+                        <a href='/quiz/delete/@quiz.Id' class="btn btn-warning" role="button">
+                            Delete
+                        </a>
+                        <a href='/questions/@quiz.Id' class="btn btn-dark" role="button">
+                            Questions
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 @code {
+    protected List<Quiz> moduleQuizList = new();
+    protected override async Task OnInitializedAsync()
+    {
+        moduleQuizList = EffizyService.GetQuizes(moduleId);
+    }
+}
+@code {
+    [Parameter]
+    public int moduleId { get; set; }
 
 }

@@ -1,0 +1,63 @@
+﻿@page "/quiz/edit/{quizId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+<h3>Edit Quiz</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="UpdateQuiz" FormName="editquiz">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label">Quiz Title</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.QuizTitle" />
+        </div>
+        <ValidationMessage For="@(() => model.QuizTitle)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.Description"></InputText>
+        </div>
+        <ValidationMessage For="@(() => model.Description)" />
+    </div>
+    <input type="hidden" @bind-value="model.Id" name="model.Id" />
+    <input type="hidden" @bind-value="model.ModuleID" name="model.ModuleID" />
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn btn-light" href="/quizes/@model.ModuleID">
+            Cancel
+        </a> 
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int quizId { get; set; }
+
+    [SupplyParameterFromForm]
+    protected Quiz model { get; set; }
+
+    protected override void OnInitialized() => model ??= new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (model.Id == 0 && model.ModuleID == 0)
+        {
+            model = EffizyService.GetQuiz(quizId);
+        }
+    }
+
+    protected async Task UpdateQuiz()
+    {
+        if (!string.IsNullOrEmpty(model.QuizTitle) && !string.IsNullOrEmpty(model.Description))
+        {
+            EffizyService.UpdateQuiz(model);
+            Cancel();
+        }
+    }
+
+     public void Cancel()
+     {
+        NavigationManager.NavigateTo("/quizes/" + model.ModuleID);
+     }
+}
