@@ -1,7 +1,6 @@
 ﻿@page "/paymenthistory/"
 @using EffizyMusicSystem.Models
-@* @inject HttpClient Http *@
-@* @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService *@
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 <h3>Payment History</h3>
 @if (model == null)
 {
@@ -12,7 +11,7 @@ else
     <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
-                <th>PaymentID</th>
+                <th>Payment ID</th>
                 <th>Payment Method</th>
                 <th>Date</th>
                 <th>Amount</th>
@@ -28,7 +27,7 @@ else
                 </tr>
             }
 
-            @if(model != null)
+            @if (model != null)
             {
                 foreach (var entity in model)
                 {
@@ -57,12 +56,16 @@ else
                     </tr>
                 }
             }
-            
+
         </tbody>
     </table>
 }
-
 @code {
     protected List<Payment> model = new();
-
+    protected override async Task OnInitializedAsync()
+    {
+        model = EffizyService.GetPayments();
+        
+    }
 }
+
