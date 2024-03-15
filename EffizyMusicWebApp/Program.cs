@@ -20,6 +20,14 @@ services.AddDbContext<EffizyMusicContext>(options =>
 // Register UserService
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Register UserTypeService
+builder.Services.AddScoped<UserTypeService>();
+
+// Register UserInstrumentService
+builder.Services.AddScoped<InstrumentService>();
+// Register EffizyMusicApplicationService
+builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
+
 var app = builder.Build();
 
 

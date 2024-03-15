@@ -26,18 +26,63 @@ namespace EffizyMusicSystem.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+ 
                 return false;
             }
         }
 
+        public async Task<bool> CreateStudentAsync(Student student)
+        {
+            try
+            {
+                _context.Students.Add(student);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+ 
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateInstructorAsync(Instructor instructor)
+        {
+            try
+            {
+                _context.Instructors.Add(instructor);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+ 
+                return false;
+            }
+        }
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users
-                .Include(x => x.UserType)
+                .Include(x => x.UType)
                 .FirstOrDefaultAsync(x => x.UserID == userId);
         }
+
+        public async Task AddPaymentAsync(int userId, decimal amount)
+        {
+            var payment = new Payment
+            {
+                UserID = userId,
+                Amount = (double)amount,
+                PaymentDate = DateTime.UtcNow // or any date/time you prefer
+            };
+
+            await _context.Payments.AddAsync(payment);
+            await _context.SaveChangesAsync();
+        }
+
     }
+
 
 }

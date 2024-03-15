@@ -4,6 +4,7 @@ using EffizyMusicSystem.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EffizyMusicSystem.Migrations
 {
     [DbContext(typeof(EffizyMusicContext))]
-    partial class EffizyMusicContextModelSnapshot : ModelSnapshot
+    [Migration("20240311163913_MyDBMigration")]
+    partial class MyDBMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,12 +342,7 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserID")
-                        .HasColumnType("int");
-
                     b.HasKey("UserTypeID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("UserTypes");
                 });
@@ -440,20 +438,13 @@ namespace EffizyMusicSystem.Migrations
 
             modelBuilder.Entity("EffizyMusicSystem.Models.User", b =>
                 {
-                    b.HasOne("EffizyMusicSystem.Models.UserType", "UType")
+                    b.HasOne("EffizyMusicSystem.Models.UserType", "UserType")
                         .WithMany()
                         .HasForeignKey("UserTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UType");
-                });
-
-            modelBuilder.Entity("EffizyMusicSystem.Models.UserType", b =>
-                {
-                    b.HasOne("EffizyMusicSystem.Models.User", null)
-                        .WithMany("UserType")
-                        .HasForeignKey("UserID");
+                    b.Navigation("UserType");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Course", b =>
@@ -464,11 +455,6 @@ namespace EffizyMusicSystem.Migrations
             modelBuilder.Entity("EffizyMusicSystem.Models.Module", b =>
                 {
                     b.Navigation("Lessons");
-                });
-
-            modelBuilder.Entity("EffizyMusicSystem.Models.User", b =>
-                {
-                    b.Navigation("UserType");
                 });
 #pragma warning restore 612, 618
         }
