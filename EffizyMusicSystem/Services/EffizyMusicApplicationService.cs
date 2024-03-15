@@ -18,7 +18,7 @@ namespace EffizyMusicSystem.Services
     {
         private readonly EffizyMusicContext _context;
 
-        public EffizyMusicApplicationService(EffizyMusicContext context)
+        internal EffizyMusicApplicationService(EffizyMusicContext context)
         {
             _context = context;
         }
