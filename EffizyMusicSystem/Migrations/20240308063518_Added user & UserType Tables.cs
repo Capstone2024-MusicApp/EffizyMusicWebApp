@@ -5,18 +5,23 @@
 namespace EffizyMusicSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class userMigration : Migration
+    public partial class AddeduserUserTypeTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "UserTypes",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+            migrationBuilder.CreateTable(
+                name: "UserTypes",
+                columns: table => new
+                {
+                    UserTypeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTypes", x => x.UserTypeID);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Users",
@@ -36,7 +41,18 @@ namespace EffizyMusicSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserID);
+                    table.ForeignKey(
+                        name: "FK_Users_UserTypes_UserTypeID",
+                        column: x => x.UserTypeID,
+                        principalTable: "UserTypes",
+                        principalColumn: "UserTypeID",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserTypeID",
+                table: "Users",
+                column: "UserTypeID");
         }
 
         /// <inheritdoc />
@@ -45,15 +61,8 @@ namespace EffizyMusicSystem.Migrations
             migrationBuilder.DropTable(
                 name: "Users");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "UserTypes",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+            migrationBuilder.DropTable(
+                name: "UserTypes");
         }
     }
 }

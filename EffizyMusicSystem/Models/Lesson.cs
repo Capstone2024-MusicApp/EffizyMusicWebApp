@@ -15,12 +15,7 @@ namespace EffizyMusicSystem.Models
         public int LessonNumber { get; set; }
         public string Title { get; set; } = string.Empty;
         public string LessonMode { get; set; } = string.Empty;
-        public byte[] LessonContent { get; set; } = new byte[0];
-
-        [ForeignKey("ModuleID")]
-        public string ModuleID { get; set; }
-
-        
-        public Module Module { get; set; }
+        public byte[] LessonContent { get; set; } = new byte[0];        
+        public virtual Module Module { get; set; }
     }
 }

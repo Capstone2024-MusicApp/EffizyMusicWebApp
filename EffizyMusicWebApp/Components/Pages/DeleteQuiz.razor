@@ -1,0 +1,60 @@
+﻿@page "/quiz/delete/{quizId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+<h3>Delete Quiz</h3>
+<h5 style="color:red">Do you want to delete this Quiz? It will delete related Questions, choices and answer!</h5>
+<hr />
+<hr />
+<EditForm Model="@model" OnValidSubmit="RemoveQuiz" FormName="delquiz">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label"><b>Quiz Title</b></label>
+        <div class="col-md-4">
+            <label>@model.QuizTitle</label> 
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label"><b>Description</b></label>
+        <div class="col-md-4">
+            <label>@model.Description</label>
+        </div>
+    </div>
+    <input type="hidden" @bind-value="model.Id" name="model.Id" />
+    <input type="hidden" @bind-value="model.ModuleID" name="model.ModuleID" />
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a class="btn btn-light" href="/quizes/@model.ModuleID">
+            Cancel
+        </a> 
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int quizId { get; set; }
+
+    [SupplyParameterFromForm]
+    protected Quiz model { get; set; }
+
+    protected override void OnInitialized() => model ??= new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (model.Id == 0 && model.ModuleID == 0)
+        {
+            model = EffizyService.GetQuiz(quizId);
+        }
+    }
+
+    protected async Task RemoveQuiz()
+    {
+        EffizyService.DeleteQuiz(quizId);
+        Cancel();
+    }
+
+     public void Cancel()
+     {
+        NavigationManager.NavigateTo("/quizes/" + model.ModuleID);
+     }
+}
