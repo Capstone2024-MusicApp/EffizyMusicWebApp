@@ -1,12 +1,74 @@
-﻿@page "/StudentCourse/AccessCourse/{CourseID:int}"
+﻿@page "/StudentCourse/AccessCourse/{EnrollmentID:int}"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @rendermode InteractiveServer
 
-<h3>AccessCourse</h3>
 
-@CourseID
+<br />
+<br />
+<div class="access-course-main">
+    <label class="course-title">@studentCourse.Title</label>
+    <br /> 
+    <br />
+    <br />
+    <br />
+    <div class="lesson-frame">
+        <label class="video-lesson-title">@lesson.Title</label>
+        <br />
+        <!--<img src="/img/drums.png" width="600" height="400"/>-->
+        <video controls="controls" width="750px" height="550px"></video>
+        <br />
+        <br />
+
+        <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
+    </div>
+    <div class="module-list">
+        <Accordion AlwaysOpen="true">
+            @foreach (var module in studentCourse.Modules)
+            {
+                <AccordionItem>
+                    <TitleTemplate>
+                        <Icon Name="IconName.MusicNote" Class="me-1" />
+                        @module.Title
+                    </TitleTemplate>
+                    <Content>
+                        <table>
+                            @foreach(var lesson in module.Lessons)
+                            {
+                                <tr>
+                                    <td class="lesson-title" ><Button Class="accordion-item">Lesson - @lesson.Title </Button></td>
+                                 </tr>
+                            }
+                            @foreach (var quiz in module.Quizzes)
+                            {
+                                <tr>
+                                    <td class="lesson-title"><Button Class="accordion-item btn-info"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
+                                    </tr>
+                            }
+                        </table>
+                    </Content>
+                </AccordionItem>
+            }
+            
+        </Accordion>
+
+    </div>
+
+</div>
+
 @code {
     [Parameter]
-    public int CourseID { get; set; }
+    public int EnrollmentID { get; set; }
+
+    public StudentCourseDTO? studentCourse;
+
+    public Lesson? lesson;
+
+    protected override async Task OnInitializedAsync()
+    {
+        studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
+        lesson = studentCourse.Modules.First().Lessons.First();
+    }
 }

@@ -1,5 +1,6 @@
 ﻿@page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 
 <h2>Courses</h2>
@@ -25,6 +26,7 @@ else
                         <th>Title</th>
                         <th>Description</th>
                         <th>Course Mode</th>
+                        <th>Progress</th>
                         <th>Access</th>
                     </tr>
                 </thead>
@@ -36,7 +38,8 @@ else
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
                             <td>@course.CourseMode</td>
-                            <td><a href="\StudentCourse\AccessCourse\@course.CourseID">Access Course</a></td>
+                            <td>@course.ProgressStatus</td>
+                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
                         }
                     </tr>
@@ -76,13 +79,14 @@ else
 }
 
 @code {
-    private List<Course> availablecourses;
-    private List<Course> enrolledCourses;
+    private List<Course>? availablecourses;
+    private List<StudentCourseDTO>? enrolledCourses;
+
 
     protected override async Task OnInitializedAsync()
     {
-        availablecourses = await EffizyService.GetCoursesAsync();
-        enrolledCourses = await EffizyService.GetEnrolledCoursesAsync(1);
+        availablecourses = await EffizyService.GetCourses();
+        enrolledCourses = await EffizyService.GetEnrolledCourses(1);
     }
 
     

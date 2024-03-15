@@ -13,6 +13,7 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddScoped<EffizyMusicApplicationService>();
+builder.Services.AddBlazorBootstrap();
 
 
 // Add services to the container.

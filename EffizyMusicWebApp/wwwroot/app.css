@@ -73,3 +73,57 @@ h1:focus {
     padding: 8px 20px 8px 20px;
     
 }
+
+.access-course-main{
+    display: block;
+    width: 100%;
+}
+.course-title {
+    text-align: center;
+    display: block;
+    font-weight: bold;
+    font-size: 50px;
+    color: #1f1e8b;
+}
+
+.lesson-frame {
+    width: 900px;
+    display: block;
+    margin-left: 100px;
+    vertical-align: middle;
+    float: left;
+}
+
+.module-list {
+    display: block;
+    margin-left: 200px;
+    text-align: left;
+    vertical-align: middle;
+    float:inline-start;
+    border-radius: 10px;
+    width: 600px;
+    height: 600px;
+}
+.module-title {
+    padding: 10px 20px 10px 20px;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.module-table{
+    margin-left: 10px;
+    margin-right: 30px;
+    margin-top: 15px;
+}
+
+.lesson-title {
+    padding: 10px 20px 0px 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.video-lesson-title{
+    font-weight: 600;
+    font-size: 30px;
+
+}

@@ -1,5 +1,6 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
+using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -29,7 +30,7 @@ namespace EffizyMusicSystem.Services
             return _context.Lessons.ToList();
         }
 
-        public async Task<List<Course>> GetCoursesAsync()
+        public async Task<List<Course>> GetCourses()
         {
             return await _context.Courses.ToListAsync();
         }
@@ -46,10 +47,7 @@ namespace EffizyMusicSystem.Services
             return true;
         }
 
-        public async Task<List<Course>> GetEnrolledCoursesAsync(int studentID)
-        {
-            return await _context.Courses.FromSql($"select * from courses where CourseId in (select distinct CourseId from enrollments where StudentID = {studentID});").ToListAsync();
-        }
+
         //Add your methods here that directly connects to the dtabase
 
         #region Modules
@@ -425,6 +423,26 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        #endregion
+
+        #region Student Courses
+        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
+        {
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+        }
+
+        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
+        {
+            StudentCourseDTO studentCourse;
+
+            //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
+            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+
+            studentCourse.Modules = _context.Modules.Include(l=>l.Lessons).Include(q=>q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            return studentCourse;
+            // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
+
+        }
         #endregion
     }
 }
