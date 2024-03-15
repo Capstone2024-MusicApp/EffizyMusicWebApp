@@ -1,10 +1,10 @@
-﻿@page "/payments/"
+﻿@page "/paymenthistory/"
 @using EffizyMusicSystem.Models
-@inject HttpClient Http
-@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@* @inject HttpClient Http *@
+@* @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService *@
 <h3>Payment History</h3>
 @if (model == null)
-{0
+{
     <p><em>Loading...</em></p>
 }
 else
@@ -60,3 +60,9 @@ else
             
         </tbody>
     </table>
+}
+
+@code {
+    protected List<Payment> model = new();
+
+}

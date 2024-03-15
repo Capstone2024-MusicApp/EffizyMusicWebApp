@@ -26,6 +26,11 @@ namespace EffizyMusicSystem.Services
             return _context.Lessons.ToList();
         }
 
+        public List<Payment> GetPayments()
+        {
+            return _context.Payments.ToList();
+        }
+
         //Add your methods here that directly connects to the dtabase
     }
 }
