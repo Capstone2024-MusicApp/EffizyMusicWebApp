@@ -10,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 builder.Services.AddScoped<EffizyMusicApplicationService>();
+
 
 // Add services to the container.
 var services = builder.Services;
