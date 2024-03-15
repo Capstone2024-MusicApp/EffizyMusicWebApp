@@ -17,6 +17,7 @@ namespace EffizyMusicSystem.Services
 
         Task<bool> AddRating(InstructorRating rating);
     }
+
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
     {
         private readonly EffizyMusicContext _context;
@@ -25,6 +26,7 @@ namespace EffizyMusicSystem.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
         public List<Lesson> GetLessons()
         {
             return _context.Lessons.ToList();
@@ -44,6 +46,32 @@ namespace EffizyMusicSystem.Services
             return true;
         }
 
+        public async Task<bool> CreateUserAsync(User user)
+        {
+            try
+            {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<List<UserType>> GetUserTypes()
+    {
+        return await _context.UserTypes.ToListAsync();
+    }
+
+        public async Task<User> GetUserByIdAsync(int userTypeID)
+        {
+            return await _context.Users
+                .Include(x => x.UType)
+                .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
+        }
+
+        //Add other methods here that directly connect to the database
         public List<Feedback> GetFeedback()
         {
             return _context.Feedbacks.ToList();
