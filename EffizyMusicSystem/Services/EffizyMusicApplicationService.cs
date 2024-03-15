@@ -46,6 +46,10 @@ namespace EffizyMusicSystem.Services
             return true;
         }
 
+        public async Task<List<Course>> GetEnrolledCoursesAsync(int studentID)
+        {
+            return await _context.Courses.FromSql($"select * from courses where CourseId in (select distinct CourseId from enrollments where StudentID = {studentID});").ToListAsync();
+        }
         //Add your methods here that directly connects to the dtabase
 
         #region Modules

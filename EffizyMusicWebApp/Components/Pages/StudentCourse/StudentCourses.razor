@@ -4,7 +4,7 @@
 
 <h2>Courses</h2>
 <br />
-@if (courses == null)
+@if (availablecourses == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -13,29 +13,36 @@ else
     <div class="main-student-course">
         <h3>Your Enrolled Courses</h3>
         <br />
-        <table class="student-course-list">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Course Mode</th>
-                    <th>Access</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    @foreach (var course in courses)
-                    {
+        @if(enrolledCourses == null)
+        {
+            <p><em>No enrolled courses.</em></p>
+        }
+        else
+        {
+            <table class="student-course-list">
+                <thead>
                     <tr>
-                        <td>@course.Title</td>
-                        <td>@course.CourseDescription</td>
-                        <td>@course.CourseMode</td>
-                        <td><a href="\StudentCourse\AccessCourse\@course.CourseID">Access Course</a></td>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Course Mode</th>
+                        <th>Access</th>
                     </tr>
-                    }
-                </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <tr>
+                        @foreach (var course in enrolledCourses)
+                        {
+                        <tr>
+                            <td>@course.Title</td>
+                            <td>@course.CourseDescription</td>
+                            <td>@course.CourseMode</td>
+                            <td><a href="\StudentCourse\AccessCourse\@course.CourseID">Access Course</a></td>
+                        </tr>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        }
 
         <br />
         <br />
@@ -53,7 +60,7 @@ else
             </thead>
             <tbody>
                 <tr>
-                    @foreach (var course in courses)
+                    @foreach (var course in availablecourses)
                     {
                     <tr>
                         <td>@course.Title</td>
@@ -69,11 +76,13 @@ else
 }
 
 @code {
-    private List<Course> courses;
+    private List<Course> availablecourses;
+    private List<Course> enrolledCourses;
 
     protected override async Task OnInitializedAsync()
     {
-        courses = await EffizyService.GetCoursesAsync();
+        availablecourses = await EffizyService.GetCoursesAsync();
+        enrolledCourses = await EffizyService.GetEnrolledCoursesAsync(1);
     }
 
     
