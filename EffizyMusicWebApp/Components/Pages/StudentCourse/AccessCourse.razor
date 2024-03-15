@@ -25,7 +25,7 @@
         <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
     </div>
     <div class="module-list">
-        <Accordion AlwaysOpen="true">
+        <Accordion AlwaysOpen="true" >
             @foreach (var module in studentCourse.Modules)
             {
                 <AccordionItem>
@@ -38,13 +38,13 @@
                             @foreach(var lesson in module.Lessons)
                             {
                                 <tr>
-                                    <td class="lesson-title" ><Button Class="accordion-item">Lesson - @lesson.Title </Button></td>
+                                    <td class="lesson-title"><Button Class="accordion-item" @onclick="() => UpdateLesson(lesson.Title)">Lesson - @lesson.Title </Button></td>
                                  </tr>
                             }
                             @foreach (var quiz in module.Quizzes)
                             {
                                 <tr>
-                                    <td class="lesson-title"><Button Class="accordion-item btn-info"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
+                                    <td class="lesson-title"><Button Class="accordion-item btn-info" ><i>Quiz</i> - @quiz.QuizTitle</Button></td>
                                     </tr>
                             }
                         </table>
@@ -70,5 +70,10 @@
     {
         studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
         lesson = studentCourse.Modules.First().Lessons.First();
+    }
+
+    public void UpdateLesson(string title)
+    {
+        lesson.Title = title;
     }
 }
