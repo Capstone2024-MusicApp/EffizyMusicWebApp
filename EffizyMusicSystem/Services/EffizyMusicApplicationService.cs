@@ -31,10 +31,10 @@ namespace EffizyMusicSystem.Services
         {
             return _context.Lessons.ToList();
         }
-        public List<Instructor> GetInstructors()
-        {
-            return _context.Instructors.ToList();
-        }
+        //public List<Instructor> GetInstructors()
+        //{
+        //    return _context.Instructors.ToList();
+        //}
         public async Task<bool> AddRating(InstructorRating rating)
         {
             if(rating == null)
@@ -100,7 +100,7 @@ namespace EffizyMusicSystem.Services
             }
             catch
             {
-                throw
+                throw;
             }
         }
         #region Modules
@@ -205,7 +205,7 @@ namespace EffizyMusicSystem.Services
             }
             catch
             {
-                throw
+                throw;
             }
             
         }
@@ -218,8 +218,9 @@ namespace EffizyMusicSystem.Services
             }
             catch
             {
-                throw
+                throw;
             }
+        }
         public bool DeleteQuiz(int id)
         {
             try
@@ -276,14 +277,15 @@ namespace EffizyMusicSystem.Services
             {
                 return _context.Payments.ToList();
             }
-                catch
+            catch
             {
                 throw;
             }
-        /// <summary>
-        /// Get quiz Question
-        /// </summary>
-        /// <returns></returns>
+            /// <summary>
+            /// Get quiz Question
+            /// </summary>
+            /// <returns></returns>
+        }
         public List<Question> GetQuizQuestions(int quizId)
         {
             try
