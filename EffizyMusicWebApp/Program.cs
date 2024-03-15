@@ -23,6 +23,17 @@ var services = builder.Services;
 services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnectionBAIST")));
 
+// Register UserService
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Register UserTypeService
+builder.Services.AddScoped<UserTypeService>();
+
+// Register UserInstrumentService
+builder.Services.AddScoped<InstrumentService>();
+// Register EffizyMusicApplicationService
+builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
+
 var app = builder.Build();
 
 
@@ -37,6 +48,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
