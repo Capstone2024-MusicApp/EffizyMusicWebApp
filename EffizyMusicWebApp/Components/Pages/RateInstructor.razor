@@ -1,9 +1,7 @@
 ﻿@page "/RateInstructor/"
-@* @using EffizyMusicSystem.Controllers *@
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
-
-<script src="js/addons/rating.js"></script>
+@rendermode InteractiveServer
 <PageTitle>Rate Instructor</PageTitle>
 <h2 class="display-3 text-center">Rate Instructor</h2>
 
@@ -41,7 +39,7 @@
 
             <div class="form-outline mt-2">
                 <label>Rate the Instructor:</label>
-                <RatingComponent CurrentRating="@RatingData.Rating" RatingChanged="@HandleRatingChange" />
+                <RatingComponent CurrentRating="@RatingData.Rating" RatingChanged="@HandleRatingChange" />                
             </div>
    
     <div class="form-outline mt-2">
@@ -79,7 +77,7 @@
 
     protected override void OnInitialized()
     {
-        InstructorList = EffizyService.GetInstructors();
+        // InstructorList = EffizyService.GetInstructors();
     }
 
     private void HandleRatingChange(int newRating)

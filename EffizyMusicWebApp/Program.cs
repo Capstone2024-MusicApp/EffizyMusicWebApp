@@ -12,8 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-
-builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddBlazorBootstrap();
 
 
@@ -22,7 +20,7 @@ var services = builder.Services;
 
 // Add your DbContext configuration
 services.AddDbContext<EffizyMusicContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnectionBAIST")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
 // Register UserService
 builder.Services.AddScoped<IUserService, UserService>();
