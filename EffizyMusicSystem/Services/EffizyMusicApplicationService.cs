@@ -14,8 +14,9 @@ namespace EffizyMusicSystem.Services
     public interface IEffizyMusicApplicationService
     {
         List<Lesson> GetLessons();
-        Task<bool> CreateUserAsync(User user);
-        Task<User> GetUserByIdAsync(int userId);
+        List<Instructor> GetInstructors();
+
+        Task<bool> AddRating(InstructorRating rating);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -24,11 +25,25 @@ namespace EffizyMusicSystem.Services
 
         public EffizyMusicApplicationService(EffizyMusicContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public  List<Lesson> GetLessons()
         {
             return _context.Lessons.ToList();
+        }
+        public List<Instructor> GetInstructors()
+        {
+            return _context.Instructors.ToList();
+        }
+        public async Task<bool> AddRating(InstructorRating rating)
+        {
+            if(rating == null)
+            {
+                return false; //Can Add exception
+            }
+            _context.InstructorRatings.Add(rating);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<Course>> GetCourses()
