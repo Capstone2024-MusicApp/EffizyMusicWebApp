@@ -1,0 +1,59 @@
+﻿@page "/question/delete/{questionId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+<h3>Delete Question</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="RemoveQuestion" FormName="delquestion">
+<div class="form-group">
+    <h5 style="color:red">Do you want to delete this question? It will delete related choices and answer!</h5>
+    <hr />
+    <table class="table">
+        <tbody>
+            <tr>
+                    <td><b>Question Text:</b> @model.QuestionText</td>
+            </tr>
+                @if (questionChoices != null)
+                    {
+                    @for (int count = 0; count < questionChoices.Count; count++)
+                        {
+                          <tr>
+                            @* <td>Choice Text 1</td> *@
+                            <td>@(Convert.ToInt16(count + 1)): @questionChoices[count].ChoiceText</td>
+                          </tr>
+                        }
+                    }
+             
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Confirm Delete" class="btn btn-danger" />
+        <a class="btn btn-light" href="/questions/@model.QuizId">
+            Cancel
+        </a>
+</div>
+</EditForm>
+@code {
+    [Parameter]
+    public int questionId { get; set; }
+
+    Question model = new Question();
+    List<QuestionChoice> questionChoices = new List<QuestionChoice>();
+    protected override async Task OnInitializedAsync()
+    {
+        model = EffizyService.GetQuestion(questionId);
+        questionChoices = EffizyService.GetQuestionChoices(questionId);
+    }
+
+    protected async Task RemoveQuestion()
+    {
+        EffizyService.DeleteQuestion(questionId);
+        NavigationManager.NavigateTo("/questions/" + model.QuizId);
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/questions/" + model.QuizId);
+    }
+}

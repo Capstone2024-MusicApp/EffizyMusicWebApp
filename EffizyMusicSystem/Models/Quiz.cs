@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.Models
@@ -15,5 +16,10 @@ namespace EffizyMusicSystem.Models
         public string QuizTitle { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int ModuleID { get; set; }
+
+        [JsonIgnore]
+        public virtual Module? Module { get; set; } = null!;
+
+        public virtual ICollection<Question>? Questions { get; set; }
     }
 }

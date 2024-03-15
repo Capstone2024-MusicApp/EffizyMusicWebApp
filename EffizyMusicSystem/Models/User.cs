@@ -12,32 +12,20 @@ namespace EffizyMusicSystem.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserID { get; set; }
-
-        [Required(ErrorMessage = "Email is required")]
+        
+       // [Required(ErrorMessage = "Email is required")]
         public string? Email { get; set; }
 
         public string? Password { get; set; }
 
         public string? ConfirmPassword { get; set; }
-
-
-        [Required(ErrorMessage = "First Name is required")]
-        public string? FirstName { get; set; }
-
-        [Required(ErrorMessage = "Last Name is required")]
-        public string? LastName { get; set; }
-
-        [Required(ErrorMessage = "Gender is required")]
-        public string? Gender { get; set; }
-
-        [Required(ErrorMessage = "Phone Number is required")]
-        public int? Phone { get; set; }
-
-        [ForeignKey("UserTypeID")]
+        
+        //[ForeignKey("UserTypes")]
         public int UserTypeID { get; set; }
-        public UserType UserType { get; set; }
 
+        public List<UserType> UserType { get; set; }
 
+        public UserType UType { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EffizyMusicSystem.Models;
+using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace EffizyMusicSystem.DAL
 
         public DbSet<Quiz> Quizes { get; set; }
 
+
+
         public DbSet<Question> Questions { get; set; }
 
         public DbSet<QuestionChoice> QuestionChoices { get; set; }
@@ -38,6 +41,59 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Answer> Answers { get; set; }
 
         public DbSet<Enrollment> Enrollments { get; set; }
-    }
+        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; } 
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Quiz>(entity =>
+            {
+                entity.ToTable("Quizes");
+                entity.Property(e => e.QuizTitle)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(2000);
+            });
+
+            modelBuilder.Entity<Quiz>(entity =>
+            {
+                entity.HasOne(d => d.Module)
+                    .WithMany(p => p.Quizzes)
+                    .HasForeignKey(d => d.ModuleID)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Module_Quiz");
+            });
+
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.HasOne(d => d.Quiz)
+                    .WithMany(p => p.Questions)
+                    .HasForeignKey(d => d.QuizId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Question_Quiz");
+            });
+
+            modelBuilder.Entity<QuestionChoice>(entity =>
+            {
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p.QuestionChoices)
+                    .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_QuestionChoices_Question");
+            });
+
+            modelBuilder.Entity<Answer>(entity =>
+            {
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p.Answers)
+                    .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Answer_Question");
+            });
+
+
+            modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);
+        }
+    }
 }

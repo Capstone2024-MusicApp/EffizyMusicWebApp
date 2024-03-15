@@ -1,0 +1,111 @@
+﻿@page "/question/edit/{questionId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using EffizyMusicSystem.Enum
+@inject NavigationManager NavigationManager
+
+<h3>Edit Question</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="SaveQuestion" FormName="editquestion">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label">Question Text</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.QuestionText" />
+        </div>
+        <ValidationMessage For="@(() => model.QuestionText)" />
+    </div>
+    <b>Add multiple choices for the question</b>
+    <div class="mb-3">
+        <label class="form-label">Choice A:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText1" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText1)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice B:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText2" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText2)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice C:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText3" />
+        </div>
+        <ValidationMessage For="@(() => model.ChoiceText3)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choice D:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.ChoiceText4" />
+        </div>
+    </div>
+    <b style="background-color:aliceblue; color:darkolivegreen">Please select correct choice</b>
+    <div class="mb-3">
+        <label class="form-label">Correct Choice</label>
+        @* <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.CorrectChoice" />
+        </div>
+        <ValidationMessage For="@(() => model.CorrectChoice)" /> *@
+        <div class="col-md-4">
+            <InputSelect @bind-Value="model.Choices" class="form-select" name="model.Choices">
+                @foreach (var choice in Enum.GetValues(typeof(Choices)))
+                {
+                    if(choice.ToString() == model.CorrectChoice)
+                    {
+                        <option value="@choice" selected="selected">@choice</option>
+                    }
+                    else
+                    {
+                        <option value="@choice">@choice</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+    </div>
+    <input type="hidden" @bind-value="model.QuestionId" name="model.QuestionId" />
+    <input type="hidden" @bind-value="model.QuizId" name="model.QuizId" />
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn btn-light" href="/questions/@model.QuizId">
+            Cancel
+        </a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int questionId { get; set; }
+
+    [SupplyParameterFromForm]
+    protected QuestionChoiceViewModel model { get; set; }
+
+    protected override void OnInitialized() => model ??= new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (model.QuestionId == 0 && model.QuizId == 0)
+        {
+            model = EffizyService.GetQuestionWithChoices(questionId);
+        }
+    }
+
+    protected async Task SaveQuestion()
+    {
+        if (!string.IsNullOrEmpty(model.QuestionText))
+        {
+            EffizyService.UpdateQuestion(model);
+            //string apiUrl = "https://localhost:7164/api/Questions";
+            //await Http.PutAsJsonAsync(apiUrl, model);
+            Cancel();
+        }
+    }
+
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/questions/" + model.QuizId);
+    }
+}
