@@ -23,9 +23,7 @@ namespace EffizyMusicSystem.Models
         //[ForeignKey("UserTypes")]
         public int UserTypeID { get; set; }
 
-        public List<UserType> UserType { get; set; }
-
-        public UserType UType { get; set; }
+        public UserType UserType { get; set; }
 
     }
 }
