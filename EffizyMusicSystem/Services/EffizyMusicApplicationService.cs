@@ -1,5 +1,6 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
+using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -13,8 +14,9 @@ namespace EffizyMusicSystem.Services
     public interface IEffizyMusicApplicationService
     {
         List<Lesson> GetLessons();
-        Task<bool> CreateUserAsync(User user);
-        Task<User> GetUserByIdAsync(int userId);
+        List<Instructor> GetInstructors();
+
+        Task<bool> AddRating(InstructorRating rating);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -23,12 +25,30 @@ namespace EffizyMusicSystem.Services
 
         public EffizyMusicApplicationService(EffizyMusicContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-
-        public List<Lesson> GetLessons()
+        public  List<Lesson> GetLessons()
         {
             return _context.Lessons.ToList();
+        }
+        public List<Instructor> GetInstructors()
+        {
+            return _context.Instructors.ToList();
+        }
+        public async Task<bool> AddRating(InstructorRating rating)
+        {
+            if(rating == null)
+            {
+                return false; //Can Add exception
+            }
+            _context.InstructorRatings.Add(rating);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<Course>> GetCourses()
+        {
+            return await _context.Courses.ToListAsync();
         }
 
         public async Task<bool> CreateUserAsync(User user)
@@ -68,6 +88,7 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         //Add your methods here that directly connects to the dtabase
 
@@ -444,6 +465,26 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        #endregion
+
+        #region Student Courses
+        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
+        {
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+        }
+
+        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
+        {
+            StudentCourseDTO studentCourse;
+
+            //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
+            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+
+            studentCourse.Modules = _context.Modules.Include(l=>l.Lessons).Include(q=>q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            return studentCourse;
+            // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
+
+        }
         #endregion
     }
 }
