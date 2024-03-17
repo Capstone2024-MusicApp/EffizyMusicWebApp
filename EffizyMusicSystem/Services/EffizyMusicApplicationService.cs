@@ -15,11 +15,13 @@ namespace EffizyMusicSystem.Services
     {
         Task<List<Lesson>> GetLessons();
         List<Instructor> GetInstructors();
+        Task<bool> AddModules(Module module);
         Task<bool> AddLesson(Lesson lessonData);
         Task<bool> UpdateLesson(Lesson lessonData);
         Task<bool> DeleteLesson(int id);
 
         Task<bool> AddRating(InstructorRating rating);
+        Task<List<Course>> GetCourses();
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -29,10 +31,6 @@ namespace EffizyMusicSystem.Services
         public EffizyMusicApplicationService(EffizyMusicContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
-        public  List<Lesson> GetLessons()
-        {
-            return _context.Lessons.ToList();
         }
         public List<Instructor> GetInstructors()
         {
@@ -144,7 +142,24 @@ namespace EffizyMusicSystem.Services
             return true;
         }
 
+        #region Course
+        public async Task<bool> DeleteCourse(int id)
+        {
+            var existingID = _context.Courses.Find(id);
+            if (existingID != null)
+            {
+                _context.Remove(existingID);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
+        }
+
+        #endregion
         //Add your methods here that directly connects to the dtabase
 
         #region Modules
@@ -157,6 +172,19 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<bool> AddModules(Module module)
+        {
+            try
+            {
+                _context.Modules.Add(module);
+                await _context.SaveChangesAsync();
+                return true;
             }
             catch
             {

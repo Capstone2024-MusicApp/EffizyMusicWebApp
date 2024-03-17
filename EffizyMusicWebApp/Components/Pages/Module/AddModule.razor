@@ -1,0 +1,59 @@
+﻿@page "/AddModule/"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavService
+<h3>Add Module</h3>
+
+<EditForm Model="@ModuleData" FormName="Add-Module" OnValidSubmit="SaveModuleInfo">
+    
+        <div class="form-outline mt-2 col-md-6">
+                <label for="title" class="form-label">Module Title:</label>
+                <InputText @bind-value="ModuleData.Title" class="form-control"></InputText>
+            </div>            
+  
+    <div class="form-outline mt-2 col-md-6">
+        <label for="instructor" class="form-label">Choose Course:</label>
+        <InputSelect class="form-control" @bind-Value="ModuleData.Course.CourseDescription" required>
+            <option value="">[Please Choose the Instructor...]</option>
+            @foreach (var course in CourseList)
+            {
+                <option value="@course.CourseID">@course.CourseDescription (CourseMode : @course.CourseMode)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" />
+    </div>
+</EditForm>
+
+@if (!IsModuleAdded)
+{
+    <p class="text-center text-danger"><em>@ErrorMessage</em></p>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    public Module ModuleData { get; set; } = new();
+    public List<Course> CourseList { get; set; } = new();
+
+    [Parameter]
+    public bool IsModuleAdded { get; set; }
+
+    [Parameter]
+    public string ErrorMessage { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        CourseList = await EffizyService.GetCourses();
+    }
+
+    public async Task SaveModuleInfo()
+    {
+        IsModuleAdded = await EffizyService.AddModules(ModuleData);
+        if (IsModuleAdded)
+        {
+            NavService.NavigateTo("~/Modules/");
+        }
+        else
+        {
+            ErrorMessage = "Error in Adding Lesson";
+        }
+    }
+}
