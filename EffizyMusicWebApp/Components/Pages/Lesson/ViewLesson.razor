@@ -1,0 +1,52 @@
+﻿@page "/ViewLesson"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavService
+<h3>Lessons List</h3>
+
+@if (LessonList == null)
+{
+    <p class="text-center"><em>Loading...</em></p>
+}
+@foreach(var item in LessonList)
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Lesson Number</th>
+                <th>Lesson Title</th>
+                <th>Lesson Mode</th>
+             @*    <th>Lesson Content</th> *@
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lesson in LessonList)
+            {
+                <tr>
+                    <td>@lesson.LessonNumber</td> 
+                    <td>@lesson.Title</td>
+                    <td>@lesson.LessonMode</td>
+                    <td>
+                        <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-outline-dark" role="button">
+                            Edit
+                        </a>
+                    </td>
+                    <td>
+                       <button class="btn btn-danger" role="button">Delete</button>                          
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+
+    // @page "/user/{Id:int}"
+    public List<Lesson> LessonList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        LessonList = await EffizyService.GetLessons();
+    }
+}

@@ -13,8 +13,11 @@ namespace EffizyMusicSystem.Services
 {
     public interface IEffizyMusicApplicationService
     {
-        List<Lesson> GetLessons();
+        Task<List<Lesson>> GetLessons();
         List<Instructor> GetInstructors();
+        Task<bool> AddLesson(Lesson lessonData);
+        Task<bool> UpdateLesson(Lesson lessonData);
+        Task<bool> DeleteLesson(int id);
 
         Task<bool> AddRating(InstructorRating rating);
     }
@@ -46,6 +49,58 @@ namespace EffizyMusicSystem.Services
             return true;
         }
 
+        #region Lesson
+        public async Task<bool> AddLesson(Lesson lessonData)
+        {
+            try
+            {
+                if (lessonData == null)
+                {
+                    return false;
+                }
+                else {
+                    _context.Lessons.Add(lessonData);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }                
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+            
+        }
+        public async Task<bool> UpdateLesson(Lesson lessonData)
+        {
+            try
+            {
+                _context.Entry(lessonData).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex) { return false; }
+        }
+        public async Task<bool> DeleteLesson(int id)
+        {
+            var existingID = _context.Lessons.Find(id);
+            if(existingID != null)
+            {
+                _context.Remove(existingID);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        public async Task<List<Lesson>> GetLessons()
+        {
+            return await _context.Lessons.ToListAsync();
+        }
+
+        #endregion
         public async Task<List<Course>> GetCourses()
         {
             return await _context.Courses.ToListAsync();

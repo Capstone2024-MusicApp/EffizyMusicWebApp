@@ -1,0 +1,91 @@
+﻿@page "/AddLesson/"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavService
+<h2 class="display-3 text-center">Add Lesson</h2>
+
+<EditForm Model="@LessonData" FormName="Add-Lesson" OnValidSubmit="SaveLessonInfo">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="form-outline mt-2">
+                <label for="title" class="form-label">Lesson Title:</label>
+                <InputText @bind-value="LessonData.Title" class="form-control"></InputText>
+            </div>
+            <div class="form-outline mt-2">
+                <label for="lessonMode" class="form-label">Lesson Mode:</label>
+                <InputText @bind-value="LessonData.LessonMode" class="form-control"></InputText>
+            </div>
+            <div class="form-outline mt-2">
+                <label for="content" class="form-label">Lesson Content:</label>
+                <InputFile @bind-value="LessonData.LessonContent" onchange="HandleFileSelected">Upload your Lesson File</InputFile>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Add Lesson</button>
+        </div>
+    </div>
+</EditForm>
+
+@if (!IsLessonAdded)
+{
+    <p class="text-center text-danger"><em>@ErrorMessage</em></p>
+}
+@code {
+    [SupplyParameterFromForm]
+    public Lesson LessonData { get; set; } = new();
+
+    [Parameter]
+    public bool IsLessonAdded { get; set; }
+
+    [Parameter]
+    public string ErrorMessage { get; set; }
+
+
+    private IBrowserFile selectedFile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get User Info
+    }
+    public async void SaveLessonInfo()
+    {
+        LessonData.LessonContent = await UploadVideo();
+        IsLessonAdded = await EffizyService.AddLesson(LessonData);
+        if (IsLessonAdded)
+        {
+            NavService.NavigateTo("/ViewLesson/");
+        }
+        else
+        {
+            ErrorMessage = "Error in Adding Lesson";
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.GetMultipleFiles().FirstOrDefault();
+    }
+
+    private async Task<byte[]> UploadVideo()
+    {
+        byte[] videoBytes = new byte[0];
+        if (selectedFile != null)
+        {
+            using (var stream = selectedFile.OpenReadStream())
+            {
+                // Convert stream to byte array
+                videoBytes = await ConvertStreamToByteArray(stream);
+
+                // Save videoBytes to your storage or database
+                // Example: await SaveToDatabase(videoBytes);
+            }
+        }
+        return videoBytes;
+    }
+    private async Task<byte[]> ConvertStreamToByteArray(Stream stream)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            await stream.CopyToAsync(ms);
+            return ms.ToArray();
+        }
+    }
+}
