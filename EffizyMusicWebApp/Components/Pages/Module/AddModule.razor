@@ -4,56 +4,87 @@
 @inject NavigationManager NavService
 <h3>Add Module</h3>
 
-<EditForm Model="@ModuleData" FormName="Add-Module" OnValidSubmit="SaveModuleInfo">
+<EditForm FormName="Submit-Module" method="post" Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4">
     
-        <div class="form-outline mt-2 col-md-6">
+   
+
+    <div class="form-outline mt-2 col-md-6">
                 <label for="title" class="form-label">Module Title:</label>
-                <InputText @bind-value="ModuleData.Title" class="form-control"></InputText>
+                <InputText @bind-Value="ModuleData.Title" class="form-control"></InputText>
             </div>            
   
     <div class="form-outline mt-2 col-md-6">
-        <label for="instructor" class="form-label">Choose Course:</label>
-        <InputSelect class="form-control" @bind-Value="ModuleData.Course.CourseDescription" required>
-            <option value="">[Please Choose the Instructor...]</option>
+        <label for="course" class="form-label">Choose Course:</label>
+        <InputSelect class="form-control" @bind-Value="ModuleData.Course" required>
+            <option value="">[Please Choose the Course...]</option>
+
             @foreach (var course in CourseList)
             {
                 <option value="@course.CourseID">@course.CourseDescription (CourseMode : @course.CourseMode)</option>
             }
         </InputSelect>
-        <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" />
+        @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
     </div>
+
+
+    @* <div class="form-outline mt-2 col-md-6">
+        <label for="title" class="form-label">Module ID:</label>
+        <InputNumber @bind-Value="ModuleData.ModuleID" class="form-control"></InputNumber>
+    </div> *@
+
+
+    <button type="submit" class="btn btn-primary mt-4"><i class="fa fa-plus-square" aria-hidden="true"></i>  Add Module</button>
 </EditForm>
 
-@if (!IsModuleAdded)
+@* @if (!IsModuleAdded)
 {
     <p class="text-center text-danger"><em>@ErrorMessage</em></p>
-}
+} *@
 
 @code {
     [SupplyParameterFromForm]
     public Module ModuleData { get; set; } = new();
-    public List<Course> CourseList { get; set; } = new();
 
     [Parameter]
-    public bool IsModuleAdded { get; set; }
+    public int CourseId { get; set; }
+    public List<Course> CourseList = new();
 
     [Parameter]
-    public string ErrorMessage { get; set; }
-    protected override async Task OnInitializedAsync()
+    public bool IsModuleAdded { get; set; } = false;
+
+    [Parameter]
+    public string ErrorMessage { get; set; } = "";
+    protected override void OnInitialized()
     {
-        CourseList = await EffizyService.GetCourses();
+        CourseList = EffizyService.GetCourseList();
     }
-
-    public async Task SaveModuleInfo()
+    protected override void OnParametersSet()
     {
-        IsModuleAdded = await EffizyService.AddModules(ModuleData);
-        if (IsModuleAdded)
+        ModuleData.Course.CourseID = CourseId;
+    }
+    private async Task SaveModuleInfo()
+    {
+        try
         {
-            NavService.NavigateTo("~/Modules/");
+            IsModuleAdded = await EffizyService.AddModules(ModuleData);
+            if (IsModuleAdded)
+            {
+                NavService.NavigateTo("~/Modules/");
+                ResetForm();
+            }
+            else
+            {
+                ErrorMessage = "Error in Adding Lesson";
+            }
         }
-        else
+        catch(Exception ex)
         {
-            ErrorMessage = "Error in Adding Lesson";
+           
         }
+
+    }
+    private void ResetForm()
+    {
+        ModuleData = new();
     }
 }
