@@ -47,5 +47,24 @@ namespace EffizyMusicSystem.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<Instrument>> GetInstrumentsAsync()
+        {
+            return await _context.Instruments.ToListAsync();
+        }
+
+        public async Task<List<Instructor>> GetInstructorsAsync()
+        {
+            var instructors = await _context.Instructors.ToListAsync();
+
+            if (instructors == null)
+            {
+                return new List<Instructor>();
+            }
+
+            return instructors;
+        }
+
+
     }
 }

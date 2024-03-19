@@ -11,9 +11,12 @@ namespace EffizyMusicSystem.Services
     public interface ICourseService
     {
             Task<List<Course>> GetCoursesAsync();
-            Task<Course> GetCourseByIdAsync(int id);
+            Task<Course> GetCourseByIdAsync(int CourseID);
             Task AddCourseAsync(Course course);
             Task UpdateCourseAsync(Course course);
-            Task DeleteCourseAsync(int id);     
+            Task DeleteCourseAsync(int CourseID);
+
+            Task<List<Instrument>> GetInstrumentsAsync();
+            Task<List<Instructor>> GetInstructorsAsync();
     }
 }

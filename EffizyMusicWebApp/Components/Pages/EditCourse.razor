@@ -1,4 +1,5 @@
-﻿@page "/editcourse/{CourseID}"
+﻿@page "/editCourse"
+@page "/editCourse/{CourseID:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components.Forms
@@ -9,7 +10,7 @@
 
 @if (Course != null)
 {
-    <EditForm Model="@Course" OnValidSubmit="UpdateCourse">
+    <EditForm Model="@Course" OnValidSubmit="UpdateCourse" formname="editCourseForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -30,6 +31,27 @@
             <InputTextArea @bind-Value="Course.CourseDescription" class="form-control" />
             <ValidationMessage For="@(() => Course.CourseDescription)" />
         </div>
+
+        <div class="form-group">
+            <label>Instrument</label>
+            <select class="form-control" @bind="Course.InstrumentID">
+                @foreach (var instrum in Instruments)
+                {
+                    <option value="@instrum.InstrumentID">@instrum.InstrumentType</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Instructor</label>
+            <select class="form-control" @bind="Course.InstructorID">
+                @foreach (var instruc in Instructors)
+                {
+                    <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
+                }
+            </select>
+        </div>
+
 
         <div class="form-group">
             <label>Instrument ID</label>
@@ -70,9 +92,14 @@ else
 
     private Course Course;
 
+    private List<Instrument> Instruments = new List<Instrument>();
+    private List<Instructor> Instructors = new List<Instructor>();
+
     protected override async Task OnInitializedAsync()
     {
         Course = await CourseService.GetCourseByIdAsync(CourseID);
+        Instruments = await CourseService.GetInstrumentsAsync();
+        Instructors = await CourseService.GetInstructorsAsync();
     }
 
     private async Task UpdateCourse()
