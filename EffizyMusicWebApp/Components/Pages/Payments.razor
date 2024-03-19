@@ -1,0 +1,73 @@
+﻿@page "/paymenthistory/"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+<h3>Payment History</h3>
+@if (model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Payment ID</th>
+                <th>Payment Method</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Billing Address</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (model == null || model.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">No record found.</td>
+                </tr>
+            }
+
+            @if (model != null)
+            {
+                foreach (var entity in model)
+                {
+                    <tr>
+                        <td>@entity.PaymentID</td>
+                        <td>@entity.PaymentMethod</td>
+                        <td>@entity.PaymentDate.ToShortDateString()</td>
+                        <td>@entity.Amount</td>
+                        <td>@entity.BillingAddress</td>
+                        @if (entity.PaymentStatus.ToLower() == "Completed".ToLower())
+                        {
+                            <td><span class="btn btn-success">@entity.PaymentStatus</span></td>
+                        }
+                        else if (entity.PaymentStatus.ToLower() == "Cancelled".ToLower())
+                        {
+                            <td><span class="btn btn-danger">@entity.PaymentStatus</span></td>
+                        }
+                        else if (entity.PaymentStatus.ToLower() == "Pending".ToLower())
+                        {
+                            <td><span class="btn btn-dark">@entity.PaymentStatus</span></td>
+                        }
+                        else
+                        {
+                            <td>@entity.PaymentStatus</td>
+                        }
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+}
+@code {
+    protected List<Payment> model = new();
+    protected override async Task OnInitializedAsync()
+    {
+        model = EffizyService.GetPayments();
+        
+    }
+}
+@code {
+}
+
