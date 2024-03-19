@@ -210,6 +210,7 @@ namespace EffizyMusicSystem.Services
             
         }
 
+
         public List<Instructor> GetInstructors()
         {
             try
@@ -221,6 +222,7 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
         public bool DeleteQuiz(int id)
         {
             try
@@ -281,11 +283,12 @@ namespace EffizyMusicSystem.Services
             {
                 throw;
             }
-            /// <summary>
-            /// Get quiz Question
-            /// </summary>
-            /// <returns></returns>
+
         }
+        /// <summary>
+        /// Get quiz Question
+        /// </summary>
+        /// <returns></returns>
         public List<Question> GetQuizQuestions(int quizId)
         {
             try
