@@ -15,17 +15,42 @@
     <br />
     <br />
     <div class="lesson-frame">
-        <label class="video-lesson-title">@lesson.Title</label>
-        <br />
-        <!--<img src="/img/drums.png" width="600" height="400"/>-->
-        <video controls="controls" width="750px" height="550px"></video>
-        <br />
-        <br />
+        @if (DisplayLesson)
+        {
+            <label class="video-lesson-title">@lessonTitle</label>
+            <br />
+            <!--<img src="/img/drums.png" width="600" height="400"/>-->
+            <video controls="controls" width="800px" height="600px"></video>
+            <br />
+            <br />
 
-        <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
+            <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
+        }
+        else
+        {
+            <label class="video-lesson-title">Quiz</label>
+            <br />
+            <!--<img src="/img/drums.png" width="600" height="400"/>-->
+            <br />
+            <p>@selectedQuiz.QuestionText</p>
+            <br />
+            <InputRadioGroup Name="selectedQuiz" @bind-Value="@testString">
+                <InputRadio Value="selectedQuiz.ChoiceText1" />   -    @selectedQuiz.ChoiceText1
+                    <br />
+                <InputRadio Value="selectedQuiz.ChoiceText2" />   -    @selectedQuiz.ChoiceText2
+                <br />
+                <InputRadio Value="selectedQuiz.ChoiceText3" />   -    @selectedQuiz.ChoiceText3
+                    <br />
+                <InputRadio Value="selectedQuiz.ChoiceText4" />   -    @selectedQuiz.ChoiceText4
+            </InputRadioGroup>
+                <br />
+
+        }
     </div>
+
+
     <div class="module-list">
-        <Accordion AlwaysOpen="true">
+        <Accordion AlwaysOpen="true" >
             @foreach (var module in studentCourse.Modules)
             {
                 <AccordionItem>
@@ -38,13 +63,13 @@
                             @foreach(var lesson in module.Lessons)
                             {
                                 <tr>
-                                    <td class="lesson-title" ><Button Class="accordion-item">Lesson - @lesson.Title </Button></td>
+                                    <td class="lesson-title"><Button Class="accordion-item" @onclick="() => UpdateLesson(lesson.Title)">Lesson - @lesson.Title </Button></td>
                                  </tr>
                             }
                             @foreach (var quiz in module.Quizzes)
                             {
                                 <tr>
-                                    <td class="lesson-title"><Button Class="accordion-item btn-info"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
+                                    <td class="lesson-title"><Button Class="accordion-item btn-info" @onclick="() => selectQuiz(quiz.Id)"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
                                     </tr>
                             }
                         </table>
@@ -64,11 +89,29 @@
 
     public StudentCourseDTO? studentCourse;
 
-    public Lesson? lesson;
+    public String? lessonTitle;
+    public String? testString;
+    public Boolean DisplayLesson { get; set; } = true;
+
+    public QuestionChoiceViewModel selectedQuiz;
 
     protected override async Task OnInitializedAsync()
     {
         studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
-        lesson = studentCourse.Modules.First().Lessons.First();
+        lessonTitle = studentCourse.Modules.First().Lessons.First().Title;
+    }
+
+    public void UpdateLesson(string title)
+    {
+        lessonTitle = title;
+        DisplayLesson = true;
+    }
+
+    public void selectQuiz(int quizID)
+    {
+
+        DisplayLesson = false;
+        System.Console.WriteLine("the quiz ID: " + quizID);
+        selectedQuiz = EffizyService.GetQuestionWithChoices(quizID);
     }
 }

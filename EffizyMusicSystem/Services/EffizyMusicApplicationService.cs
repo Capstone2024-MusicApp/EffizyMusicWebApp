@@ -65,9 +65,9 @@ namespace EffizyMusicSystem.Services
             }
         }
         public async Task<List<UserType>> GetUserTypes()
-    {
-        return await _context.UserTypes.ToListAsync();
-    }
+        {
+            return await _context.UserTypes.ToListAsync();
+        }
 
         public async Task<User> GetUserByIdAsync(int userTypeID)
         {
@@ -92,6 +92,17 @@ namespace EffizyMusicSystem.Services
 
         //Add your methods here that directly connects to the dtabase
 
+        public void AddCourse(Course entity)
+        {
+            try
+            {
+                _context.Courses.Add(entity);
+            }
+            catch
+            {
+                throw;
+            }
+        }
         #region Modules
         /// <summary>
         /// Get all modules
@@ -167,6 +178,17 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<Instrument> GetInstruments()
+        {
+            try
+            {
+                return _context.Instruments.ToList();
+                }
+            catch
+            {
+                throw;
+            }
+        }
         public Quiz? GetQuiz(int id)
         {
             try
@@ -180,6 +202,20 @@ namespace EffizyMusicSystem.Services
                 {
                     return null;
                 }
+            }
+            catch
+            {
+                throw;
+            }
+            
+        }
+
+
+        public List<Instructor> GetInstructors()
+        {
+            try
+            {
+                return _context.Instructors.ToList();
             }
             catch
             {
@@ -237,6 +273,18 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<Payment> GetPayments()
+        {
+            try
+            {
+                return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
         /// <summary>
         /// Get quiz Question
         /// </summary>
