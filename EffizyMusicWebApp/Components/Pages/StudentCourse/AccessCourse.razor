@@ -20,7 +20,7 @@
             <label class="video-lesson-title">@lessonTitle</label>
             <br />
             <!--<img src="/img/drums.png" width="600" height="400"/>-->
-            <video controls="controls" width="700px" height="550px"></video>
+            <video controls="controls" width="800px" height="600px"></video>
             <br />
             <br />
 
@@ -111,6 +111,7 @@
     {
 
         DisplayLesson = false;
+        System.Console.WriteLine("the quiz ID: " + quizID);
         selectedQuiz = EffizyService.GetQuestionWithChoices(quizID);
     }
 }

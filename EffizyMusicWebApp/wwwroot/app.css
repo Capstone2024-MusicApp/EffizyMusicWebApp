@@ -87,7 +87,7 @@ h1:focus {
 }
 
 .lesson-frame {
-    width: 750px;
+    width: 900px;
     display: block;
     margin-left: 20px;
     vertical-align: middle;
@@ -101,7 +101,7 @@ h1:focus {
     vertical-align: middle;
     float:inline-start;
     border-radius: 10px;
-    width: 400px;
+    width: 500px;
 }
 
 

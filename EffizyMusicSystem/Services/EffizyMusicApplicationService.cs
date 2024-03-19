@@ -100,7 +100,7 @@ namespace EffizyMusicSystem.Services
             }
             catch
             {
-                throw
+                throw;
             }
         }
         #region Modules
@@ -205,21 +205,12 @@ namespace EffizyMusicSystem.Services
             }
             catch
             {
-                throw
+                throw;
             }
             
         }
 
-        public List<Instructor> GetInstructors()
-        {
-            try
-            {
-                return _context.Instructors.ToList();
-            }
-            catch
-            {
-                throw
-            }
+
         public bool DeleteQuiz(int id)
         {
             try
@@ -276,10 +267,11 @@ namespace EffizyMusicSystem.Services
             {
                 return _context.Payments.ToList();
             }
-                catch
+            catch
             {
                 throw;
             }
+        }
         /// <summary>
         /// Get quiz Question
         /// </summary>
