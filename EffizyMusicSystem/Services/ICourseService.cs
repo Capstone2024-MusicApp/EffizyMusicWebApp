@@ -14,7 +14,6 @@ namespace EffizyMusicSystem.Services
             Task<Course> GetCourseByIdAsync(int CourseID);
             Task AddCourseAsync(Course course);
             Task UpdateCourseAsync(Course course);
-            Task DeleteCourseAsync(int CourseID);
 
             Task<List<Instrument>> GetInstrumentsAsync();
             Task<List<Instructor>> GetInstructorsAsync();
