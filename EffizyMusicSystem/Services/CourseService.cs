@@ -21,9 +21,9 @@ namespace EffizyMusicSystem.Services
             return await _context.Courses.ToListAsync();
         }
 
-        public async Task<Course> GetCourseByIdAsync(int id)
+        public async Task<Course> GetCourseByIdAsync(int CourseID)
         {
-            return await _context.Courses.FindAsync(id);
+            return await _context.Courses.FindAsync(CourseID);
         }
 
         public async Task AddCourseAsync(Course course)
@@ -38,15 +38,17 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteCourseAsync(int id)
+
+        public async Task DeleteCourseAsync(int CourseID)
         {
-            var course = await _context.Courses.FindAsync(id);
+            var course = await _context.Courses.FindAsync(CourseID);
             if (course != null)
             {
                 _context.Courses.Remove(course);
                 await _context.SaveChangesAsync();
             }
         }
+
 
         public async Task<List<Instrument>> GetInstrumentsAsync()
         {
@@ -55,16 +57,8 @@ namespace EffizyMusicSystem.Services
 
         public async Task<List<Instructor>> GetInstructorsAsync()
         {
-            var instructors = await _context.Instructors.ToListAsync();
-
-            if (instructors == null)
-            {
-                return new List<Instructor>();
-            }
-
-            return instructors;
+            return await _context.Instructors.ToListAsync();
         }
-
 
     }
 }
