@@ -6,59 +6,7 @@
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 
 <h3>Courses</h3>
-<hr />
-<div class="col-md-12">
-    <a href='/course/add/' class="btn btn-primary" role="button" style="float:right;">
-        <i class="fas fa-user-plus"></i>
-        ADD COURSE
-    </a>
-</div>
-@if (availablecourses == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-<div class="main-student-course">
-  <br />
-        <br />
-        <br />
-        <h3>Configured Courses</h3>
-        <br />
-        <table class="student-course-list">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Course Mode</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    @foreach (var course in availablecourses)
-                    {
-                    <tr>
-                        <td>@course.Title</td>
-                        <td>@course.CourseDescription</td>
-                        <td>@course.CourseMode</td>
-                        <td><a href="">View Course</a></td>
-                    </tr>
-                    }
-                </tr>
-            </tbody>
-        </table>
-    </div>
-}
-
 
 @code {
-    private List<Course>? availablecourses;
-    private List<StudentCourseDTO>? enrolledCourses;
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        availablecourses = await EffizyService.GetCourses();
-    }
 }
