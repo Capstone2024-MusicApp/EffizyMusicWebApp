@@ -1,0 +1,542 @@
+﻿@page "/registrationForm"
+@using EffizyMusicSystem.DAL
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@using PayPalCheckoutSdk.Core
+@using PayPalCheckoutSdk.Orders
+@using PayPalCheckoutSdk.Payments
+@using PayPalHttp
+@using Newtonsoft.Json.Linq
+@using System.Net.Http
+@using System.Net
+
+@inject UserTypeService userTypeService
+@inject InstrumentService instrumentService
+@rendermode InteractiveServer
+
+@if (CurrentStep == 1)
+{
+    <div class="container justify-content-center mt-4 mb-4">
+        <EditForm Model="@user" OnValidSubmit="NextStep" FormName="RegistrationForm" class="row g-3 justify-content-center">
+            <DataAnnotationsValidator />
+
+
+            <h3 class="text-center">User Registration</h3>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Email" class="form-label">Email:</label>
+                    <InputText id="Email" @bind-Value="user.Email" class="form-control" />
+                    <ValidationMessage For="@(() => user.Email)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Password" class="form-label">Password:</label>
+                    <InputText id="Password" @bind-Value="user.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => user.Password)" />
+                </div>
+                <div class="mb-4">
+                    <label for="ConfirmPassword" class="form-label">Confirm Password:</label>
+                    <InputText id="ConfirmPassword" @bind-Value="user.ConfirmPassword" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => user.ConfirmPassword)" />
+                </div>
+
+                @if (userTypes != null)
+                {
+                    <div class="mb-4">
+                        <label for="UserType" class="form-label">User Type:</label>
+                        <InputSelect id="UserTypeID" @bind-Value="user.UserTypeID" class="form-select">
+                            <option value="0" selected data-default>select role</option>
+                            @foreach (var userType in userTypes)
+                            {
+                                <option value="@userType.UserTypeID">@userType.Description</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => user.UserTypeID)" />
+                    </div>
+                }
+
+
+                <div class="col-12">
+                    <button class="btn btn-primary">Next</button>
+                </div>
+            </div>
+
+            
+        </EditForm>
+    </div>
+}
+
+@if (user.UserTypeID == 1 && CurrentStep == 2) // Student
+{
+    <div class="containerd-flex justify-content-center  mt-4 mb-4">
+        <h3 class="text-center">Student Registration</h3>
+        <EditForm Model="@student" OnValidSubmit="NextStep" FormName="StudentRegistrationForm" class="row g-3">
+            <DataAnnotationsValidator />
+
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="FirstName" class="form-label">First Name:</label>
+                    <InputText id="FirstName" @bind-Value="@student.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => student.FirstName)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="LastName" class="form-label">Last Name:</label>
+                    <InputText id="LastName" @bind-Value="@student.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => student.LastName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Gender" class="form-label">Gender:</label>
+                    <InputSelect id="Gender" @bind-Value="student.Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.Gender)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <InputText id="Phone" @bind-Value="@student.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => student.Phone)" />
+                </div>
+               
+            </div>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Instrument" class="form-label">Instrument:</label>
+                    <InputSelect id="Instrument" @bind-Value="student.InstrumentID" class="form-select">
+                        <option value="0">Select Instrument</option>
+                        @foreach (var inst in instruments)
+                        {
+                            <option value="@inst.InstrumentID">@inst.InstrumentType</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.InstrumentID)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="skillLevel" class="form-label">Skill Level:</label>
+                    <InputSelect id="skillLevel" @bind-Value="student.SkillLevel" class="form-select">
+                        <option value="">Select Skill Level</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advance">Advance</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.SkillLevel)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="skillLevel" class="form-label">Payment Plan:</label>
+                    <InputSelect id="PaymentPlan" @bind-Value="student.PaymentPlan" class="form-select">
+                        <option value="">Select Payment Plan</option>
+                        <option value="Monthly">Monthly Subscription</option>
+                        <option value="FullPayment">Full Payment</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.PaymentPlan)" />
+                </div>
+            </div>
+            <div class="form-check mb-4">
+                <input type="checkbox" class="form-check-input" id="termsAndConditions" @bind="student.TermsAndConditions" />
+                <label class="form-check-label" for="termsAndConditions">Agree to Terms and Conditions</label>
+            </div>
+
+            <div class="col-12">
+                <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+                <button class="btn btn-primary">Next</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (user.UserTypeID == 2 && CurrentStep == 2) // Instructor
+{
+    <div class="container justify-content-center mt-4 mb-4">
+        <h3 class="text-center">Instructor Registration</h3>
+        <EditForm Model="@instructor" OnValidSubmit="RegisterInstructor" FormName="InstructorRegistrationForm" class="row g-3">
+            <DataAnnotationsValidator />
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="FirstName" class="form-label">First Name:</label>
+                    <InputText id="FirstName" @bind-Value="@instructor.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.FirstName)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="LastName" class="form-label">Last Name:</label>
+                    <InputText id="LastName" @bind-Value="@instructor.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.LastName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Gender" class="form-label">Gender:</label>
+                    <InputSelect id="Gender" @bind-Value="instructor.Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => instructor.Gender)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <InputText id="Phone" @bind-Value="@instructor.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.Phone)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Location" class="form-label">Location:</label>
+                    <InputText id="Location" @bind-Value="instructor.Location" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.Location)" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Instrument" class="form-label">Instrument:</label>
+                    <InputSelect id="Instrument" @bind-Value="instructor.InstrumentID" class="form-select">
+                        <option value="0">Select Instrument</option>
+                        @foreach (var inst in instruments)
+                        {
+                            <option value="@inst.InstrumentID">@inst.InstrumentType</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.InstrumentID)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="HighestMusicQualification" class="form-label">Highest Musical Qualification:</label>
+                    <InputSelect id="HighestMusicQualification" @bind-Value="instructor.HighestMusicQualification" class="form-select">
+                        <option value="">Select Highest Music Qualification</option>
+                        <option value="High School Dipoma">High School Dipoma</option>
+                        <option value="Post Secondary Dipoma">Post Secondary Dipoma</option>
+                        <option value="BA">BA</option>
+                        <option value="MSc">MSc</option>
+                        <option value="Ph D">Ph D</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => instructor.HighestMusicQualification)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="YearsOfExperience" class="form-label">Years of Experience:</label>
+                    <InputNumber id="YearsOfExperience" @bind-Value="instructor.YearsOfExperience" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.YearsOfExperience)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="ReferenceEmail" class="form-label">Reference Email:</label>
+                    <InputText id="ReferenceEmail" @bind-Value="instructor.ReferenceEmail" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.ReferenceEmail)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="ReferencePhone" class="form-label">Reference Phone:</label>
+                    <InputText id="ReferencePhone" @bind-Value="instructor.ReferencePhone" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.ReferencePhone)" />
+                </div>
+            </div>
+            <!-- Hidden field for Status -->
+            <input type="hidden" @bind="instructor.Status" />
+
+            <div class="col-12">
+                <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+                <button type="submit" @onclick="RegisterInstructor" class="btn btn-primary">Register</button>
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+    </div>
+}
+@if (user.UserTypeID == 2 && CurrentStep == 3) // Instructor
+{
+    <div class="mt-4 mb-4">
+        <h3>Instructor Registration</h3>
+        <p>Registration Successful, Click here to login.</p>
+    </div>
+}
+@if (user.UserTypeID == 1 && CurrentStep == 3) // Student
+{
+    <div class="mt-4 mb-4">
+        <h3>Student Registration Payment</h3>
+        <p>Please make a payment of $XX for student registration.</p>
+        <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+        <button type="button" @onclick="RegisterStudent" class="btn btn-primary">Make Payment</button>
+    </div>
+}
+else if (user.UserTypeID == 1 && CurrentStep == 4) //&& paymentSuccessful == true)
+{
+    <div class="container mt-4 mb-4">
+        <h3>Payment Confirmation</h3>
+        <p>Your payment was successful. Thank you!</p>
+        <!-- Additional confirmation details or actions -->
+    </div>
+}
+else if (user.UserTypeID == 1 && CurrentStep == 4 && paymentSuccessful == false)
+{
+    <div class="container mt-4 mb-4">
+        <h3>Payment Failed</h3>
+        <p>Unfortunately, your payment was not successful. Please try again.</p>
+        <!-- Additional error handling or actions -->
+    </div>
+}
+<div class="container mt-4 mb-4">
+    <div class="row">
+        <div class="col text-center">
+            <!-- Add music images here -->
+            <img src="your-music-image-1.jpg" alt="Music Image 1" class="img-fluid" />
+            <img src="your-music-image-2.jpg" alt="Music Image 2" class="img-fluid" />
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    int CurrentStep = 1;
+    private User user = new User();
+
+    private Student student = new Student();
+
+    private Instrument instrument = new Instrument();
+    private List<Instrument> instruments;
+
+    private string ErrorMessage { get; set; } = "";
+    private List<UserType> userTypes;
+
+    private bool paymentSuccessful = false; // Flag to track payment status
+
+    private string ClientId = "Af9rn3sOsNDtyCwBZRlcQl3yNy_pPEc69KOJ3uJ1Ql5jHsdsKQKUYxMThkd_YBXKDBrrr1ymmVWUWBq6";
+    private string ClientSecret = "EBbCW4OQZKIKa-kBssHSCkrHXhSKH-GeLE9spVrbPCCGey6jCrjuRO2tHYcfnpTRiIuJNDIizVLMZoxh";
+
+    private PayPalService payPalService;
+
+    private int selectedInstrumentID;
+
+    private readonly EffizyMusicContext _context;
+
+    [Inject]
+    private IUserService userService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+
+    private Instructor instructor = new Instructor();
+
+    decimal amount = 0.00M;
+    int userId = 0;
+
+    void NextStep()
+    {
+        if (user.UserTypeID == 1 || user.UserTypeID == 2)
+        {
+            student.InstrumentID = selectedInstrumentID;
+            CurrentStep++;
+        }
+    }
+    void GoBack()
+    {
+        if (CurrentStep > 1)
+        {
+            CurrentStep--;
+        }
+    }
+
+    async Task RegisterStudent()
+    {
+        try
+        {
+            // Create the user first
+            bool userCreated = await userService.CreateUserAsync(user);
+
+            if (!userCreated)
+            {
+                ErrorMessage = "Failed to create user.";
+                return;
+            }
+
+            // Use the generated User ID for the student
+            student.UserID = user.UserID;
+
+            // Create the student
+            bool studentCreated = await userService.CreateStudentAsync(student);
+
+            if (studentCreated)
+            {
+                CurrentStep = 4;
+                return;
+            }
+            else
+            {
+                // Handle case where student creation failed
+                ErrorMessage = "Failed to create student.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exception, log, etc.
+            ErrorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+
+    async Task RegisterInstructor()
+    {
+        try
+        {
+            // Create the user first
+            bool userCreated = await userService.CreateUserAsync(user);
+
+            if (!userCreated)
+            {
+                ErrorMessage = "Failed to create user.";
+                return;
+            }
+
+            instructor.UserID = user.UserID;
+
+            bool instructorCreated = await userService.CreateInstructorAsync(instructor);
+
+            if (instructorCreated)
+            {
+                CurrentStep = 3;
+                return;
+            }
+            else
+            {    
+                ErrorMessage = "Failed to create instructor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+
+    async Task MakePayment()
+    {
+        try
+        {
+            // Set up PayPal SDK environment
+            var environment = new SandboxEnvironment(ClientId, ClientSecret);
+            var client = new PayPalHttpClient(environment);
+
+            // Build order request body
+            var returnUrl = "https://localhost:7106/registrationForm";
+            var orderRequest = BuildOrderRequest(returnUrl);
+
+            // Create an order request
+            var createOrderRequest = new OrdersCreateRequest();
+            createOrderRequest.Prefer("return=representation");
+            createOrderRequest.RequestBody(orderRequest);
+
+            // Make the payment request to PayPal
+            var response = await client.Execute(createOrderRequest);
+            var order = response.Result<Order>();
+
+            if (order != null && order.Status == "CREATED")
+            {
+                // Payment successful
+                paymentSuccessful = true;
+                CurrentStep = 4; // Move to CurrentStep 4
+
+                // var payment = new Payment
+                //     {
+                //         Amount = (double)amount,
+                //         // Add other payment details as needed
+                //     };
+                // // Record the payment in the database
+                // await RecordPayment(payment);
+            }
+            else
+            {
+                // Payment failed
+                paymentSuccessful = false;
+                CurrentStep = 4; // Move to CurrentStep 4
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle payment failure
+            paymentSuccessful = false;
+            ErrorMessage = "Payment failed: " + ex.Message;
+        }
+    }
+
+    // private async Task RecordPayment(Payment payment)
+    // {
+    //     try
+    //     {
+    //         // Create a new Payment object
+    //         var payment = new Payment
+    //             {
+    //                 UserID = UserID,
+    //                 Amount = (double)amount,
+    //                 PaymentDate = DateTime.UtcNow // or any date/time you prefer
+    //             };
+
+    //         // Add the Payment object to the Payments DbSet
+    //         _context.Payments.Add(payment);
+    //         await _context.SaveChangesAsync();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Handle database error
+    //         ErrorMessage = "Failed to record payment: " + ex.Message;
+    //     }
+    // }
+
+
+    public async Task<bool> CreateInstructorAsync(Instructor instructor)
+    {
+        try
+        {
+            _context.Instructors.Add(instructor);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+
+    private PayPalCheckoutSdk.Orders.OrderRequest BuildOrderRequest(string returnUrl)
+    {
+        var orderRequest = new PayPalCheckoutSdk.Orders.OrderRequest()
+            {
+                CheckoutPaymentIntent = "CAPTURE",
+                ApplicationContext = new PayPalCheckoutSdk.Orders.ApplicationContext()
+                {
+                    BrandName = "Your Brand",
+                    LandingPage = "BILLING",
+                    UserAction = "PAY_NOW",
+                    ReturnUrl = returnUrl
+                },
+                PurchaseUnits = new List<PayPalCheckoutSdk.Orders.PurchaseUnitRequest>()
+        {
+            new PayPalCheckoutSdk.Orders.PurchaseUnitRequest()
+            {
+                AmountWithBreakdown = new PayPalCheckoutSdk.Orders.AmountWithBreakdown()
+                {
+                    CurrencyCode = "USD",
+                    Value = "10.00" // Example amount
+                }
+            }
+        }
+            };
+
+        return orderRequest;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        userTypes = await userTypeService.GetUserTypes();
+        user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0; // Set default UserTypeID
+
+        instruments = await instrumentService.GetInstruments();
+        selectedInstrumentID = instruments?.FirstOrDefault()?.InstrumentID ?? 0;
+    }
+}

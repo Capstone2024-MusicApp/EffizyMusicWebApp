@@ -13,12 +13,26 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column(Order = 1)]
         public int InstructorID { get; set; }
+        // [Required (ErrorMessage = "First Name is required")]
+        public string? FirstName { get; set; }
+
+        // [Required(ErrorMessage = "Last Name is required")]
+        public string? LastName { get; set; }
+
+        //[Required(ErrorMessage = "Gender is required")]
+        public string? Gender { get; set; }
+
+        // [Required(ErrorMessage = "Phone Number is required")]
+        public string? Phone { get; set; }
         public string Location {  get; set; }
         public string HighestMusicQualification { get; set; } = string.Empty;
         public int YearsOfExperience {  get; set; }
         public string ReferenceEmail {  get; set; }
         public string ReferencePhone { get; set; }
+        public string Status { get; set; } = "pending";
         public int UserID {  get; set; }
+        public int InstrumentID { get; set; }
+        public User User { get; set; }
 
 
     }

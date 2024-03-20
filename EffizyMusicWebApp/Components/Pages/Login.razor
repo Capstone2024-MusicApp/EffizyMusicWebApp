@@ -1,0 +1,66 @@
+﻿@page "/login"
+@using EffizyMusicSystem.Models
+@* @inject IAuthenticationService AuthService *@
+@inject NavigationManager NavManager
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+<h3>Login</h3>
+
+@if (showAuthenticationError)
+{
+    <div class="alert alert-danger role="alert">
+        <p>@authenticationErrorText</p>
+    </div>
+}
+
+<EditForm Model="model" @* OnInvalidSubmit="ExecuteLogin"  *@ class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group row">
+        <label for="userid" class="col-md-2 col-form-label">User ID</label>
+        <div class="col-md-10">
+            <InputText id="userid" class="form-control" @bind-Value="model.UserID" />
+            @* <ValidationMessage For="@(() => model.UserID" /> *@
+        </div>
+        <span></span>
+    </div>
+
+     <div class="form-group row">
+         <label for="password" class="col-md-2 col-form-label">Password</label>
+        <div class="col-md-10">
+            <InputText type="password" class="form-control" @bind-Value="model.Password" />
+            @* <ValidationMessage For="@(() => model.Password" /> *@
+        </div>
+     </div>
+    
+     <div class="row">
+         <div class="col-md-12 text-right">
+             <button type="submit" class="btn btn-success">Log In</button>
+         </div>
+     </div>
+</EditForm>
+
+@code {
+    private LoginAuthentication model = new();
+
+    private bool showAuthenticationError = false;
+    private string authenticationErrorText = "";
+
+    // private async Task ExecuteLogin()
+    // {
+    //     showAuthenticationError = false;
+
+    //     var result = AuthService.Login(model);
+
+    //     if (result is not null)
+    //     {
+    //         NavManager.NavigateTo("/");
+    //     }
+    //     else
+    //     {
+    //         authenticationErrorText = "There was an error when trying to log in.";
+    //         showAuthenticationError = true;
+    //     }
+    // }
+}

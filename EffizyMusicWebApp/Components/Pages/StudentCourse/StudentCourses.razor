@@ -1,0 +1,94 @@
+﻿@page "/StudentCourse/StudentCourses"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+<h2>Courses</h2>
+<br />
+@if (availablecourses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main-student-course">
+        <h3>Your Enrolled Courses</h3>
+        <br />
+        @if(enrolledCourses == null)
+        {
+            <p><em>No enrolled courses.</em></p>
+        }
+        else
+        {
+            <table class="student-course-list">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Course Mode</th>
+                        <th>Progress</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        @foreach (var course in enrolledCourses)
+                        {
+                        <tr>
+                            <td>@course.Title</td>
+                            <td>@course.CourseDescription</td>
+                            <td>@course.CourseMode</td>
+                            <td>@course.ProgressStatus</td>
+                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                        </tr>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        }
+
+        <br />
+        <br />
+        <br />
+        <h3>Available Courses</h3>
+        <br />
+        <table class="student-course-list">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Course Code</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @foreach (var course in availablecourses)
+                    {
+                    <tr>
+                        <td>@course.Title</td>
+                        <td>@course.CourseDescription</td>
+                        <td>@course.CourseCode</td>
+                        <td><a href="">View Course</a></td>
+                    </tr>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Course>? availablecourses;
+    private List<StudentCourseDTO>? enrolledCourses;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        availablecourses = await EffizyService.GetCourses();
+        enrolledCourses = await EffizyService.GetEnrolledCourses(1);
+    }
+
+    
+
+}
