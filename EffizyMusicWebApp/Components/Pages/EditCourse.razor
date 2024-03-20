@@ -8,7 +8,7 @@
 
 <h3>Edit Course</h3>
 
-@if (Course != null)
+@if (course != null)
 {
     <EditForm Model="@Course" OnValidSubmit="UpdateCourse" formname="editCourseForm">
         <DataAnnotationsValidator />
@@ -16,20 +16,20 @@
 
         <div class="form-group">
             <label>Title</label>
-            <InputText @bind-Value="Course.Title" class="form-control" />
-            <ValidationMessage For="@(() => Course.Title)" />
+            <InputText @bind-Value="course.Title" class="form-control" />
+            <ValidationMessage For="@(() => course.Title)" />
         </div>
 
         <div class="form-group">
             <label>Course Code</label>
-            <InputText @bind-Value="Course.CourseCode" class="form-control" />
-            <ValidationMessage For="@(() => Course.CourseCode)" />
+            <InputText @bind-Value="course.CourseCode" class="form-control" />
+            <ValidationMessage For="@(() => course.CourseCode)" />
         </div>
 
         <div class="form-group">
             <label>Description</label>
-            <InputTextArea @bind-Value="Course.CourseDescription" class="form-control" />
-            <ValidationMessage For="@(() => Course.CourseDescription)" />
+            <InputTextArea @bind-Value="course.CourseDescription" class="form-control" />
+            <ValidationMessage For="@(() => course.CourseDescription)" />
         </div>
 
         <div class="form-group">
@@ -53,14 +53,14 @@
         </div>
         <div class="form-group">
             <label>Skill Level</label>
-            <InputText @bind-Value="Course.SkillLevel" class="form-control" />
-            <ValidationMessage For="@(() => Course.SkillLevel)" />
+            <InputText @bind-Value="course.SkillLevel" class="form-control" />
+            <ValidationMessage For="@(() => course.SkillLevel)" />
         </div>
 
         <div class="form-group">
             <label>Estimated Time</label>
-            <InputText @bind-Value="Course.EstimatedTime" class="form-control" />
-            <ValidationMessage For="@(() => Course.EstimatedTime)" />
+            <InputText @bind-Value="course.EstimatedTime" class="form-control" />
+            <ValidationMessage For="@(() => course.EstimatedTime)" />
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
