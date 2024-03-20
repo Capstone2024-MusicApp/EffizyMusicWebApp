@@ -94,8 +94,8 @@ else
     private async Task UpdateCourse()
     {
         // Update Course object with selected InstrumentID and InstructorID
-        Course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == Course.InstrumentID);
-        Course.Instructor = Instructors.FirstOrDefault(i => i.InstructorID == Course.InstructorID);
+        course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == Course.InstrumentID);
+        course.Instructor = Instructors.FirstOrDefault(i => i.InstructorID == course.InstructorID);
 
         try
         {
