@@ -33,10 +33,10 @@ namespace EffizyMusicSystem.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public List<Instructor> GetInstructors()
-        {
-            return _context.Instructors.ToList();
-        }
+        //public List<Instructor> GetInstructors()
+        //{
+        //    return _context.Instructors.ToList();
+        //}
         public List<Course> GetCourseList()
         {
             return _context.Courses.ToList();

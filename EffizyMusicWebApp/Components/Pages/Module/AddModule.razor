@@ -20,7 +20,7 @@
 
             @foreach (var course in CourseList)
             {
-                <option value="@course.CourseID">@course.CourseDescription (CourseMode : @course.CourseMode)</option>
+                <option value="@course.CourseID">@course.CourseDescription (CourseMode : @course.CourseCode)</option>
             }
         </InputSelect>
         @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
