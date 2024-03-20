@@ -347,6 +347,9 @@ else if (user.UserTypeID == 12 && CurrentStep == 4 && paymentSuccessful == false
     {
         try
         {
+            // Hash the passwords before saving
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 
@@ -384,6 +387,11 @@ else if (user.UserTypeID == 12 && CurrentStep == 4 && paymentSuccessful == false
     {
         try
         {
+            // Hash the passwords before saving
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+
+
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 

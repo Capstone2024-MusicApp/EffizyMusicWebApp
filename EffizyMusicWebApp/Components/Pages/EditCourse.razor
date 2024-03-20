@@ -94,21 +94,23 @@ else
         Instruments = await CourseService.GetInstrumentsAsync();
         Instructors = await CourseService.GetInstructorsAsync();
 
-        // Set selected InstrumentID and InstructorID
-        course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
-        course.InstructorID = course.Instructor?.InstructorID ?? 0;
+        if (course != null)
+        {
+            course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
+            course.InstructorID = course.Instructor?.InstructorID ?? 0;
+        }
     }
 
     private async Task UpdateCourse()
     {
         // Update Course object with selected InstrumentID and InstructorID
-        course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == course.InstrumentID);
-        course.Instructor = Instructors.FirstOrDefault(i => i.InstructorID == course.InstructorID);
+        //course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == course.InstrumentID);
+        //course.Instructor = Instructors.FirstOrDefault(i => i.InstructorID == course.InstructorID);
 
         try
         {
             await CourseService.UpdateCourseAsync(course);
-            NavigationManager.NavigateTo("/courses");
+            //NavigationManager.NavigateTo("/courses");
         }
         catch (Exception ex)
         {

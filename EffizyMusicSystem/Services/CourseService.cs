@@ -39,9 +39,9 @@ namespace EffizyMusicSystem.Services
         }
 
 
-        public async Task DeleteCourseAsync(int CourseID)
+        public async Task DeleteCourseAsync(int ID)
         {
-            var course = await _context.Courses.FindAsync(CourseID);
+            var course = await _context.Courses.FindAsync(ID);
             if (course != null)
             {
                 _context.Courses.Remove(course);
