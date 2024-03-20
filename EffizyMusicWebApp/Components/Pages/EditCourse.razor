@@ -10,7 +10,7 @@
 
 @if (course != null)
 {
-    <EditForm Model="@Course" OnValidSubmit="UpdateCourse" formname="editCourseForm">
+    <EditForm Model="@course" OnValidSubmit="UpdateCourse" formname="editCourseForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -34,7 +34,7 @@
 
         <div class="form-group">
             <label>Instrument</label>
-            <select class="form-control" @bind="Course.InstrumentID">
+            <select class="form-control" @bind="course.InstrumentID">
                 @foreach (var instrum in Instruments)
                 {
                     <option value="@instrum.InstrumentID">@instrum.InstrumentType</option>
@@ -44,7 +44,7 @@
 
         <div class="form-group">
             <label>Instructor</label>
-            <select class="form-control" @bind="Course.InstructorID">
+            <select class="form-control" @bind="course.InstructorID">
                 @foreach (var instruc in Instructors)
                 {
                     <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
@@ -66,6 +66,12 @@
         <button type="submit" class="btn btn-primary">Save</button>
         <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
     </EditForm>
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ErrorMessage
+        </div>
+    }
 }
 else
 {
@@ -76,30 +82,32 @@ else
     [Parameter]
     public int CourseID { get; set; }
 
-    private Course Course;
+    private Course course;
     private List<Instrument> Instruments = new List<Instrument>();
     private List<Instructor> Instructors = new List<Instructor>();
 
+    private string ErrorMessage { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
-        Course = await CourseService.GetCourseByIdAsync(CourseID);
+        course = await CourseService.GetCourseByIdAsync(CourseID);
         Instruments = await CourseService.GetInstrumentsAsync();
         Instructors = await CourseService.GetInstructorsAsync();
 
         // Set selected InstrumentID and InstructorID
-        Course.InstrumentID = Course.Instrument?.InstrumentID ?? 0;
-        Course.InstructorID = Course.Instructor?.InstructorID ?? 0;
+        course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
+        course.InstructorID = course.Instructor?.InstructorID ?? 0;
     }
 
     private async Task UpdateCourse()
     {
         // Update Course object with selected InstrumentID and InstructorID
-        course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == Course.InstrumentID);
+        course.Instrument = Instruments.FirstOrDefault(i => i.InstrumentID == course.InstrumentID);
         course.Instructor = Instructors.FirstOrDefault(i => i.InstructorID == course.InstructorID);
 
         try
         {
-            await CourseService.UpdateCourseAsync(Course);
+            await CourseService.UpdateCourseAsync(course);
             NavigationManager.NavigateTo("/courses");
         }
         catch (Exception ex)
