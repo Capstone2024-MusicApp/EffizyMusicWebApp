@@ -1,36 +1,34 @@
 ﻿@page "/AddModule/"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
-@inject NavigationManager NavService
+@inject NavigationManager NavigationManager
 <h3>Add Module</h3>
-
-<EditForm FormName="Submit-Module" method="post" Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4">
+<hr />
+<EditForm Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4" FormName="Add-Module">
     
-   
+    <DataAnnotationsValidator />
 
     <div class="form-outline mt-2 col-md-6">
-                <label for="title" class="form-label">Module Title:</label>
-                <InputText @bind-Value="ModuleData.Title" class="form-control"></InputText>
+        <label class="form-label">Course Title:</label>
+        
+            <InputText class="form-control" @bind-Value="ModuleData.Title" />
+        
+        <ValidationMessage For="@(() => ModuleData.Title)" />
             </div>            
   
     <div class="form-outline mt-2 col-md-6">
         <label for="course" class="form-label">Choose Course:</label>
-        <InputSelect class="form-control" @bind-Value="ModuleData.Course" required>
+        <select class="form-control" name="ModuleData.Course.CourseID" required>
             <option value="">[Please Choose the Course...]</option>
 
             @foreach (var course in CourseList)
             {
-                <option value="@course.CourseID">@course.CourseDescription (CourseMode : @course.CourseCode)</option>
+                <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
             }
-        </InputSelect>
+        </select>
+        @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
         @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
     </div>
-
-
-    @* <div class="form-outline mt-2 col-md-6">
-        <label for="title" class="form-label">Module ID:</label>
-        <InputNumber @bind-Value="ModuleData.ModuleID" class="form-control"></InputNumber>
-    </div> *@
 
 
     <button type="submit" class="btn btn-primary mt-4"><i class="fa fa-plus-square" aria-hidden="true"></i>  Add Module</button>
@@ -42,34 +40,37 @@
 } *@
 
 @code {
-    [SupplyParameterFromForm]
-    public Module ModuleData { get; set; } = new();
-
     [Parameter]
     public int CourseId { get; set; }
-    public List<Course> CourseList = new();
+
 
     [Parameter]
     public bool IsModuleAdded { get; set; } = false;
 
     [Parameter]
     public string ErrorMessage { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    protected Module ModuleData { get; set; } = new();
+    public List<Course> CourseList = new();
     protected override void OnInitialized()
     {
         CourseList = EffizyService.GetCourseList();
     }
-    protected override void OnParametersSet()
-    {
-        ModuleData.Course.CourseID = CourseId;
-    }
-    private async Task SaveModuleInfo()
+    // protected override void OnParametersSet()
+    // {
+    //     // ModuleData.Course.CourseID = CourseId;
+    // }
+    public async Task SaveModuleInfo()
     {
         try
         {
+            var Id = ModuleData.Course.CourseID;
+            ModuleData.Course = await EffizyService.GetCourseByID(ModuleData.Course.CourseID);
             IsModuleAdded = await EffizyService.AddModules(ModuleData);
             if (IsModuleAdded)
             {
-                NavService.NavigateTo("~/Modules/");
+                NavigationManager.NavigateTo("~/Modules/");
                 ResetForm();
             }
             else
@@ -79,7 +80,7 @@
         }
         catch(Exception ex)
         {
-           
+            ErrorMessage = "Error in Adding Lesson";
         }
 
     }
