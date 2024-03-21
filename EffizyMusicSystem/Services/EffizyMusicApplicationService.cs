@@ -69,12 +69,12 @@ namespace EffizyMusicSystem.Services
             return await _context.UserTypes.ToListAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(int userTypeID)
-        {
-            return await _context.Users
-                .Include(x => x.UType)
-                .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
-        }
+        //public async Task<User> GetUserByIdAsync(int userTypeID)
+        //{
+        //    return await _context.Users
+        //        .Include(x => x.UType)
+        //        .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
+        //}
 
         //Add other methods here that directly connect to the database
         public List<Feedback> GetFeedback()

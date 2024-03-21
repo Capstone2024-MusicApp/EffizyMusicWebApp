@@ -1,0 +1,35 @@
+﻿@using EffizyMusicSystem.Models
+
+@if (StudentProfile != null)
+{
+    <h4>Edit Student Profile</h4>
+    <form @onsubmit="@HandleSubmit">
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input id="firstName" class="form-control" @bind="@StudentProfile.FirstName" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" class="form-control" @bind="@StudentProfile.LastName" />
+        </div>
+        <!-- Add more fields as needed -->
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public Student StudentProfile { get; set; }
+
+    [Parameter]
+    public EventCallback<Student> OnSubmit { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync(StudentProfile);
+    }
+}
