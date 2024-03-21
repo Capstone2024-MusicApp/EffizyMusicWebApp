@@ -1,0 +1,24 @@
+﻿@page "/DeleteCourse/{CourseID:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<h3>Delete Course</h3>
+<hr>
+<EditForm Model="@Course" OnValidSubmit="RemoveCourse">
+
+    </EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public Course Course{ get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+    public async Task RemoveCourse()
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this Course? It will delete related Modules, Lessons and Quizes associated with it. Please double check before proceeding");
+    
+    }
+}

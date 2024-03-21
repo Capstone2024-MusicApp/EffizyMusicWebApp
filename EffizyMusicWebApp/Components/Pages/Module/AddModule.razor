@@ -19,16 +19,16 @@
 
     <div class="form-outline mt-2 col-md-6">
         <label for="course" class="form-label">Choose Course:</label>
-        <select class="form-control" name="@ModuleData.Course.CourseID" required>
-            @* <option value="">[Please Choose the Course...]</option> *@
-            @if (CourseList != null)
+        <select class="form-control" @onchange="HandleSelectedValue" required>
+            <option value="">[Please Choose the Course...]</option>
+
+            @foreach (var course in CourseList)
             {
-                @foreach (var course in CourseList)
-                {
-                    <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
-                }
+                <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
             }
+
         </select>
+
         @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
         @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
     </div>
@@ -64,12 +64,11 @@
     {
         try
         {
-            var Id = ModuleData.Course.CourseID;
-            ModuleData.Course = await EffizyService.GetCourseByID(ModuleData.Course.CourseID);
+            ModuleData.Course = await EffizyService.GetCourseByID(CourseId);
             IsModuleAdded = await EffizyService.AddModules(ModuleData);
             if (IsModuleAdded)
             {
-                NavigationManager.NavigateTo("~/Modules/");
+                NavigationManager.NavigateTo("/Modules/");
                 ResetForm();
             }
             else
@@ -82,6 +81,10 @@
             ErrorMessage = "Error in Adding Lesson";
         }
 
+    }
+    private void HandleSelectedValue(ChangeEventArgs e)
+    {
+        CourseId = Convert.ToInt32(e.Value);
     }
     private void ResetForm()
     {
