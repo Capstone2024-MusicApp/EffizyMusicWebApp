@@ -10,7 +10,7 @@ namespace EffizyMusicSystem.Models
 {
     public class Module
     {
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ModuleID { get; set; }
         public string Title { get; set; }        
         public virtual Course Course { get; set; }

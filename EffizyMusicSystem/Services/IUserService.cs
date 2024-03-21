@@ -13,5 +13,8 @@ namespace EffizyMusicSystem.Services
         Task<bool> CreateStudentAsync(Student student);
         Task<bool> CreateInstructorAsync(Instructor instructor);
         Task<User> GetUserByIdAsync(int userTypeID);
+        Task<User> GetUserByEmailAsync(string email);
+        Task<User> UpdateUserAsync(User user);
     }
+
 }
