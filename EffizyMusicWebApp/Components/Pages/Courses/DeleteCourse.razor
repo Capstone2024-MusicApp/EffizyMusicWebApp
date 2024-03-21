@@ -1,4 +1,4 @@
-﻿@page "/DeleteCourse/{CourseID:int}"
+﻿@page "/DeleteCourse/{CourseId:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
@@ -9,6 +9,9 @@
 
     </EditForm>
 @code {
+    [Parameter]
+    public bool IsDeleted { get; set; }
+    public int CourseId{ get; set; }
     [SupplyParameterFromForm]
     public Course Course{ get; set; }
 
@@ -18,7 +21,14 @@
     }
     public async Task RemoveCourse()
     {
-        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this Course? It will delete related Modules, Lessons and Quizes associated with it. Please double check before proceeding");
-    
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the Course named {Course.CourseCode}? It will delete related Modules, Lessons and Quizes associated with it. Please double check before proceeding");
+        if (confirmed)
+        {
+            IsDeleted = await EffizyService.DeleteCourse(Course.CourseID);
+            if (IsDeleted)
+            {
+                NavigationManager.NavigateTo("/Course");
+            }
+        }
     }
 }

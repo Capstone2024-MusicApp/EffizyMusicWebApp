@@ -25,6 +25,7 @@ namespace EffizyMusicSystem.Services
         List<Course> GetCourseList();
 
         Task<Course> GetCourseByID(int id);
+        Task<bool> DeleteCourse(int id);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
