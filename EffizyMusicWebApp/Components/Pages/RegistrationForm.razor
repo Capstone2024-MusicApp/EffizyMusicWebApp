@@ -67,7 +67,7 @@
     </div>
 }
 
-@if (user.UserTypeID == 12 && CurrentStep == 2) // Student
+@if (user.UserTypeID == 1 && CurrentStep == 2) // Student
 {
     <div class="containerd-flex justify-content-center  mt-4 mb-4">
         <h3 class="text-center">Student Registration</h3>
@@ -149,7 +149,7 @@
         </EditForm>
     </div>
 }
-else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
+else if (user.UserTypeID == 2 && CurrentStep == 2) // Instructor
 {
     <div class="container justify-content-center mt-4 mb-4">
         <h3 class="text-center">Instructor Registration</h3>
@@ -248,14 +248,14 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
     </div>
 }
-@if (user.UserTypeID == 13 && CurrentStep == 3) // Instructor
+@if (user.UserTypeID == 2 && CurrentStep == 3) // Instructor
 {
     <div class="mt-4 mb-4">
         <h3>Instructor Registration</h3>
         <p>Registration Successful, Click here to login.</p>
     </div>
 }
-@if (user.UserTypeID == 12 && CurrentStep == 3) // Student
+@if (user.UserTypeID == 1 && CurrentStep == 3) // Student
 {
     <div class="mt-4 mb-4">
         <h3>Student Registration Payment</h3>
@@ -264,7 +264,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         <button type="button" @onclick="RegisterStudent" class="btn btn-primary">Make Payment</button>
     </div>
 }
-else if (user.UserTypeID == 12 && CurrentStep == 4) //&& paymentSuccessful == true)
+else if (user.UserTypeID == 1 && CurrentStep == 4) //&& paymentSuccessful == true)
 {
     <div class="container mt-4 mb-4">
         <h3>Payment Confirmation</h3>
@@ -272,7 +272,7 @@ else if (user.UserTypeID == 12 && CurrentStep == 4) //&& paymentSuccessful == tr
         <!-- Additional confirmation details or actions -->
     </div>
 }
-else if (user.UserTypeID == 12 && CurrentStep == 4 && paymentSuccessful == false)
+else if (user.UserTypeID == 1 && CurrentStep == 4 && paymentSuccessful == false)
 {
     <div class="container mt-4 mb-4">
         <h3>Payment Failed</h3>
@@ -329,7 +329,7 @@ else if (user.UserTypeID == 12 && CurrentStep == 4 && paymentSuccessful == false
 
     void NextStep()
     {
-        if (user.UserTypeID == 12 || user.UserTypeID == 13)
+        if (user.UserTypeID == 1 || user.UserTypeID == 2)
         {
             student.InstrumentID = selectedInstrumentID;
             CurrentStep++;

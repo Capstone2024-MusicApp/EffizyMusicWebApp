@@ -15,7 +15,7 @@ namespace EffizyMusicSystem.Models.DTO
         public required string Title { get; set; }
 
         public required string CourseDescription { get; set; }
-        public required string CourseMode { get; set; }
+        public required string CourseCode { get; set; }
         public int StudentID { get; set;}
 
         public required string ProgressStatus { get; set; }

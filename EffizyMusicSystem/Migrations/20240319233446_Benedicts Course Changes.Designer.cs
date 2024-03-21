@@ -4,6 +4,7 @@ using EffizyMusicSystem.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EffizyMusicSystem.Migrations
 {
     [DbContext(typeof(EffizyMusicContext))]
-    partial class EffizyMusicContextModelSnapshot : ModelSnapshot
+    [Migration("20240319233446_Benedicts Course Changes")]
+    partial class BenedictsCourseChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +51,7 @@ namespace EffizyMusicSystem.Migrations
                 {
                     b.Property<int>("CourseID")
                         .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseID"));
@@ -94,16 +98,16 @@ namespace EffizyMusicSystem.Migrations
 
             modelBuilder.Entity("EffizyMusicSystem.Models.DTO.StudentCourseDTO", b =>
                 {
-                    b.Property<string>("CourseCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CourseDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CourseID")
                         .HasColumnType("int");
+
+                    b.Property<string>("CourseMode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EnrollmentID")
                         .HasColumnType("int");

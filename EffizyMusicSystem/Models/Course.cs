@@ -15,17 +15,19 @@ namespace EffizyMusicSystem.Models
 
         public string Title { get; set; }
 
-        public string CourseCode { get; set; }
-
+        [StringLength(30)]
+        public string CourseCode { get; set; } = string.Empty;
+       
         public string CourseDescription { get; set; }
 
         public int InstrumentID { get; set; }
 
         public int InstructorID { get; set; }
-
-        public string SkillLevel { get; set; }
-
-        public string EstimatedTime { get; set; }
+      
+        [StringLength(30)]
+        public string SkillLevel { get; set; } = string.Empty;
+        [StringLength(30)]
+        public string EstimatedTime { get; set; } = string.Empty;
 
         public Instrument Instrument { get; set; }
 
