@@ -2,28 +2,31 @@
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 <h3>Add Module</h3>
 <hr />
 <EditForm Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4" FormName="Add-Module">
-    
+
     <DataAnnotationsValidator />
 
     <div class="form-outline mt-2 col-md-6">
         <label class="form-label">Course Title:</label>
-        
-            <InputText class="form-control" @bind-Value="ModuleData.Title" />
-        
+
+        <InputText class="form-control" @bind-Value="ModuleData.Title" />
+
         <ValidationMessage For="@(() => ModuleData.Title)" />
-            </div>            
-  
+    </div>
+
     <div class="form-outline mt-2 col-md-6">
         <label for="course" class="form-label">Choose Course:</label>
-        <select class="form-control" name="ModuleData.Course.CourseID" required>
-            <option value="">[Please Choose the Course...]</option>
-
-            @foreach (var course in CourseList)
+        <select class="form-control" name="@ModuleData.Course.CourseID" required>
+            @* <option value="">[Please Choose the Course...]</option> *@
+            @if (CourseList != null)
             {
-                <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
+                @foreach (var course in CourseList)
+                {
+                    <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
+                }
             }
         </select>
         @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
@@ -57,10 +60,6 @@
     {
         CourseList = EffizyService.GetCourseList();
     }
-    // protected override void OnParametersSet()
-    // {
-    //     // ModuleData.Course.CourseID = CourseId;
-    // }
     public async Task SaveModuleInfo()
     {
         try
@@ -78,7 +77,7 @@
                 ErrorMessage = "Error in Adding Lesson";
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorMessage = "Error in Adding Lesson";
         }
