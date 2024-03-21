@@ -64,10 +64,21 @@ namespace EffizyMusicSystem.Services
         }
         public async Task<User> GetUserByIdAsync(int userId)
         {
-            return await _context.Users
-                .Include(x => x.UType)
-                .FirstOrDefaultAsync(x => x.UserID == userId);
+            return await _context.Users.FindAsync(userId);
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User> UpdateUserAsync(User user)
+        {
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return user;
+        }
+
 
         public async Task AddPaymentAsync(int userId, decimal amount)
         {
