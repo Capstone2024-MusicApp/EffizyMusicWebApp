@@ -28,7 +28,7 @@ namespace EffizyMusicSystem.Services
         Task<Module> GetModuleByID(int id);
 
         Task<Course> GetCourseByID(int id);
-        Task<bool> DeleteCourse(int id);
+        Task DeleteCourse(int id);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -160,20 +160,14 @@ namespace EffizyMusicSystem.Services
 
 
         }
-        public async Task<bool> DeleteCourse(int id)
+        public async Task DeleteCourse(int id)
         {
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
                 _context.Remove(existingID);
-                await _context.SaveChangesAsync();
-                return true;
+                await _context.SaveChangesAsync();               
             }
-            else
-            {
-                return false;
-            }
-
         }
 
         #endregion
