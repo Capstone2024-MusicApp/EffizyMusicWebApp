@@ -19,7 +19,7 @@ namespace EffizyMusicSystem.Services
         Task<bool> AddLesson(Lesson lessonData);
         Task<bool> UpdateLesson(Lesson lessonData);
         Task<bool> DeleteLesson(int id);
-
+        Task<Lesson> GetLessonById(int id);
         Task<bool> AddRating(InstructorRating rating);
         Task<List<Course>> GetCourses();
         List<Course> GetCourseList();
@@ -110,6 +110,10 @@ namespace EffizyMusicSystem.Services
             return await _context.Lessons.ToListAsync();
         }
 
+        public async Task<Lesson> GetLessonById(int id)
+        {
+            return await _context.Lessons.Where(x=>x.LessonNumber == id).FirstOrDefaultAsync();
+        }
         #endregion
 
 

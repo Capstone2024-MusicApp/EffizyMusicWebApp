@@ -1,9 +1,78 @@
 ﻿@page "/EditLesson/{lessonNumber:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
-@inject NavigationManager NavService
-<h3>EditLesson</h3>
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<h3>Edit Lesson</h3>
+<hr />
 
+@* <EditForm Model="@LessonData" OnValidSubmit="UpdateLesson" formname="Edit-Lesson">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Title</label>
+        <InputText @bind-Value="course.Title" class="form-control" />
+        <ValidationMessage For="@(() => course.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label>Course Code</label>
+        <InputText @bind-Value="course.CourseCode" class="form-control" />
+        <ValidationMessage For="@(() => course.CourseCode)" />
+    </div>
+
+    <div class="form-group">
+        <label>Description</label>
+        <InputTextArea @bind-Value="course.CourseDescription" class="form-control" />
+        <ValidationMessage For="@(() => course.CourseDescription)" />
+    </div>
+
+    <div class="form-group">
+        <label>Instrument</label>
+        <select class="form-control" @bind="course.InstrumentID">
+            @foreach (var instrum in Instruments)
+            {
+                <option value="@instrum.InstrumentID">@instrum.InstrumentType</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Instructor</label>
+        <select class="form-control" @bind="course.InstructorID">
+            @foreach (var instruc in Instructors)
+            {
+                <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-danger" @onclick="RemoveCourse">Delete</button>
+    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+</EditForm> *@
 @code {
+    [Parameter]
+    public int LessonNumber { get; set; }
 
+
+    private Lesson LessonData;
+    private string ErrorMessage { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            LessonData = await EffizyService.GetLessonById(LessonNumber);           
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error loading course data: " + ex.Message;
+        }
+    }
+    public async Task UpdateLesson()
+    {
+        
+    }
 }
