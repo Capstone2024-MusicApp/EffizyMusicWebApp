@@ -2,35 +2,50 @@
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
+@rendermode InteractiveServer
 <h2 class="display-3 text-center">Add Lesson</h2>
 
-<EditForm Model="@LessonData" FormName="Add-Lesson" OnValidSubmit="SaveLessonInfo">
+<hr />
+    <EditForm Model="@LessonData" OnValidSubmit="SaveLessonInfo" FormName="Add-Lesson">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="form-outline mt-2">
                 <label for="title" class="form-label">Lesson Title:</label>
-                <InputText @bind-value="LessonData.Title" class="form-control"></InputText>
+                <InputText @bind-Value="LessonData.Title" class="form-control"></InputText>
             </div>
             <div class="form-outline mt-2">
                 <label for="lessonMode" class="form-label">Lesson Mode:</label>
-                <InputText @bind-value="LessonData.LessonMode" class="form-control"></InputText>
+                <InputText @bind-Value="LessonData.LessonMode" class="form-control"></InputText>
             </div>
-            <div class="form-outline mt-2">
+            @* <div class="form-outline mt-2">
                 <label for="content" class="form-label">Lesson Content:</label>
-                <InputFile @bind-value="LessonData.LessonContent" onchange="HandleFileSelected">Upload your Lesson File</InputFile>
+            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Uploadl"></Icon> Upload your Lesson File
+            </div> *@
+            <div class="form-outline mt-2">
+                <label for="module" class="form-label">Choose Module:</label>
+                <select class="form-control" @onchange="HandleSelectedValue" required>
+                    <option value="">[Please Choose the Module...]</option>
+                    @foreach (var module in ModuleList)
+                    {
+                        <option value="@module.ModuleID">@module.Title</option>
+                    }
+                </select>
+
+                @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
+                @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
             </div>
             <button type="submit" class="btn btn-primary mt-4">Add Lesson</button>
         </div>
     </div>
 </EditForm>
 
-@if (!IsLessonAdded)
+@* @if (!IsLessonAdded)
 {
     <p class="text-center text-danger"><em>@ErrorMessage</em></p>
-}
+} *@
 @code {
-    [SupplyParameterFromForm]
-    public Lesson LessonData { get; set; } = new();
+
+
 
     [Parameter]
     public bool IsLessonAdded { get; set; }
@@ -38,16 +53,22 @@
     [Parameter]
     public string ErrorMessage { get; set; }
 
+    // private byte[] videoBytes;
 
-    private IBrowserFile selectedFile;
+    public int ModuleId { get; set; }
+
+    public List<Module> ModuleList = new();
+
+    [SupplyParameterFromForm]
+    protected Lesson LessonData { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // Get User Info
+        ModuleList = await EffizyService.GetModules();
     }
     public async void SaveLessonInfo()
     {
-        LessonData.LessonContent = await UploadVideo();
+        LessonData.Module = await EffizyService.GetModuleByID(ModuleId);
         IsLessonAdded = await EffizyService.AddLesson(LessonData);
         if (IsLessonAdded)
         {
@@ -58,27 +79,22 @@
             ErrorMessage = "Error in Adding Lesson";
         }
     }
-
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        selectedFile = e.GetMultipleFiles().FirstOrDefault();
-    }
-
-    private async Task<byte[]> UploadVideo()
-    {
-        byte[] videoBytes = new byte[0];
-        if (selectedFile != null)
+        var file = e.File;
+        if (file != null)
         {
-            using (var stream = selectedFile.OpenReadStream())
+            using (var stream = new MemoryStream())
             {
-                // Convert stream to byte array
-                videoBytes = await ConvertStreamToByteArray(stream);
-
-                // Save videoBytes to your storage or database
-                // Example: await SaveToDatabase(videoBytes);
+                file.OpenReadStream().CopyToAsync(stream);
+                // videoBytes = stream.ToArray();
+                LessonData.LessonContent = stream.ToArray();
             }
         }
-        return videoBytes;
+    }
+    private void HandleSelectedValue(ChangeEventArgs e)
+    {
+        ModuleId = Convert.ToInt32(e.Value);
     }
     private async Task<byte[]> ConvertStreamToByteArray(Stream stream)
     {

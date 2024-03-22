@@ -8,45 +8,61 @@
 {
     <p class="text-center"><em>Loading...</em></p>
 }
-@foreach(var item in LessonList)
-{
-    <table class="table table-striped align-middle table-bordered">
-        <thead class="table-success">
+<table class="table table-striped align-middle table-bordered">
+    <thead class="table-success">
+        <tr>
+            <th>Lesson Number</th>
+            <th>Lesson Title</th>
+            <th>Lesson Mode</th>
+            @*    <th>Lesson Content</th> *@
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lesson in LessonList)
+        {
             <tr>
-                <th>Lesson Number</th>
-                <th>Lesson Title</th>
-                <th>Lesson Mode</th>
-             @*    <th>Lesson Content</th> *@
-                <th></th>
+                <td>@lesson.LessonNumber</td>
+                <td>@lesson.Title</td>
+                <td>@lesson.LessonMode</td>
+                <td>
+                    @if (lesson.LessonContent != null)
+                    {
+                        <video controls>
+                            <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    }
+                    else
+                    {
+                        <p>No video available.</p>
+                    }
+                </td>
+                <td>
+                    <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
+                        <Icon Name="IconName.PencilSquare"></Icon> Edit
+                    </a>                
+                    <button class="btn btn-danger" role="button"> Delete</button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var lesson in LessonList)
-            {
-                <tr>
-                    <td>@lesson.LessonNumber</td> 
-                    <td>@lesson.Title</td>
-                    <td>@lesson.LessonMode</td>
-                    <td>
-                        <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-outline-dark" role="button">
-                            Edit
-                        </a>
-                    </td>
-                    <td>
-                       <button class="btn btn-danger" role="button">Delete</button>                          
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        }
+    </tbody>
+</table>
+
 @code {
 
     // @page "/user/{Id:int}"
     public List<Lesson> LessonList { get; set; } = new();
-
+    // private byte[] videoBytes; // The byte array containing the video content
+    // private string videoUrl;
     protected override async Task OnInitializedAsync()
     {
+    //     string base64String = Convert.ToBase64String(videoBytes);
+
+    //     // Construct data URL
+    //     videoUrl = $"data:video/mp4;base64,{base64String}";
         LessonList = await EffizyService.GetLessons();
+
     }
 }

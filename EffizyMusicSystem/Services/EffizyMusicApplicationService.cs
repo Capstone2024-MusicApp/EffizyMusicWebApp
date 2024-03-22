@@ -24,6 +24,9 @@ namespace EffizyMusicSystem.Services
         Task<List<Course>> GetCourses();
         List<Course> GetCourseList();
 
+        Task<List<Module>> GetModules();
+        Task<Module> GetModuleByID(int id);
+
         Task<Course> GetCourseByID(int id);
         Task<bool> DeleteCourse(int id);
     }
@@ -197,6 +200,17 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<Module> GetModuleByID(int id)
+        {
+            try
+            {
+                return await _context.Modules.Where(x=>x.ModuleID == id).FirstOrDefaultAsync();
             }
             catch
             {
