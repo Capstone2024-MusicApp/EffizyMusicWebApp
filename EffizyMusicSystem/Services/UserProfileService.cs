@@ -26,30 +26,72 @@ namespace EffizyMusicSystem.Services
                 .FirstOrDefaultAsync(u => u.UserID == userId);
         }
 
-        public async Task<Student> GetStudentProfileAsync(int userId)
+        public async Task<Student> GetStudentProfileAsync(int studentID)
         {
-            return await _context.Students
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.UserID == userId);
+            try
+            {
+                var student = await _context.Students.FindAsync(studentID);
+                return student;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting student profile: {ex.Message}");
+                throw new Exception($"Error updating student profile: {ex.Message}");
+            }
         }
 
-        public async Task<Instructor> GetInstructorProfileAsync(int userId)
+        public async Task<int?> GetStudentIDByUserIDAsync(int userId)
         {
-            return await _context.Instructors
-                .Include(i => i.User)
-                .FirstOrDefaultAsync(i => i.UserID == userId);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == userId);
+            return student?.StudentID;
+        }
+
+        public async Task<int?> GetInstructorIDByUserIDAsync(int userId)
+        {
+            var instructor = await _context.Instructors.FirstOrDefaultAsync(i => i.UserID == userId);
+            return instructor?.InstructorID;
+        }
+
+        public async Task<Instructor> GetInstructorProfileAsync(int instructorID)
+        {
+            try
+            {
+                var instructor =  await _context.Instructors.FindAsync(instructorID);
+                return instructor;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting student profile: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<bool> UpdateStudentProfileAsync(Student student)
         {
-            _context.Students.Update(student);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.Students.Update(student);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> UpdateInstructorProfileAsync(Instructor instructor)
         {
-            _context.Instructors.Update(instructor);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.Instructors.Update(instructor);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 

@@ -1,35 +1,140 @@
-﻿@using EffizyMusicSystem.Models
+﻿@page "/admin/edit-student-profile/{StudentID}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components
+@using System.Threading.Tasks
+@inject IUserProfileService UserProfileService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Edit Student Profile</h3>
 
 @if (StudentProfile != null)
 {
-    <h4>Edit Student Profile</h4>
-    <form @onsubmit="@HandleSubmit">
+    <EditForm Model="@StudentProfile" OnValidSubmit="@UpdateProfile">
+        <DataAnnotationsValidator />
+
         <div class="form-group">
             <label for="firstName">First Name</label>
-            <input id="firstName" class="form-control" @bind="@StudentProfile.FirstName" />
+            <InputText id="firstName" class="form-control" @bind-Value="@StudentProfile.FirstName" />
+            <ValidationMessage For="@(() => StudentProfile.FirstName)" />
         </div>
+
         <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input id="lastName" class="form-control" @bind="@StudentProfile.LastName" />
+            <InputText id="lastName" class="form-control" @bind-Value="@StudentProfile.LastName" />
+            <ValidationMessage For="@(() => StudentProfile.LastName)" />
         </div>
-        <!-- Add more fields as needed -->
-        <button type="submit" class="btn btn-primary">Save</button>
-    </form>
+
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <InputText id="gender" class="form-control" @bind-Value="@StudentProfile.Gender" />
+            <ValidationMessage For="@(() => StudentProfile.Gender)" />
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <InputText id="phone" class="form-control" @bind-Value="@StudentProfile.Phone" />
+            <ValidationMessage For="@(() => StudentProfile.Phone)" />
+        </div>
+
+        <div class="form-group">
+            <label for="skillLevel">Skill Level</label>
+            <InputText id="skillLevel" class="form-control" @bind-Value="@StudentProfile.SkillLevel" readonly="readonly" />
+            <ValidationMessage For="@(() => StudentProfile.SkillLevel)" />
+        </div>
+
+        <div class="form-group">
+            <label for="grades">Grades</label>
+            <InputNumber id="grades" class="form-control" @bind-Value="@StudentProfile.Grades" readonly="readonly" />
+            <ValidationMessage For="@(() => StudentProfile.Grades)" />
+        </div>
+
+        <div class="form-group">
+            <label for="paymentPlan">Payment Plan</label>
+            <InputText id="paymentPlan" class="form-control" @bind-Value="@StudentProfile.PaymentPlan" readonly="readonly" />
+            <ValidationMessage For="@(() => StudentProfile.PaymentPlan)" />
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary" @onclick="UpdateProfile">Save</button>
+            <button class="btn btn-secondary ml-2" @onclick="Back">Back</button>
+        </div>
+    </EditForm>
+}
+else if (IsLoading)
+{
+    <p>Loading...</p>
 }
 else
 {
-    <p>Loading...</p>
+    <p>Student profile not found for ID: @StudentID</p>
 }
 
 @code {
     [Parameter]
-    public Student StudentProfile { get; set; }
+    public string StudentID { get; set; }
 
-    [Parameter]
-    public EventCallback<Student> OnSubmit { get; set; }
+    private Student StudentProfile { get; set; }
+    private bool IsLoading { get; set; } = true;
+    private string ErrorMessage { get; set; }
 
-    private async Task HandleSubmit()
+    protected override async Task OnInitializedAsync()
     {
-        await OnSubmit.InvokeAsync(StudentProfile);
+        await LoadStudentProfile();
+    }
+
+    private async Task LoadStudentProfile()
+    {
+        if (!string.IsNullOrEmpty(StudentID) && int.TryParse(StudentID, out int studentId))
+        {
+            try
+            {
+                ErrorMessage = $"Loading student profile for ID: {studentId}";
+                StudentProfile = await UserProfileService.GetStudentProfileAsync(studentId);
+                IsLoading = false;
+                if (StudentProfile != null)
+                {
+                    ErrorMessage = $"Student profile loaded: {StudentProfile.FirstName} {StudentProfile.LastName}";
+                }
+                else
+                {
+                    ErrorMessage = $"Student profile is null for ID: {studentId}";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error loading student profile: {ex.Message}";
+            }
+        }
+        else
+        {
+            ErrorMessage = "Invalid Student ID";
+        }
+    }
+
+    private async Task UpdateProfile()
+    {
+        try
+        {
+            var result = await UserProfileService.UpdateStudentProfileAsync(StudentProfile);
+            if (result)
+            {
+                NavigationManager.NavigateTo("/profile");
+            }
+            else
+            {
+                ErrorMessage = "Failed to update student profile.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error updating student profile: {ex.Message}";
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/profile");
     }
 }
