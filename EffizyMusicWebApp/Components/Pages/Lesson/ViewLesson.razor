@@ -14,13 +14,13 @@
             <th>Lesson Number</th>
             <th>Lesson Title</th>
             <th>Lesson Mode</th>
-            @*    <th>Lesson Content</th> *@
+            <th>Lesson Content</th>
             <th></th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var lesson in LessonList)
+        @foreach (var lesson in PaginatedLessons)
         {
             <tr>
                 <td>@lesson.LessonNumber</td>
@@ -42,7 +42,7 @@
                 <td>
                     <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
                         <Icon Name="IconName.PencilSquare"></Icon> Edit
-                    </a>                
+                    </a>
                     <button class="btn btn-danger" role="button"> Delete</button>
                 </td>
             </tr>
@@ -50,19 +50,41 @@
     </tbody>
 </table>
 
+@* <Pagination CurrentPage="@CurrentPage"
+            PageSize="@PageSize"
+            TotalItems="@TotalItems"
+            OnPageChanged="HandlePageChange" /> *@
+
 @code {
 
-    // @page "/user/{Id:int}"
+    private int PageSize { get; set; } = 5;
+    private int CurrentPage { get; set; } = 1;
+    private int TotalItems { get; set; } = 0;
     public List<Lesson> LessonList { get; set; } = new();
-    // private byte[] videoBytes; // The byte array containing the video content
-    // private string videoUrl;
+    public List<Lesson> PaginatedLessons { get; set; } = new();
+
+
     protected override async Task OnInitializedAsync()
     {
-    //     string base64String = Convert.ToBase64String(videoBytes);
+        await LoadData();
+    }
 
-    //     // Construct data URL
-    //     videoUrl = $"data:video/mp4;base64,{base64String}";
+    private async Task LoadData()
+    {
         LessonList = await EffizyService.GetLessons();
+        TotalItems = LessonList.Count;
+        Paginate();
+    }
 
+    private void Paginate()
+    {
+        PaginatedLessons = LessonList.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    private async Task HandlePageChange(int newPage)
+    {
+        CurrentPage = newPage;
+        Paginate();
+        StateHasChanged(); // Ensure the UI is updated after pagination
     }
 }

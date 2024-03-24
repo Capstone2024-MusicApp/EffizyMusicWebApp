@@ -17,10 +17,10 @@
                 <label for="lessonMode" class="form-label">Lesson Mode:</label>
                 <InputText @bind-Value="LessonData.LessonMode" class="form-control"></InputText>
             </div>
-            @* <div class="form-outline mt-2">
+            <div class="form-outline mt-2">
                 <label for="content" class="form-label">Lesson Content:</label>
-            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Uploadl"></Icon> Upload your Lesson File
-            </div> *@
+            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon> Upload your Lesson File
+            </div> 
             <div class="form-outline mt-2">
                 <label for="module" class="form-label">Choose Module:</label>
                 <select class="form-control" @onchange="HandleSelectedValue" required>
@@ -44,8 +44,6 @@
     <p class="text-center text-danger"><em>@ErrorMessage</em></p>
 } *@
 @code {
-
-
 
     [Parameter]
     public bool IsLessonAdded { get; set; }
@@ -79,19 +77,28 @@
             ErrorMessage = "Error in Adding Lesson";
         }
     }
-    private void HandleFileSelected(InputFileChangeEventArgs e)
+
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
         {
             using (var stream = new MemoryStream())
             {
-                file.OpenReadStream().CopyToAsync(stream);
-                // videoBytes = stream.ToArray();
-                LessonData.LessonContent = stream.ToArray();
+                await file.OpenReadStream().CopyToAsync(stream);
+                // Reset the stream position to the beginning
+                stream.Seek(0, SeekOrigin.Begin);
+
+                // Convert the memory stream to a byte array
+                byte[] videoBytes = stream.ToArray();
+
+                // Assign the byte array to the LessonContent property
+                LessonData.LessonContent = videoBytes;
             }
         }
     }
+
     private void HandleSelectedValue(ChangeEventArgs e)
     {
         ModuleId = Convert.ToInt32(e.Value);

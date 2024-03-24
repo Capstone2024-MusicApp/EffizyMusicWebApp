@@ -6,57 +6,52 @@
 <h3>Edit Lesson</h3>
 <hr />
 
-@* <EditForm Model="@LessonData" OnValidSubmit="UpdateLesson" formname="Edit-Lesson">
+<EditForm Model="@LessonData" OnValidSubmit="UpdateLesson" formname="Edit-Lesson">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
         <label>Title</label>
-        <InputText @bind-Value="course.Title" class="form-control" />
-        <ValidationMessage For="@(() => course.Title)" />
+        <InputText @bind-Value="LessonData.Title" class="form-control" /> @LessonData.Title
+        <ValidationMessage For="@(() => LessonData.Title)" />
+    </div>
+
+    <div class="form-outline mt-2">
+        <label for="lessonMode" class="form-label">Lesson Mode:</label>
+        <InputText @bind-Value="LessonData.LessonMode" class="form-control">@LessonData.LessonMode</InputText>
+    </div>
+    <div class="form-outline mt-2">
+        <label for="content" class="form-label">Lesson Content:</label>
+        <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon> Upload your Lesson File
+        @LessonData.LessonContent
     </div>
 
     <div class="form-group">
-        <label>Course Code</label>
-        <InputText @bind-Value="course.CourseCode" class="form-control" />
-        <ValidationMessage For="@(() => course.CourseCode)" />
-    </div>
-
-    <div class="form-group">
-        <label>Description</label>
-        <InputTextArea @bind-Value="course.CourseDescription" class="form-control" />
-        <ValidationMessage For="@(() => course.CourseDescription)" />
-    </div>
-
-    <div class="form-group">
-        <label>Instrument</label>
-        <select class="form-control" @bind="course.InstrumentID">
-            @foreach (var instrum in Instruments)
+        <label>Module</label>
+        <select class="form-control" @bind="LessonData.Module.ModuleID">
+            @foreach (var module in ModuleList)
             {
-                <option value="@instrum.InstrumentID">@instrum.InstrumentType</option>
-            }
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Instructor</label>
-        <select class="form-control" @bind="course.InstructorID">
-            @foreach (var instruc in Instructors)
-            {
-                <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
+                <option value="@module.ModuleID">@module.Title</option>
             }
         </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-    <button type="submit" class="btn btn-danger" @onclick="RemoveCourse">Delete</button>
+    <button type="submit" class="btn btn-danger" @onclick="RemoveLesson">Delete</button>
     <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
-</EditForm> *@
+</EditForm> 
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
 @code {
     [Parameter]
     public int LessonNumber { get; set; }
 
 
+    public List<Module> ModuleList = new();
     private Lesson LessonData;
     private string ErrorMessage { get; set; } = "";
 
@@ -64,7 +59,8 @@
     {
         try
         {
-            LessonData = await EffizyService.GetLessonById(LessonNumber);           
+            LessonData = await EffizyService.GetLessonById(LessonNumber);
+            ModuleList = await EffizyService.GetModules();
         }
         catch (Exception ex)
         {
@@ -73,6 +69,36 @@
     }
     public async Task UpdateLesson()
     {
-        
+        try
+        {
+            await EffizyService.UpdateLesson(LessonData);
+            NavigationManager.NavigateTo("/ViewLesson");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error updating lesson: " + ex.Message;
+        }
+    }
+    public async Task RemoveLesson()
+    {
+        try
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the Lesson named {LessonData.Title}?");
+            if (confirmed)
+            {
+                await EffizyService.DeleteLesson(LessonNumber);
+                NavigationManager.NavigateTo("/ViewLesson");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error deleting Lesson: " + ex.Message;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        NavigationManager.NavigateTo("/ViewLesson");
     }
 }
