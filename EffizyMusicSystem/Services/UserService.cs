@@ -65,7 +65,7 @@ namespace EffizyMusicSystem.Services
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users
-                .Include(x => x.UType)
+                .Include(x => x.UserType)
                 .FirstOrDefaultAsync(x => x.UserID == userId);
         }
 
