@@ -36,4 +36,8 @@
     <ProjectReference Include="..\EffizyMusicSystem\EffizyMusicSystem.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\NewFolder\" />
+  </ItemGroup>
+
 </Project>

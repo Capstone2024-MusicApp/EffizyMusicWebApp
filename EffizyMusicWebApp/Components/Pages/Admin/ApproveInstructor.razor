@@ -35,7 +35,7 @@
                     <td>@instructor.Phone</td>
                     <td>@instructor.Location</td>
                     <td>@instructor.Status</td>
-                    <td>@instructor.InstrumentID</td>
+                    <td>@(instructor.Instrument != null ? instructor.Instrument.InstrumentType : "N/A")</td>
                     <td>@instructor.YearsOfExperience</td>
                     <td>
                         <button class="btn btn-primary" @onclick="@(() => ViewInstructor(instructor.InstructorID))">View</button>
@@ -52,6 +52,7 @@ else
 
 @code {
     private List<Instructor> PendingInstructors { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {

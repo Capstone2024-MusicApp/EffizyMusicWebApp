@@ -19,8 +19,16 @@ namespace EffizyMusicSystem.Services
         public async Task<List<Instructor>> GetPendingInstructorsAsync()
         {
             return await _context.Instructors
-                .Where(i => i.Status == "pending")
+                .Include(i => i.Instrument)
+                .Where(i => i.Status == "Pending")
                 .ToListAsync();
+        }
+
+        public async Task<Instructor> GetInstructorByIdWithInstrumentAsync(int id)
+        {
+            return await _context.Instructors
+                .Include(i => i.Instrument)
+                .FirstOrDefaultAsync(i => i.InstructorID == id);
         }
 
         public async Task<bool> ApproveInstructorAsync(int instructorId)
@@ -46,12 +54,6 @@ namespace EffizyMusicSystem.Services
             }
             return false;
         }
-        public async Task<Instructor> GetInstructorByIdAsync(int instructorId) // Implementation for new method
-        {
-            return await _context.Instructors
-                .Include(i => i.User)
-                .ThenInclude(u => u.UserType)
-                .FirstOrDefaultAsync(i => i.InstructorID == instructorId);
-        }
+        
     }
 }
