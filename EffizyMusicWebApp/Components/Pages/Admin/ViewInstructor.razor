@@ -1,0 +1,94 @@
+﻿@page "/admin/view-instructor/{InstructorId}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components
+@inject IInstructorService InstructorService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<h3>Instructor Details</h3>
+
+@if (Instructor != null)
+{
+    <div>
+        <p><strong>First Name:</strong> @Instructor.FirstName</p>
+        <p><strong>Last Name:</strong> @Instructor.LastName</p>
+        <p><strong>Gender:</strong> @Instructor.Gender</p>
+        <p><strong>Phone:</strong> @Instructor.Phone</p>
+        <p><strong>Location:</strong> @Instructor.Location</p>
+        <p><strong>Status:</strong> @Instructor.Status</p>
+        <p><strong>Instrument:</strong> @Instructor.InstrumentID</p>
+        <p><strong>Years of Experience:</strong> @Instructor.YearsOfExperience</p>
+        <button class="btn btn-success" @onclick="@ApproveInstructorAsync">Approve</button>
+        <button class="btn btn-danger" @onclick="@RejectInstructorAsync">Reject</button>
+    </div>
+}
+else
+{
+    <p>Instructor not found.</p>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string InstructorId { get; set; }
+
+    private Instructor Instructor { get; set; }
+    private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInstructor();
+    }
+
+    private async Task LoadInstructor()
+    {
+        if (!string.IsNullOrEmpty(InstructorId) && int.TryParse(InstructorId, out int id))
+        {
+            Instructor = await InstructorService.GetInstructorByIdAsync(id);
+        }
+    }
+
+    private async Task ApproveInstructorAsync()
+    {
+        if (Instructor != null)
+        {
+            var success = await InstructorService.ApproveInstructorAsync(Instructor.InstructorID);
+            if (success)
+            {
+                Instructor.Status = "Approved"; 
+                ErrorMessage = null;
+                NavigationManager.NavigateTo("/admin/approve-instructors");
+            }
+            else
+            {
+                ErrorMessage = "Failed to approve instructor.";
+            }
+        }
+    }
+
+    private async Task RejectInstructorAsync()
+    {
+        if (Instructor != null)
+        {
+            var success = await InstructorService.RejectInstructorAsync(Instructor.InstructorID);
+            if (success)
+            {
+                Instructor.Status = "Rejected";
+                ErrorMessage = null;
+                NavigationManager.NavigateTo("/admin/approve-instructors");
+            }
+            else
+            {
+                ErrorMessage = "Failed to reject instructor.";
+            }
+        }
+    }
+}
