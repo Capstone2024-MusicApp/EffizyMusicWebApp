@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +10,14 @@
 
     <main>
         <div class="top-row px-2">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (isLogin == false)
+            {
+                <a href="/loginForm">Login</a>
+            }
+            else
+            {
+                <button @onclick="@Logout" class="btn-link">Logout</button>
+            }
         </div>
 
         <article class="content px-4">
@@ -21,3 +31,38 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code
+{
+    bool isLogin { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        isLogin = await IsUserLogin();
+    }
+
+    protected async Task<bool> IsUserLogin()
+    {
+        var email = await ProtectedSessionStore.GetAsync<String>("Email");
+        if (email.Value != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    protected async Task Logout()
+    {
+        await ProtectedSessionStore.DeleteAsync("Email");
+        await ProtectedSessionStore.DeleteAsync("UserID");
+        await ProtectedSessionStore.DeleteAsync("UserTypeID");
+        await ProtectedSessionStore.DeleteAsync("FirstName");
+        await ProtectedSessionStore.DeleteAsync("LastName");
+
+        //Redirect to specific page.
+        NavigationManager.NavigateTo("/loginForm", true);
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
 using EffizyMusicSystem.Models.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -609,5 +610,17 @@ namespace EffizyMusicSystem.Services
 
         }
         #endregion
+
+        //Login
+        public User ValidateUser(string email, string password)
+        {
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                string hashPassword = PasswordHasher.HashPassword(password);
+                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
+            }
+            else
+                return null;
+        }
     }
 }
