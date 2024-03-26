@@ -535,5 +535,13 @@ namespace EffizyMusicSystem.Services
 
         }
         #endregion
-    }
+
+        #region feedbacks
+        public List<FeedbackDTO> GetFeedbackDTOs()
+        {
+            return  _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
+
+        }
+        #endregion
+}
 }

@@ -1,5 +1,6 @@
 ﻿@page "/feedback"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @rendermode InteractiveServer
 
@@ -9,7 +10,7 @@
         @foreach (var feedback in feedbacks)
         {
             <tr>
-                <td>@feedback.UserID</td>
+                <td>@feedback.FirstName @feedback.LastName</td>
             </tr>
             <tr>
                 <td>@feedback.FeedbackDate</td>
@@ -44,12 +45,12 @@
 </div>
 
 @code {
-    private List<Feedback> feedbacks;
+    private List<FeedbackDTO> feedbacks;
     private string? feedbackInput { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        feedbacks =  EffizyService.GetFeedback();
+        feedbacks = EffizyService.GetFeedbackDTOs();
     }
 
     private  async Task InsertFeedback()
@@ -61,7 +62,7 @@
 
         await EffizyService.InsertFeedbackAsync(feedback);
         feedbackInput = String.Empty;
-        feedbacks = EffizyService.GetFeedback();
+        feedbacks = EffizyService.GetFeedbackDTOs();
     }
 
 }
