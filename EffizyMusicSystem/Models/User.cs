@@ -21,17 +21,15 @@ namespace EffizyMusicSystem.Models
         public string? ConfirmPassword { get; set; }
 
 
-        [Required(ErrorMessage = "First Name is required")]
-        public string? FirstName { get; set; }
+        //public string? FirstName { get; set; }
 
-        [Required(ErrorMessage = "Last Name is required")]
-        public string? LastName { get; set; }
+ 
+        //public string? LastName { get; set; }
 
-        [Required(ErrorMessage = "Gender is required")]
-        public string? Gender { get; set; }
+       
+        //public string? Gender { get; set; }
 
-        [Required(ErrorMessage = "Phone Number is required")]
-        public int? Phone { get; set; }
+        //public int? Phone { get; set; }
 
         [ForeignKey("UserTypeID")]
         public int UserTypeID { get; set; }
