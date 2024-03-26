@@ -21,15 +21,15 @@ namespace EffizyMusicSystem.Models
         public string? ConfirmPassword { get; set; }
 
 
-        //public string? FirstName { get; set; }
+        public string? FirstName { get; set; }
 
- 
-        //public string? LastName { get; set; }
 
-       
-        //public string? Gender { get; set; }
+        public string? LastName { get; set; }
 
-        //public int? Phone { get; set; }
+
+        public string? Gender { get; set; }
+
+        public int? Phone { get; set; }
 
         [ForeignKey("UserTypeID")]
         public int UserTypeID { get; set; }
