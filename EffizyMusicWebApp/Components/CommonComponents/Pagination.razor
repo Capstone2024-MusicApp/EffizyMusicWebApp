@@ -1,45 +1,53 @@
-﻿<div class="pagination">
-    <button class="btn btn-outline-secondary"
-            disabled="@IsPreviousDisabled"
-            @onclick="PreviousPage">
-        Previous
-    </button>
+﻿<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item @((CurrentPage == 1) ? "disabled" : "")">
+            <button class="page-link" @onclick="PreviousPage">Previous</button>
+        </li>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            var pageNumber = i; // Capture the current value of i
+            <li class="page-item @(i == CurrentPage ? "active" : "")">
+                <button class="page-link" @onclick="(() => GoToPage(pageNumber))">@i</button>
+            </li>
+        }
+        <li class="page-item @((CurrentPage == TotalPages) ? "disabled" : "")">
+            <button class="page-link" @onclick="NextPage">Next</button>
+        </li>
+    </ul>
+</nav>
+@code{
+    [Parameter]
+    public int CurrentPage { get; set; }
 
-    <span class="page-info">Page @CurrentPage of @TotalPages</span>
+    [Parameter]
+    public int TotalPages { get; set; }
 
-    <button class="btn btn-outline-secondary"
-            disabled="@IsNextDisabled"
-            @onclick="NextPage">
-        Next
-    </button>
-</div>
+    [Parameter]
+    public EventCallback<int> OnPageChange{get;set;}
 
-@code {
-    [Parameter] public int CurrentPage { get; set; }
-    [Parameter] public int PageSize { get; set; }
-    [Parameter] public int TotalItems { get; set; }
-    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
-
-    private int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
-    private bool IsPreviousDisabled => CurrentPage == 1;
-    private bool IsNextDisabled => CurrentPage == TotalPages;
-
-    private async Task PreviousPage()
+    private void PreviousPage()
     {
-        if (!IsPreviousDisabled)
+        if (CurrentPage > 1)
         {
             CurrentPage--;
-            await OnPageChanged.InvokeAsync(CurrentPage);
+            OnPageChange.InvokeAsync(CurrentPage);
+        }
+    }
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            OnPageChange.InvokeAsync(CurrentPage);
         }
     }
 
-    private async Task NextPage()
+    private void GoToPage(int page)
     {
-        if (!IsNextDisabled)
+        if (page >= 1 && page <= TotalPages)
         {
-            CurrentPage++;
-            await OnPageChanged.InvokeAsync(CurrentPage);
+            CurrentPage = page;
+            OnPageChange.InvokeAsync(CurrentPage);
         }
-
     }
 }

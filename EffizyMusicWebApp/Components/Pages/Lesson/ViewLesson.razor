@@ -2,9 +2,10 @@
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
-<h3>Lessons List</h3>
-
-@if (LessonList == null)
+@rendermode InteractiveServer
+<h3 class="text-center">Lessons List</h3>
+<hr />
+@if (items == null)
 {
     <p class="text-center"><em>Loading...</em></p>
 }
@@ -20,7 +21,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var lesson in PaginatedLessons)
+        @foreach (var lesson in GetItemsOnCurrentPage())
         {
             <tr>
                 <td>@lesson.LessonNumber</td>
@@ -50,41 +51,68 @@
     </tbody>
 </table>
 
-@* <Pagination CurrentPage="@CurrentPage"
-            PageSize="@PageSize"
-            TotalItems="@TotalItems"
-            OnPageChanged="HandlePageChange" /> *@
+@* <Pagination CurrentPage="@currentPage" TotalPages="@TotalPages" OnPageChange="HandlePageChange" /> *@
+
+<nav aria-label="Page-navigation" class="d-flex justify-content-center">
+    <ul class="pagination">
+        <li class="page-item @((currentPage == 1) ? "disabled" : "")">
+            <button class="page-link" @onclick="PreviousPage">Previous</button>
+        </li>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            var pageNumber = i; // Capture the current value of i
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <button class="page-link" @onclick="(() => GoToPage(pageNumber))">@i</button>
+            </li>
+        }
+        <li class="page-item @((currentPage == TotalPages) ? "disabled" : "")">
+            <button class="page-link" @onclick="NextPage">Next</button>
+        </li>
+    </ul>
+</nav>
 
 @code {
-
-    private int PageSize { get; set; } = 5;
-    private int CurrentPage { get; set; } = 1;
-    private int TotalItems { get; set; } = 0;
-    public List<Lesson> LessonList { get; set; } = new();
-    public List<Lesson> PaginatedLessons { get; set; } = new();
-
+    private List<Lesson> items = new();
+    private int pageSize = 4;
+    private int currentPage = 1;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        // Populate items with your data asynchronously
+        items = await EffizyService.GetLessons();
     }
 
-    private async Task LoadData()
+    private IEnumerable<Lesson> GetItemsOnCurrentPage()
     {
-        LessonList = await EffizyService.GetLessons();
-        TotalItems = LessonList.Count;
-        Paginate();
+        int startIndex = (currentPage - 1) * pageSize;
+        return items.Skip(startIndex).Take(pageSize);
     }
 
-    private void Paginate()
+    private bool IsFirstPage => currentPage == 1;
+    private bool IsLastPage => currentPage == TotalPages;
+
+    private int TotalPages => (int)Math.Ceiling((double)items.Count / pageSize);
+
+    private void PreviousPage()
     {
-        PaginatedLessons = LessonList.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+        if (!IsFirstPage)
+        {
+            currentPage--;
+        }
     }
 
-    private async Task HandlePageChange(int newPage)
+    private void NextPage()
     {
-        CurrentPage = newPage;
-        Paginate();
-        StateHasChanged(); // Ensure the UI is updated after pagination
+        if (!IsLastPage)
+        {
+            currentPage++;
+        }
     }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+        StateHasChanged();
+    }
+
 }
