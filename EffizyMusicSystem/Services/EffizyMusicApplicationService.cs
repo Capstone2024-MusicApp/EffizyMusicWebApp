@@ -1,6 +1,7 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
 using EffizyMusicSystem.Models.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -72,7 +73,7 @@ namespace EffizyMusicSystem.Services
         public async Task<User> GetUserByIdAsync(int userTypeID)
         {
             return await _context.Users
-                .Include(x => x.UType)
+                .Include(x => x.UserType)
                 .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
         }
 
@@ -119,6 +120,81 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
+        public Module GetModule(int id)
+        {
+            try
+            {
+                return _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public bool DeleteModule(int id)
+        {
+            try
+            {
+                //Get all quizes of the module.
+                var quizes = _context.Quizes.Where(x => x.ModuleID == id).ToList();
+                foreach (var quiz in quizes)
+                {
+                    //get all questions of the quiz
+                    var questions = _context.Questions.Where(q => q.QuizId == quiz.Id).ToList();
+                    //delete all quations.
+                    foreach (var entity in questions)
+                    {
+                        //delete questionChoices
+                        List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var choice in questionChoices)
+                        {
+                            _context.QuestionChoices.Remove(choice);
+                            _context.SaveChanges();
+                        }
+                        //delete answers
+                        List<Answer> answers = _context.Answers.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var answer in answers)
+                        {
+                            _context.Answers.Remove(answer);
+                            _context.SaveChanges();
+                        }
+                        //Delete question
+                        _context.Questions.Remove(entity);
+                        _context.SaveChanges();
+                    }
+
+                    //Delete quiz
+                    _context.Quizes.Remove(quiz);
+                    _context.SaveChanges();
+                }
+
+                //Delete lessons
+                //Get all lessons of the module.
+                var lessons = _context.Lessons.Where(x => x.Module.ModuleID == id).ToList();
+                foreach (var lsn in lessons)
+                {
+                    _context.Lessons.Remove(lsn);
+                    _context.SaveChanges();
+                }
+
+                //remove module.
+                var module = _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+                if (module != null)
+                {
+                    _context.Modules.Remove(module);
+                    _context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         #endregion
 
@@ -210,6 +286,7 @@ namespace EffizyMusicSystem.Services
             
         }
 
+
         public List<Instructor> GetInstructors()
         {
             try
@@ -221,6 +298,7 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
         public bool DeleteQuiz(int id)
         {
             try
@@ -281,11 +359,12 @@ namespace EffizyMusicSystem.Services
             {
                 throw;
             }
-            /// <summary>
-            /// Get quiz Question
-            /// </summary>
-            /// <returns></returns>
+
         }
+        /// <summary>
+        /// Get quiz Question
+        /// </summary>
+        /// <returns></returns>
         public List<Question> GetQuizQuestions(int quizId)
         {
             try
@@ -515,7 +594,7 @@ namespace EffizyMusicSystem.Services
         #region Student Courses
         public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
         {
-            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
         }
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
@@ -523,7 +602,7 @@ namespace EffizyMusicSystem.Services
             StudentCourseDTO studentCourse;
 
             //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
-            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
 
             studentCourse.Modules = _context.Modules.Include(l=>l.Lessons).Include(q=>q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
             return studentCourse;
@@ -531,5 +610,17 @@ namespace EffizyMusicSystem.Services
 
         }
         #endregion
+
+        //Login
+        public User ValidateUser(string email, string password)
+        {
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                string hashPassword = PasswordHasher.HashPassword(password);
+                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
+            }
+            else
+                return null;
+        }
     }
 }
