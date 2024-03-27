@@ -1,4 +1,13 @@
 ﻿@page "/"
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using EffizyMusicSystem.DAL
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject NavigationManager NavigationManager
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Home</PageTitle>
 
@@ -53,7 +62,7 @@
 
 <main>
     <section class="jumbotron text-center">
-        <h1>Welcome to Effizy Music School</h1>
+        <h1>Welcome to Effizy Music School</h1>        
         <p class="lead">Learn and master the art of music with our expert instructors</p>
     </section>
 
