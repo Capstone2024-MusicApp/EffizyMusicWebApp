@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Bootstrap" Version="2.0.0" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.5.0" />
+    <PackageReference Include="FontAwesome" Version="4.7.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,7 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Pages\NewFolder\" />
+    <Content Update="Components\Pages\Courses\Courses.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>
