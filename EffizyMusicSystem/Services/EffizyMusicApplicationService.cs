@@ -88,6 +88,11 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public void InsertFeedback(Feedback feedback)
+        {
+             _context.Feedbacks.AddAsync(feedback);
+             _context.SaveChangesAsync();
+        }
 
 
 

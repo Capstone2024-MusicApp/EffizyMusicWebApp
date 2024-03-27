@@ -5,64 +5,68 @@
 @rendermode InteractiveServer
 
 <div class="feedback-container">
-<h3>FeedbackPage</h3>
-    <table class="feedback-table">
-        @foreach (var feedback in feedbacks)
-        {
-            <tr>
-                <td>@feedback.FirstName @feedback.LastName</td>
-            </tr>
-            <tr>
-                <td>@feedback.FeedbackDate</td>
-            </tr>
-            <tr>
-                <td>@feedback.Comments</td>
-            </tr>
-        }
-    </table>
-    <!--<form method="post" @onsubmit="Submit" @formname="feedback-form">
-        <AntiforgeryToken />
-        <div>
-            <InputTextArea class="feedback-input" @bind-Value="feedbackInput" placeholder="Enter feedback here."></InputTextArea>
-            <br />
-            <button class="btn btn-primary">Submit</button>
-        </div>
-    </form> -->
-  <table class="feedback-post">
-        <tr>
-            <td>
-                <InputTextArea class="feedback-input" @bind-Value="feedbackInput" placeholder="Enter feedback here."/>
-                <br />
-                <button class="btn btn-primary" @onclick="InsertFeedback">Submit</button>
-            </td>
-        </tr>
-        <tr>
-            <td>
+    @if (feedbacks == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <h3>Feedback</h3>
+            <table class="feedback-table">
+                @foreach (var feedback in feedbacks)
+                {
+                    <tr>
+                        <td>@feedback.FirstName @feedback.LastName</td>
+                    </tr>
+                    <tr>
+                        <td>@feedback.FeedbackDate</td>
+                    </tr>
+                    <tr>
+                        <td>@feedback.Comments</td>
+                    </tr>
+                }
+            </table>
+          <table class="feedback-post">
+                <tr>
+                    <td>
+                        
+                    <EditForm Model="@feedbackpost" OnValidSubmit="@Submit" FormName="feedbackForm" >
+                        <InputTextArea class="feedback-input" @bind-Value="feedbackpost.Comments" placeholder="Enter feedback here." />
+                        <ValidationMessage For="@(() => feedbackpost.Comments)" />
+                        <br />
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </EditForm>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                 
-            </td>
-        </tr>
-    </table>
-</div>
+                    </td>
+                </tr>
+        </table>
+    }
+ </div>
 
 @code {
-    private List<FeedbackDTO> feedbacks;
-    private string? feedbackInput { get; set; }
+    private List<FeedbackDTO>? feedbacks;
+
+    private Feedback feedbackpost { get; set; } = new Feedback();
 
     protected override async Task OnInitializedAsync()
     {
         feedbacks = EffizyService.GetFeedbackDTOs();
     }
 
-    private  async Task InsertFeedback()
+    private  void Submit()
     {
-        var feedback = new Feedback();
-        feedback.UserID = 123;
-        feedback.FeedbackDate = DateTime.Now;
-        feedback.Comments = feedbackInput;
+        feedbackpost.UserID = 6;
+        feedbackpost.FeedbackDate = DateTime.Now;
+        feedbackpost.Comments = feedbackpost.Comments;
 
-        await EffizyService.InsertFeedbackAsync(feedback);
-        feedbackInput = String.Empty;
+         EffizyService.InsertFeedback(feedbackpost);
         feedbacks = EffizyService.GetFeedbackDTOs();
+        feedbackpost = new Feedback();
     }
 
 }
