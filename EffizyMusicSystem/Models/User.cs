@@ -14,9 +14,6 @@ namespace EffizyMusicSystem.Models
         public int UserID { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
-        public string? Email { get; set; }
-
-        [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; }
 
@@ -29,18 +26,17 @@ namespace EffizyMusicSystem.Models
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
-        public string? ConfirmPassword { get; set; }
 
 
-        public string? FirstName { get; set; }
+        //public string? FirstName { get; set; }
 
 
-        public string? LastName { get; set; }
+        //public string? LastName { get; set; }
 
 
-        public string? Gender { get; set; }
+        //public string? Gender { get; set; }
 
-        public int? Phone { get; set; }
+        //public int? Phone { get; set; }
 
         [ForeignKey("UserTypeID")]
         public int UserTypeID { get; set; }
