@@ -36,7 +36,7 @@ namespace EffizyMusicSystem.Services
             var instructor = await _context.Instructors.FindAsync(instructorId);
             if (instructor != null && instructor.User != null && instructor.User.UserType != null)
             {
-                instructor.User.UType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Instructor" && u.UserTypeID == 1); // Change to "Active" status
+                instructor.User.UserType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Instructor" && u.UserTypeID == 1); // Change to "Active" status
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -48,7 +48,7 @@ namespace EffizyMusicSystem.Services
             var instructor = await _context.Instructors.FindAsync(instructorId);
             if (instructor != null && instructor.User != null && instructor.User.UserType != null)
             {
-                instructor.User.UType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Student" && u.UserTypeID == 1); // Change to "Student" status
+                instructor.User.UserType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Student" && u.UserTypeID == 1); // Change to "Student" status
                 await _context.SaveChangesAsync();
                 return true;
             }
