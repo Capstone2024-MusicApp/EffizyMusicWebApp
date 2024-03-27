@@ -22,6 +22,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 // Register UserService
 builder.Services.AddScoped<IInstructorService, InstructorService>();
 
+// Register UserProfileService
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
+// Register EffizyMusicApplicationService
+builder.Services.AddScoped<EffizyMusicApplicationService>();
+
+// Register CourseService
+builder.Services.AddScoped<ICourseService, CourseService>();
+
 // Register UserTypeService
 builder.Services.AddScoped<UserTypeService>();
 
