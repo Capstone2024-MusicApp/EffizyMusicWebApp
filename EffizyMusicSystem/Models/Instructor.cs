@@ -35,5 +35,7 @@ namespace EffizyMusicSystem.Models
         public int UserID { get; set; }
         public int InstrumentID { get; set; }
         public User User { get; set; }
+        public Instrument Instrument { get; set; }
+
     }
 }

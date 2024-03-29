@@ -1,0 +1,71 @@
+﻿@page "/admin/approve-instructors"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components
+@inject IInstructorService InstructorService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<h3>Approve/Reject Instructors</h3>
+
+@if (PendingInstructors != null && PendingInstructors.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Instrument</th>
+                <th>Years of Experience</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instructor in PendingInstructors)
+            {
+                <tr>
+                    <td>@instructor.FirstName</td>
+                    <td>@instructor.LastName</td>
+                    <td>@instructor.Gender</td>
+                    <td>@instructor.Phone</td>
+                    <td>@instructor.Location</td>
+                    <td>@instructor.Status</td>
+                    <td>@(instructor.Instrument != null ? instructor.Instrument.InstrumentType : "N/A")</td>
+                    <td>@instructor.YearsOfExperience</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => ViewInstructor(instructor.InstructorID))">View</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No pending instructors.</p>
+}
+
+@code {
+    private List<Instructor> PendingInstructors { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPendingInstructors();
+    }
+
+    private async Task LoadPendingInstructors()
+    {
+        PendingInstructors = await InstructorService.GetPendingInstructorsAsync();
+    }
+
+    private void ViewInstructor(int instructorId)
+    {
+        NavigationManager.NavigateTo($"/admin/view-instructor/{instructorId}");
+    }
+}
