@@ -9,38 +9,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddBlazorBootstrap();
 
 // Add your DbContext configuration
 builder.Services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
-// Register UserService
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Register UserService
-builder.Services.AddScoped<IInstructorService, InstructorService>();
-
-// Register UserProfileService
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-
-// Register EffizyMusicApplicationService
+// Register Services
 builder.Services.AddScoped<EffizyMusicApplicationService>();
-
-// Register CourseService
-builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<CourseService>();
-
-// Register UserTypeService
 builder.Services.AddScoped<UserTypeService>();
-
-
-// Register UserInstrumentService
 builder.Services.AddScoped<InstrumentService>();
-builder.Services.AddScoped<EffizyMusicApplicationService>();
-// Register EffizyMusicApplicationService
+
 builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 var app = builder.Build();
 
