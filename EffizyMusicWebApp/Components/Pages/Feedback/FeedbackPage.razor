@@ -11,61 +11,69 @@
     }
     else
     {
-        <h3>Feedback</h3>
-            <table class="feedback-table">
-                @foreach (var feedback in feedbacks)
-                {
-                    <tr>
-                        <td>@feedback.FirstName @feedback.LastName</td>
-                    </tr>
-                    <tr>
-                        <td>@feedback.FeedbackDate</td>
-                    </tr>
-                    <tr>
-                        <td>@feedback.Comments</td>
-                    </tr>
-                }
-            </table>
-          <table class="feedback-post">
+        <label class="page-title">Feedback</label>
+        <div style="max-height: 600px; overflow: auto; margin: auto; width:fit-content;">
+        <table class="feedback-table">
+            @foreach (var feedback in feedbacks)
+            {
                 <tr>
                     <td>
-                        
-                    <EditForm Model="@feedbackpost" OnValidSubmit="@Submit" FormName="feedbackForm" >
-                        <InputTextArea class="feedback-input" @bind-Value="feedbackpost.Comments" placeholder="Enter feedback here." />
-                        <ValidationMessage For="@(() => feedbackpost.Comments)" />
-                        <br />
-
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </EditForm>
+                        <label class="feedback-name">@feedback.FirstName @feedback.LastName</label> -
+                        <label class="feedback-date" >@feedback.FeedbackDate.ToString("MMMM, dd yyyy HH:mm")</label>
                     </td>
+                </tr>
+                <tr >
+                    <td>@feedback.Comments</td>
                 </tr>
                 <tr>
-                    <td>
-                
-                    </td>
+                    
+                    <td><div style="border-bottom: solid 2px gray;"></div></td>
                 </tr>
+            }
         </table>
+        </div>
+        <br />
+        <EditForm Model="@feedbackpost" OnValidSubmit="@Submit" FormName="feedbackForm">
+            <table class="feedback-post">
+                <tr>
+                    <td>
+                        <InputTextArea class="feedback-input" @bind-Value="feedbackpost.Comments" placeholder="Enter feedback here." />
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary" style="width: 300px;">Submit</button>
+                    </td>
+                </tr>
+            </table>
+        </EditForm>
     }
- </div>
+</div>
 
 @code {
     private List<FeedbackDTO>? feedbacks;
 
+    private ValidationMessageStore? messageStore;
+
+    [SupplyParameterFromForm]
     private Feedback feedbackpost { get; set; } = new Feedback();
 
     protected override async Task OnInitializedAsync()
     {
-        feedbacks = EffizyService.GetFeedbackDTOs();
+        feedbacks = await EffizyService.GetFeedbackDTOs();
     }
 
-    private  void Submit()
+
+    private async Task Submit()
     {
         feedbackpost.UserID = 6;
         feedbackpost.FeedbackDate = DateTime.Now;
         feedbackpost.Comments = feedbackpost.Comments;
 
-         EffizyService.InsertFeedback(feedbackpost);
-        feedbacks = EffizyService.GetFeedbackDTOs();
+        await EffizyService.InsertFeedbackAsync(feedbackpost);
+        feedbacks = await EffizyService.GetFeedbackDTOs();
         feedbackpost = new Feedback();
     }
 

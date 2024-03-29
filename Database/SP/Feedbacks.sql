@@ -12,7 +12,8 @@ AS
 		from feedbacks f 
 		inner join users u on f.userid = u.userid
 		left join students s on u.userid = s.studentid
-		left join instructors i on u.userid = i.instructorid;
+		left join instructors i on u.userid = i.instructorid
+		order by f.feedbackdate desc;
 
 
 		IF @@ERROR <> 0 

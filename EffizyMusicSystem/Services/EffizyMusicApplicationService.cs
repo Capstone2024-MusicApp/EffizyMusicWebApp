@@ -542,9 +542,9 @@ namespace EffizyMusicSystem.Services
         #endregion
 
         #region feedbacks
-        public List<FeedbackDTO> GetFeedbackDTOs()
+        public async Task<List<FeedbackDTO>> GetFeedbackDTOs()
         {
-            return  _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
+            return  await _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToListAsync();
 
         }
         #endregion

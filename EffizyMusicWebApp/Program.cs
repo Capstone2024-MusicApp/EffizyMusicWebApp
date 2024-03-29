@@ -14,7 +14,7 @@ builder.Services.AddBlazorBootstrap();
 
 // Add your DbContext configuration
 builder.Services.AddDbContext<EffizyMusicContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnectionBAIST")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
 // Register UserService
 builder.Services.AddScoped<IUserService, UserService>();
