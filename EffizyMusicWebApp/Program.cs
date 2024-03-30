@@ -20,6 +20,9 @@ builder.Services.AddDbContext<EffizyMusicContext>(options =>
 // Register UserService
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Register UserService
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+
 // Register UserProfileService
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
@@ -28,11 +31,11 @@ builder.Services.AddScoped<EffizyMusicApplicationService>();
 
 // Register CourseService
 builder.Services.AddScoped<ICourseService, CourseService>();
-
 builder.Services.AddScoped<CourseService>();
 
 // Register UserTypeService
 builder.Services.AddScoped<UserTypeService>();
+
 
 // Register UserInstrumentService
 builder.Services.AddScoped<InstrumentService>();
