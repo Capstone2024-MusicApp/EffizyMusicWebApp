@@ -10,11 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 builder.Services.AddScoped<EffizyMusicApplicationService>();
-
-//for session, //install package Blazored.SessionStorage
-//builder.Services.AddBlazoredSessionStorage();
-
 
 // Add services to the container.
 var services = builder.Services;

@@ -14,8 +14,12 @@ namespace EffizyMusicSystem.Models
         [Column(Order = 1)]
         public int StudentID { get; set; }
 
-        public string Instrument {  get; set; }
-        public string SkillLevel { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
+        public string Instrument {  get; set; } = string.Empty;
+        public string SkillLevel { get; set; } = string.Empty;
         public double Grades { get; set; }
         public bool TermsAndConditions {  get; set; }
         public int UserID {  get; set; }

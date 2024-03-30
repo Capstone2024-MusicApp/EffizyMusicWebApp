@@ -11,11 +11,9 @@ namespace EffizyMusicSystem.DAL
     public class EffizyMusicContext : DbContext
     {
 
-        public EffizyMusicContext(DbContextOptions<EffizyMusicContext> options)
-       : base(options)
+        public EffizyMusicContext(DbContextOptions<EffizyMusicContext> options) : base(options)
         {
         }
-
         public DbSet<User> Users { get; set; }
         public DbSet<UserType> UserTypes { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
@@ -32,6 +30,8 @@ namespace EffizyMusicSystem.DAL
         public DbSet<ViewLesson> ViewLessons { get; set; }
 
         public DbSet<Quiz> Quizes { get; set; }
+
+
 
         public DbSet<Question> Questions { get; set; }
 
