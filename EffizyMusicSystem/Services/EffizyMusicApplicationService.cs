@@ -1,6 +1,7 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
 using EffizyMusicSystem.Models.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -69,12 +70,12 @@ namespace EffizyMusicSystem.Services
             return await _context.UserTypes.ToListAsync();
         }
 
-        //public async Task<User> GetUserByIdAsync(int userTypeID)
-        //{
-        //    return await _context.Users
-        //        .Include(x => x.UType)
-        //        .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
-        //}
+        public async Task<User> GetUserByIdAsync(int userTypeID)
+        {
+            return await _context.Users
+                .Include(x => x.UserType)
+                .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
+        }
 
         //Add other methods here that directly connect to the database
         
@@ -110,6 +111,81 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
+        public Module GetModule(int id)
+        {
+            try
+            {
+                return _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public bool DeleteModule(int id)
+        {
+            try
+            {
+                //Get all quizes of the module.
+                var quizes = _context.Quizes.Where(x => x.ModuleID == id).ToList();
+                foreach (var quiz in quizes)
+                {
+                    //get all questions of the quiz
+                    var questions = _context.Questions.Where(q => q.QuizId == quiz.Id).ToList();
+                    //delete all quations.
+                    foreach (var entity in questions)
+                    {
+                        //delete questionChoices
+                        List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var choice in questionChoices)
+                        {
+                            _context.QuestionChoices.Remove(choice);
+                            _context.SaveChanges();
+                        }
+                        //delete answers
+                        List<Answer> answers = _context.Answers.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var answer in answers)
+                        {
+                            _context.Answers.Remove(answer);
+                            _context.SaveChanges();
+                        }
+                        //Delete question
+                        _context.Questions.Remove(entity);
+                        _context.SaveChanges();
+                    }
+
+                    //Delete quiz
+                    _context.Quizes.Remove(quiz);
+                    _context.SaveChanges();
+                }
+
+                //Delete lessons
+                //Get all lessons of the module.
+                var lessons = _context.Lessons.Where(x => x.Module.ModuleID == id).ToList();
+                foreach (var lsn in lessons)
+                {
+                    _context.Lessons.Remove(lsn);
+                    _context.SaveChanges();
+                }
+
+                //remove module.
+                var module = _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+                if (module != null)
+                {
+                    _context.Modules.Remove(module);
+                    _context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         #endregion
 
@@ -557,5 +633,17 @@ namespace EffizyMusicSystem.Services
             _context.SaveChanges();
         }
         #endregion
+        //Login
+        public User ValidateUser(string email, string password)
+        {
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                string hashPassword = PasswordHasher.HashPassword(password);
+                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
+            }
+            else
+                return null;
+        }
+
     }
 }
