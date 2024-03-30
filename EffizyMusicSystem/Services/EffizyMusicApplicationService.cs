@@ -77,22 +77,7 @@ namespace EffizyMusicSystem.Services
         //}
 
         //Add other methods here that directly connect to the database
-        public List<Feedback> GetFeedback()
-        {
-            return _context.Feedbacks.ToList();
-        }
-
-        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
-        {
-            await _context.Feedbacks.AddAsync(feedback);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        public void InsertFeedback(Feedback feedback)
-        {
-             _context.Feedbacks.AddAsync(feedback);
-             _context.SaveChangesAsync();
-        }
+        
 
 
 
@@ -542,11 +527,35 @@ namespace EffizyMusicSystem.Services
         #endregion
 
         #region feedbacks
-        public async Task<List<FeedbackDTO>> GetFeedbackDTOs()
+        public List<FeedbackDTO> GetFeedbackDTOs()
         {
-            return  await _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToListAsync();
+            return   _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
 
         }
+
+        public List<Feedback> GetFeedback()
+        {
+            return _context.Feedbacks.ToList();
+        }
+
+        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
+        {
+            await _context.Feedbacks.AddAsync(feedback);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public void InsertFeedback(Feedback feedback)
+        {
+            _context.Feedbacks.Add(feedback);
+            _context.SaveChanges();
+        }
+
+        public void DeleteFeedback(Feedback feedback)
+        {
+            _context.Remove(feedback);
+            _context.SaveChanges();
+        }
         #endregion
-}
+    }
 }

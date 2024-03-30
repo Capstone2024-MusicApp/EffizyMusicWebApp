@@ -2,6 +2,7 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
 
 <div class="feedback-container">
@@ -21,13 +22,16 @@
                         <label class="feedback-name">@feedback.FirstName @feedback.LastName</label> -
                         <label class="feedback-date" >@feedback.FeedbackDate.ToString("MMMM, dd yyyy HH:mm")</label>
                     </td>
+                    <td align="right">
+                            <button type="button" class="btn-close" aria-label="Close" @onclick="() => DeleteFeedback(feedback)" />
+                    </td>
                 </tr>
                 <tr >
-                    <td>@feedback.Comments</td>
+                    <td colspan="2">@feedback.Comments</td>
                 </tr>
                 <tr>
                     
-                    <td><div style="border-bottom: solid 2px gray;"></div></td>
+                    <td colspan="2"><div style="border-bottom: solid 2px gray;"></div></td>
                 </tr>
             }
         </table>
@@ -40,6 +44,7 @@
                         <InputTextArea class="feedback-input" @bind-Value="feedbackpost.Comments" placeholder="Enter feedback here." />
                         <DataAnnotationsValidator />
                         <ValidationSummary />
+
                     </td>
                 </tr>
                 <tr>
@@ -62,19 +67,37 @@
 
     protected override async Task OnInitializedAsync()
     {
-        feedbacks = await EffizyService.GetFeedbackDTOs();
+        feedbacks = EffizyService.GetFeedbackDTOs();
     }
 
 
-    private async Task Submit()
+    private void Submit()
     {
         feedbackpost.UserID = 6;
         feedbackpost.FeedbackDate = DateTime.Now;
         feedbackpost.Comments = feedbackpost.Comments;
 
-        await EffizyService.InsertFeedbackAsync(feedbackpost);
-        feedbacks = await EffizyService.GetFeedbackDTOs();
+        EffizyService.InsertFeedback(feedbackpost);
+        feedbacks = EffizyService.GetFeedbackDTOs();
         feedbackpost = new Feedback();
+    }
+
+    private async Task DeleteFeedback(FeedbackDTO feedback)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("Confirm", "Are you sure you want to delete feedback?");
+        if (confirmed)
+        {
+            Feedback deleteFeedback = new Feedback();
+            deleteFeedback.FeedbackID = feedback.FeedbackID;
+            deleteFeedback.UserID = feedback.UserID;
+            deleteFeedback.Comments = feedback.Comments;
+            deleteFeedback.FeedbackDate = feedback.FeedbackDate;
+
+
+            EffizyService.DeleteFeedback(deleteFeedback);
+            feedbacks = EffizyService.GetFeedbackDTOs();
+        }
+        
     }
 
 }
