@@ -26,22 +26,8 @@ namespace EffizyMusicSystem.Models
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
-
-
-        //public string? FirstName { get; set; }
-
-
-        //public string? LastName { get; set; }
-
-
-        //public string? Gender { get; set; }
-
-        //public int? Phone { get; set; }
-
-        [ForeignKey("UserTypeID")]
         public int UserTypeID { get; set; }
-        public UserType UserType { get; set; }
 
-        
+        public UserType UserType { get; set; }
     }
 }
