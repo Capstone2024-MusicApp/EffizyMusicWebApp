@@ -1,8 +1,14 @@
 ﻿@page "/feedback"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
-@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject IJSRuntime JsRuntime
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @rendermode InteractiveServer
 
 <div class="feedback-container">
@@ -23,7 +29,10 @@
                         <label class="feedback-date" >@feedback.FeedbackDate.ToString("MMMM, dd yyyy HH:mm")</label>
                     </td>
                     <td align="right">
+                        @if(user.UserTypeID == Constants.UserType_Administrator || user.UserID == feedback.UserID)
+                        {
                             <button type="button" class="btn-close" aria-label="Close" @onclick="() => DeleteFeedback(feedback)" />
+                        }
                     </td>
                 </tr>
                 <tr >
@@ -58,9 +67,9 @@
 </div>
 
 @code {
-    private List<FeedbackDTO>? feedbacks;
 
-    private ValidationMessageStore? messageStore;
+    private User user = new User();
+    private List<FeedbackDTO>? feedbacks;
 
     [SupplyParameterFromForm]
     private Feedback feedbackpost { get; set; } = new Feedback();
@@ -68,12 +77,13 @@
     protected override async Task OnInitializedAsync()
     {
         feedbacks = EffizyService.GetFeedbackDTOs();
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
     }
 
 
     private void Submit()
     {
-        feedbackpost.UserID = 6;
+        feedbackpost.UserID = user.UserID;
         feedbackpost.FeedbackDate = DateTime.Now;
         feedbackpost.Comments = feedbackpost.Comments;
 
@@ -84,7 +94,7 @@
 
     private async Task DeleteFeedback(FeedbackDTO feedback)
     {
-        bool confirmed = await JsRuntime.InvokeAsync<bool>("Confirm", "Are you sure you want to delete feedback?");
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete feedback?");
         if (confirmed)
         {
             Feedback deleteFeedback = new Feedback();

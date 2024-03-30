@@ -18,6 +18,10 @@ namespace EffizyMusicSystem.Services
         List<Instructor> GetInstructors();
 
         Task<bool> AddRating(InstructorRating rating);
+        public List<Feedback> GetFeedback();
+        public List<FeedbackDTO> GetFeedbackDTOs();
+        public void InsertFeedback(Feedback feedback);
+        public void DeleteFeedback(Feedback feedback);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -79,10 +83,6 @@ namespace EffizyMusicSystem.Services
 
         //Add other methods here that directly connect to the database
         
-
-
-
-        //Add your methods here that directly connects to the dtabase
 
         public void AddCourse(Course entity)
         {
@@ -602,7 +602,7 @@ namespace EffizyMusicSystem.Services
         }
         #endregion
 
-        #region feedbacks
+        #region Feedbacks
         public List<FeedbackDTO> GetFeedbackDTOs()
         {
             return   _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
@@ -614,12 +614,6 @@ namespace EffizyMusicSystem.Services
             return _context.Feedbacks.ToList();
         }
 
-        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
-        {
-            await _context.Feedbacks.AddAsync(feedback);
-            await _context.SaveChangesAsync();
-            return true;
-        }
 
         public void InsertFeedback(Feedback feedback)
         {

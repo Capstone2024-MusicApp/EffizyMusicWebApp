@@ -11,8 +11,8 @@ AS
 			   (case when usertypeid =  2 then i.firstname else s.firstname end) firstname
 		from feedbacks f 
 		inner join users u on f.userid = u.userid
-		left join students s on u.userid = s.studentid
-		left join instructors i on u.userid = i.instructorid
+		left join students s on u.userid = s.userid
+		left join instructors i on u.userid = i.userid
 		order by f.feedbackdate desc;
 
 
