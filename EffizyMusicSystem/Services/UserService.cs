@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,6 +65,9 @@ namespace EffizyMusicSystem.Services
         }
         public async Task<User> GetUserByIdAsync(int userId)
         {
+            return await _context.Users
+                .Include(x => x.UserType)
+                .FirstOrDefaultAsync(x => x.UserID == userId);
             return await _context.Users.FindAsync(userId);
         }
 
@@ -93,6 +97,7 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
+      
     }
 
 

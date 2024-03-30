@@ -1,14 +1,153 @@
 ﻿@page "/"
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using EffizyMusicSystem.DAL
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject NavigationManager NavigationManager
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Home</PageTitle>
 
-<div class="text-center">
-    <h1>Hello, All!</h1>
-    <h4>Welcome to Efizzy Music Website</h4>
-</div>
+<style>
+    /* Set a fixed height and width for the card elements */
+    .card {
+        height: 100%;
+        width: 100%;
+    }
+
+    .card-img-top {
+        height: 15rem;
+        object-fit: cover;
+    }
+
+    /* Style the images to ensure they maintain their aspect ratio */
+    .card-img-top {
+        object-fit: cover;
+    }
+
+    /* Add some more style to make it look better */
+    .card-body {
+        padding: 1rem;
+    }
+
+    h2 {
+        margin-top: 2rem;
+    }
 
 
-<div class="d-flex justify-content-around">
-    <a class="btn btn-success text-light" asp-page="#"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
-    <a class="btn btn-primary text-light" href="RegistrationForm"><i class="fa fa-user" aria-hidden="true"></i> Register</a>
-</div>
+    .section {
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .section h2 {
+        margin-top: 0;
+    }
+
+    .testimonial {
+        border-left: 5px solid #333;
+        padding-left: 15px;
+        margin: 15px 0;
+    }
+
+    #about-us {
+        margin-top: 30px;
+    }
+</style>
+
+<main>
+    <section class="jumbotron text-center">
+        <h1>Welcome to Effizy Music School</h1>        
+        <p class="lead">Learn and master the art of music with our expert instructors</p>
+    </section>
+
+    <section class="container mb-8">
+        <h2>Featured Courses</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-5">
+                    <img src="guitar.jpg" class="card-img-top" alt="Guitar">
+                    <div class="card-body">
+                        <h5 class="card-title">Guitar</h5>
+                        <p class="card-text">Learn to play the guitar with our expert instructors.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-5">
+                    <img src="piano.jpg" class="card-img-top" alt="Piano">
+                    <div class="card-body">
+                        <h5 class="card-title">Piano</h5>
+                        <p class="card-text">Master the piano and become a true musician.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-5">
+                    <img src="drums.jpg" class="card-img-top" alt="Drums">
+                    <div class="card-body">
+                        <h5 class="card-title">Drums</h5>
+                        <p class="card-text">Get your rockstar dreams started with our drum lessons.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div id="about-us" class="row">
+            <div class="col-md-12">
+                <div class="section">
+
+                    <h2>About Us</h2>
+                    <p>Our music school has been serving the community for over 20 years. We have a team of experienced and dedicated teachers who are passionate about music and teaching. Our goal is to provide a fun and engaging learning environment for all of our students.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section">
+                    <h2>Testimonials</h2>
+                    <div class="testimonial">
+                        <p>"I've been taking guitar lessons at this music school for a few months now and I've learned so much. My teacher is patient and makes the lessons fun and engaging."</p>
+                        <p>- John Doe</p>
+                    </div>
+                    <div class="testimonial">
+                        <p>"My daughter started taking piano lessons here and she loves it. The teacher is great and makes the lessons enjoyable and informative."</p>
+                        <p>- Jane Doe</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="section">
+                    <h2>Contact Us</h2>
+                    <p>If you have any questions or would like to learn more about our music school, please don't hesitate to contact us. You can reach us by phone at 555-555-5555 or by email at info@musicschool.com.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="section">
+                    <h2>Our Teachers</h2>
+                    <p>Our team of teachers includes experienced musicians and educators who are dedicated to helping you reach your musical goals. Learn more about our teachers and their credentials on our team page.</p>
+                    <p><a class="btn btn-primary" href="team.html">Learn More</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <div class="text-center">
+        <p>Copyright ©  Effizy Music School. All rights reserved.</p>
+    </div>
+</footer>
