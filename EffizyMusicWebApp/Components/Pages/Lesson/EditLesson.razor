@@ -24,7 +24,7 @@
     </div>
          <div class="form-outline mt-2">
             <label for="content" class="form-label">Lesson Content:</label>
-            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon> Upload your Lesson File
+            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon>
             @if (LessonData.LessonContent != null)
         {
             <p>File Name: @GetFileNameFromContent(LessonData.LessonContent)</p>           
@@ -37,7 +37,6 @@
     <div class="form-group">
         <label>Module</label>
         <select class="form-control" @onchange="HandleSelectedModule">
-            <option value="">Select a Module</option>
             @foreach (var module in ModuleList)
             {
                 <option value="@module">@module.Title</option>
@@ -73,7 +72,8 @@
         try
         {            
             LessonData = await EffizyService.GetLessonById(LessonNumber);
-            ModuleList = await EffizyService.GetModules();        }
+            ModuleList = await EffizyService.GetModules();     
+        }
         catch (Exception ex)
         {
             ErrorMessage = "Error loading lesson data: " + ex.Message;
@@ -93,16 +93,13 @@
         }
     }
     private void HandleSelectedModule(ChangeEventArgs e)
-    {
-        // Get the selected module from the ModuleList based on its Title or other unique property
+    {     
         string selectedModuleName = e.Value.ToString();
         SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
     }
 
     private string GetFileNameFromContent(byte[] lessonContent)
     {
-        // Example: Extracting file name from byte array
-        // You may need to implement your own logic based on how the file content is stored
         return "example_filename.txt";
     }
     public async Task RemoveLesson()

@@ -28,19 +28,14 @@
             }
 
         </select>
-
-        @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
-        @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
-    </div>
-
-
+      </div>
     <button type="submit" class="btn btn-primary mt-4"><i class="fa fa-plus-square" aria-hidden="true"></i>  Add Module</button>
 </EditForm>
 
-@* @if (!IsModuleAdded)
+@if (!IsModuleAdded)
 {
     <p class="text-center text-danger"><em>@ErrorMessage</em></p>
-} *@
+} 
 
 @code {
     [Parameter]
