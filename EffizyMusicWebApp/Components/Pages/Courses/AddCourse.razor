@@ -1,0 +1,112 @@
+﻿@page "/course/add"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Enum
+@inject NavigationManager NavigationManager
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+<h3>Add Course</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label class="form-label">Course Title</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.Title" />
+        </div>
+        <ValidationMessage For="@(() => model.Title)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Course Code:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.CourseMode" />
+        </div>
+        <ValidationMessage For="@(() => model.CourseMode)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.CourseDescription" />
+        </div>
+        <ValidationMessage For="@(() => model.CourseDescription)" />
+    </div>
+
+     <div class="mb-3">
+        <label class="form-label">Select Instrument:</label>
+        <div class="col-md-4">
+            <select class="form-select" name="model.InstrumentID">
+            @if (Instruments != null)
+            {
+                foreach (var entity in Instruments)
+                {
+                    <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                }
+            }
+        </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Instructor:</label>
+        <div class="col-md-4">
+            <select class="form-select" name="model.InstructorID">
+            @if (Instructors != null)
+            {
+                foreach (var entity in Instructors)
+                {
+                    <option value="@entity.InstructorID">@entity.Location</option>
+                }
+            }
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn btn-light" href="/courses/">
+            Cancel
+        </a>
+    </div>
+</EditForm>
+@code {
+
+    [SupplyParameterFromForm]
+    protected Course model { get; set; }
+
+    protected List<Instrument> Instruments { get; set; }
+
+    protected List<Instructor> Instructors { get; set; }
+
+    //protected override void OnInitialized() => model ??= new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (model == null) // && string.IsNullOrEmpty(model.Title)
+        {
+            model = new Course();
+
+            Instruments = EffizyService.GetInstruments();
+
+            Instructors = EffizyService.GetInstructors();
+            //string apiUrl = "https://localhost:7164/api/Courses/GetInstruments/";
+            //Instruments = await Http.GetFromJsonAsync<List<Instrument>>(apiUrl);
+
+            //apiUrl = "https://localhost:7164/api/Courses/GetInstructors/";
+            //Instructors = await Http.GetFromJsonAsync<List<Instructor>>(apiUrl);
+        }
+    }
+
+    protected async Task SaveCourse()
+    {
+        if (!string.IsNullOrEmpty(model.Title))
+        {
+            EffizyService.AddCourse(model);
+            //string apiUrl = "https://localhost:7164/api/Courses/";
+            //await Http.PostAsJsonAsync(apiUrl, model);
+            Cancel();
+        }
+    }
+
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/courses/");
+    }
+}

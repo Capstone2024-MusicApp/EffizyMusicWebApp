@@ -1,0 +1,150 @@
+﻿@page "/takeQuiz/{quizId:int}/{count:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+
+<h3>Take Quiz</h3>
+<hr />
+<EditForm Model="@model" OnValidSubmit="SaveAnswer" FormName="takeQuiz">
+    @* <DataAnnotationsValidator /> *@
+    <div class="mb-3">
+        <label class="form-label"><b>Question Text</b></label>
+        <div class="col-md-4">
+            <label class="form-label">@model.QuestionText</label>
+        </div>
+        <ValidationMessage For="@(() => model.QuestionText)" />
+
+            <hr />
+        @if (model.QuestionChoices != null)
+         {
+        <div><h5>Question Choices</h5></div>
+        <InputRadioGroup @bind-Value="model.AnswerValue" Name="quiz" class="form-check">
+            @for (int count = 1; count <= model.QuestionChoices.Count; count++)
+            {
+                <div class="form-group">
+                    <label class="control-label"><h5>Choice @count:</h5></label><br>
+                    @if (count == 1)
+                    {
+                        <InputRadio @bind-Value="@count" class="form-check-input" />
+                        <label style="margin-right:10px;font-weight: normal">@model.QuestionChoices.ToList()[count - 1].ChoiceText</label>
+                        <br />
+                        <br />
+                    }
+                    @if (count == 2)
+                    {
+                        <InputRadio @bind-Value="@count" class="form-check-input"  />
+                        <label style="margin-right:10px;font-weight: normal">@model.QuestionChoices.ToList()[count - 1].ChoiceText</label>
+                        <br />
+                        <br />
+                    }
+                    @if (count == 3)
+                    {
+                        <InputRadio @bind-Value="@count" class="form-check-input" />
+                        <label style="margin-right:10px;font-weight: normal">@model.QuestionChoices.ToList()[count - 1].ChoiceText</label>
+                        <br />
+                        <br />
+                    }
+                    @if (count == 4)
+                    {
+                            <InputRadio @bind-Value="@count" class="form-check-input" />
+                        <label style="margin-right:10px;font-weight: normal">@model.QuestionChoices.ToList()[count - 1].ChoiceText</label>
+                        <br />
+                        <br />
+                    }
+                    
+                </div>
+            }
+            </InputRadioGroup>
+         }
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn btn-light" href="/quizes/@quizId">
+            Cancel
+        </a>
+    </div>
+    </EditForm>
+@code {
+    [Parameter]
+    public int quizId { get; set; }
+
+    [Parameter]
+    public int count { get; set; }
+    //int count = 0;
+
+    Question model = new Question();
+
+    List<Question> questions = new List<Question>();
+    public int totalCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bool isLogin = await IsUserLogin();
+        if(isLogin == false)
+        {
+            NavigationManager.NavigateTo("/loginForm", true);
+            return;
+        }
+        questions = EffizyService.GetQuizQuestions(quizId);
+        totalCount = questions.Count;
+        model = questions[count];
+    }
+
+    protected async Task SaveAnswer()
+    {
+        if (!string.IsNullOrEmpty(model.QuestionText) && !string.IsNullOrEmpty(model.AnswerValue))
+        {
+            string answer = "E";
+            switch(model.AnswerValue)
+            {
+                case "1":
+                    answer = "A";
+                    break;
+                case "2":
+                    answer = "B";
+                    break;
+                case "3":
+                    answer = "C";
+                    break;
+                case "4":
+                    answer = "D";
+                    break;
+            }
+            var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
+            int userId = Convert.ToInt32(UserID.Value);
+
+            QuizResult quizResult = new QuizResult
+                {
+                    QuestionId = model.Id,
+                    QuizId = model.QuizId,
+                    SelectedChoice = answer,
+                    UserId = userId,
+                    CreatedDate = DateTime.Now
+                };
+
+            count++;
+            EffizyService.AddQuizResult(quizResult);
+            if (count == totalCount)
+            {
+                NavigationManager.NavigateTo("/quizResults/" + quizId, true);
+            }
+            else
+                NavigationManager.NavigateTo("/takeQuiz/" + quizId + "/" + count, true);
+        }
+    }
+
+    protected async Task<bool> IsUserLogin()
+    {
+        var email = await ProtectedSessionStore.GetAsync<String>("Email");
+        if (email.Value != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}

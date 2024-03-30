@@ -29,8 +29,18 @@ else
                     <td>@module.Title</td>
                     @* <td>@module.Description</td> *@
                     <td>
+                        
+                        <a href='/module/edit/@module.ModuleID' class="btn btn-primary" role="button">
+                            Edit
+                        </a>
+                        <a href='/module/delete/@module.ModuleID' class="btn btn-warning" role="button">
+                            Delete
+                        </a>
                         <a href='/quizes/@module.ModuleID' class="btn btn-outline-dark" role="button">
                             Quizes
+                        </a>
+                        <a href='/module/lessons/@module.ModuleID' class="btn btn-outline-dark" role="button">
+                            Lessons
                         </a>
                     </td>
                 </tr>

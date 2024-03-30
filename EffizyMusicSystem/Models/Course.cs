@@ -11,7 +11,7 @@ namespace EffizyMusicSystem.Models
     public class Course
     {
         [Key]
-        [StringLength(10)]
+        //[StringLength(10)]
         public int CourseID { get; set; }
         [StringLength(30)]
 

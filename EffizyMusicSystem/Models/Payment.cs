@@ -14,7 +14,7 @@ namespace EffizyMusicSystem.Models
         public int PaymentID { get; set; }
 
         public DateTime PaymentDate { get; set; } = DateTime.Now;
-        public int PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; }
 
         public double Amount { get; set; }
         public string PaymentStatus {  get; set; }
