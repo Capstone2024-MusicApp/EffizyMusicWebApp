@@ -1,76 +1,89 @@
-﻿@page "/EditLesson/{lessonNumber:int}"
+﻿@page "/EditLesson"
+@page "/EditLesson/{LessonNumber:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@rendermode InteractiveServer
 <h3>Edit Lesson</h3>
 <hr />
 
 <EditForm Model="@LessonData" OnValidSubmit="UpdateLesson" formname="Edit-Lesson">
     <DataAnnotationsValidator />
     <ValidationSummary />
-
+    <div class="col-6">
     <div class="form-group">
         <label>Title</label>
-        <InputText @bind-Value="LessonData.Title" class="form-control" /> @LessonData.Title
+        <InputText @bind-Value="LessonData.Title" class="form-control" />
         <ValidationMessage For="@(() => LessonData.Title)" />
     </div>
 
     <div class="form-outline mt-2">
         <label for="lessonMode" class="form-label">Lesson Mode:</label>
-        <InputText @bind-Value="LessonData.LessonMode" class="form-control">@LessonData.LessonMode</InputText>
+        <InputText @bind-Value="LessonData.LessonMode" class="form-control" />
     </div>
-    <div class="form-outline mt-2">
-        <label for="content" class="form-label">Lesson Content:</label>
-        <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon> Upload your Lesson File
-        @LessonData.LessonContent
-    </div>
-
+         <div class="form-outline mt-2">
+            <label for="content" class="form-label">Lesson Content:</label>
+            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon> Upload your Lesson File
+            @if (LessonData.LessonContent != null)
+        {
+            <p>File Name: @GetFileNameFromContent(LessonData.LessonContent)</p>           
+        }
+        else
+        {
+            <p>No file uploaded</p>
+        }
+    </div> 
     <div class="form-group">
         <label>Module</label>
-        <select class="form-control" @bind="LessonData.Module.ModuleID">
+        <select class="form-control" @onchange="HandleSelectedModule">
+            <option value="">Select a Module</option>
             @foreach (var module in ModuleList)
             {
-                <option value="@module.ModuleID">@module.Title</option>
+                <option value="@module">@module.Title</option>
             }
         </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button type="submit" class="btn btn-danger" @onclick="RemoveLesson">Delete</button>
-    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-danger" @onclick="RemoveLesson">Delete</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    </div>
+    </div>
 </EditForm> 
-@if (!string.IsNullOrEmpty(ErrorMessage))
+@* @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-danger" role="alert">
         @ErrorMessage
     </div>
-}
+} *@
 @code {
     [Parameter]
     public int LessonNumber { get; set; }
 
+    private Module SelectedModule { get; set; }
 
     public List<Module> ModuleList = new();
-    private Lesson LessonData;
+    private Lesson LessonData = new();
     private string ErrorMessage { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         try
-        {
+        {            
             LessonData = await EffizyService.GetLessonById(LessonNumber);
-            ModuleList = await EffizyService.GetModules();
-        }
+            ModuleList = await EffizyService.GetModules();        }
         catch (Exception ex)
         {
-            ErrorMessage = "Error loading course data: " + ex.Message;
+            ErrorMessage = "Error loading lesson data: " + ex.Message;
         }
     }
     public async Task UpdateLesson()
     {
         try
         {
+            LessonData.Module = SelectedModule;
             await EffizyService.UpdateLesson(LessonData);
             NavigationManager.NavigateTo("/ViewLesson");
         }
@@ -78,6 +91,19 @@
         {
             ErrorMessage = "Error updating lesson: " + ex.Message;
         }
+    }
+    private void HandleSelectedModule(ChangeEventArgs e)
+    {
+        // Get the selected module from the ModuleList based on its Title or other unique property
+        string selectedModuleName = e.Value.ToString();
+        SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
+    }
+
+    private string GetFileNameFromContent(byte[] lessonContent)
+    {
+        // Example: Extracting file name from byte array
+        // You may need to implement your own logic based on how the file content is stored
+        return "example_filename.txt";
     }
     public async Task RemoveLesson()
     {

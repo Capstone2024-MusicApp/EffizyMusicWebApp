@@ -1,5 +1,7 @@
-﻿<nav aria-label="Page navigation example">
-    <ul class="pagination">
+﻿@inherits LayoutComponentBase
+@rendermode InteractiveServer
+<nav aria-label="Page navigation example">
+    <ul class="pagination d-flex justify-content-center">
         <li class="page-item @((CurrentPage == 1) ? "disabled" : "")">
             <button class="page-link" @onclick="PreviousPage">Previous</button>
         </li>
@@ -15,39 +17,42 @@
         </li>
     </ul>
 </nav>
-@code{
-    [Parameter]
-    public int CurrentPage { get; set; }
 
+@code {
     [Parameter]
     public int TotalPages { get; set; }
 
     [Parameter]
-    public EventCallback<int> OnPageChange{get;set;}
+    public int CurrentPage { get; set; }
 
-    private void PreviousPage()
+    [Parameter]
+    public EventCallback<int> onPageChange { get; set; }
+
+    private async Task PreviousPage()
     {
         if (CurrentPage > 1)
         {
             CurrentPage--;
-            OnPageChange.InvokeAsync(CurrentPage);
+            await onPageChange.InvokeAsync(CurrentPage);
         }
     }
-    private void NextPage()
+
+    private async Task NextPage()
     {
         if (CurrentPage < TotalPages)
         {
             CurrentPage++;
-            OnPageChange.InvokeAsync(CurrentPage);
+            await onPageChange.InvokeAsync(CurrentPage);
         }
     }
 
-    private void GoToPage(int page)
+    private async Task GoToPage(int page)
     {
         if (page >= 1 && page <= TotalPages)
         {
             CurrentPage = page;
-            OnPageChange.InvokeAsync(CurrentPage);
+            await onPageChange.InvokeAsync(CurrentPage);
+            StateHasChanged();
         }
     }
 }
