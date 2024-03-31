@@ -30,6 +30,11 @@ namespace EffizyMusicSystem.Services
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
+
+        public List<Feedback> GetFeedback();
+        public List<FeedbackDTO> GetFeedbackDTOs();
+        public void InsertFeedback(Feedback feedback);
+        public void DeleteFeedback(Feedback feedback);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -144,18 +149,7 @@ namespace EffizyMusicSystem.Services
         }
 
         //Add other methods here that directly connect to the database
-        public List<Feedback> GetFeedback()
-        {
-            return _context.Feedbacks.ToList();
-        }
-
-        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
-        {
-            await _context.Feedbacks.AddAsync(feedback);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
+        
         #region Course
         public async Task<List<Course>> GetCourses()
         {
@@ -210,6 +204,81 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.Where(x => x.ModuleID == id).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Module GetModule(int id)
+        {
+            try
+            {
+                return _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public bool DeleteModule(int id)
+        {
+            try
+            {
+                //Get all quizes of the module.
+                var quizes = _context.Quizes.Where(x => x.ModuleID == id).ToList();
+                foreach (var quiz in quizes)
+                {
+                    //get all questions of the quiz
+                    var questions = _context.Questions.Where(q => q.QuizId == quiz.Id).ToList();
+                    //delete all quations.
+                    foreach (var entity in questions)
+                    {
+                        //delete questionChoices
+                        List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var choice in questionChoices)
+                        {
+                            _context.QuestionChoices.Remove(choice);
+                            _context.SaveChanges();
+                        }
+                        //delete answers
+                        List<Answer> answers = _context.Answers.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var answer in answers)
+                        {
+                            _context.Answers.Remove(answer);
+                            _context.SaveChanges();
+                        }
+                        //Delete question
+                        _context.Questions.Remove(entity);
+                        _context.SaveChanges();
+                    }
+
+                    //Delete quiz
+                    _context.Quizes.Remove(quiz);
+                    _context.SaveChanges();
+                }
+
+                //Delete lessons
+                //Get all lessons of the module.
+                var lessons = _context.Lessons.Where(x => x.Module.ModuleID == id).ToList();
+                foreach (var lsn in lessons)
+                {
+                    _context.Lessons.Remove(lsn);
+                    _context.SaveChanges();
+
+                }
+
+                //remove module.
+                var module = _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+                if (module != null)
+                {
+                    _context.Modules.Remove(module);
+                    _context.SaveChanges();
+                }
+
+                return true;
             }
             catch
             {
