@@ -45,6 +45,50 @@
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Feedback
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+
+            <NavLink class="nav-link" href="ViewLesson">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> View Lesson
+            </NavLink>
+        </div>
+       @*  <div class="nav-item px-3">           
+            <NavLink class="nav-item" href="" @onclick="()=>expandSubMenu = !expandSubMenu">Module</NavLink>
+
+            @if (expandSubMenu)
+            {
+                <NavLink class="expand-menu" href="Lesson/AddLesson">Add Lesson</NavLink>
+                <NavLink class="expand-menu" href="Lesson/AddLesson">Edit Lesson</NavLink>
+            }
+
+        </div>
+        *@
+      @*   <div class="nav-item dropdown px-3">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="rateDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Lessons
+            </a>
+            <div class="dropdown-menu" aria-labelledby="rateDropdown">
+                <NavLink class="dropdown-item" href="Lesson/AddLesson">Add Lesson</NavLink>
+                <NavLink class="dropdown-item" href="Lesson/AddLesson">Edit Lesson</NavLink>
+                <!-- Add more dropdown items if needed -->
+            </div>
+        </div> *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/AddModule">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Add Module
+            </NavLink>
+        </div>
     </nav>
 </div>
+@code{
+    private bool collapseMenu = true;
+    private bool expandSubMenu;
+
+    private string NavMenuCssClass => collapseMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseMenu = !collapseMenu;
+    }
+
+}
 
