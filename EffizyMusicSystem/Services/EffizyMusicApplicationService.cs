@@ -113,7 +113,7 @@ namespace EffizyMusicSystem.Services
 
         public async Task<Lesson> GetLessonById(int id)
         {
-            return await _context.Lessons.Where(x=>x.LessonNumber == id).FirstOrDefaultAsync();
+            return await _context.Lessons.Where(x => x.LessonNumber == id).FirstOrDefaultAsync();
         }
         #endregion
 
@@ -171,7 +171,7 @@ namespace EffizyMusicSystem.Services
             if (existingID != null)
             {
                 _context.Remove(existingID);
-                await _context.SaveChangesAsync();               
+                await _context.SaveChangesAsync();
             }
         }
 
@@ -209,7 +209,7 @@ namespace EffizyMusicSystem.Services
         {
             try
             {
-                return await _context.Modules.Where(x=>x.ModuleID == id).FirstOrDefaultAsync();
+                return await _context.Modules.Where(x => x.ModuleID == id).FirstOrDefaultAsync();
             }
             catch
             {
@@ -218,420 +218,368 @@ namespace EffizyMusicSystem.Services
         }
         public async Task<Course> GetCourseByID(int id)
         {
-            return await _context.Courses.Where(x=>x.CourseID == id).FirstOrDefaultAsync();    
+            return await _context.Courses.Where(x => x.CourseID == id).FirstOrDefaultAsync();
         }
-    public async Task<bool> AddModules(Module module)
-    {
-        try
+        public async Task<bool> AddModules(Module module)
         {
-            if (module != null)
+            try
             {
-                _context.Modules.Add(module);
-                await _context.SaveChangesAsync();
-                return true;
+                if (module != null)
+                {
+                    _context.Modules.Add(module);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                return false;
-            }
-
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error adding module.", ex);
-        }
-    }
-
-    #endregion
-
-    #region Quizes
-    /// <summary>
-    /// Get all quizes
-    /// </summary>
-    /// <returns></returns>
-    public List<Quiz> GetQuizes()
-    {
-        try
-        {
-            return _context.Quizes.ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public List<Quiz> GetQuizes(int moduleId)
-    {
-        try
-        {
-            var quizes = _context.Quizes.Include(m => m.Module).Where(m => m.ModuleID == moduleId).ToList();
-            return quizes;
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public void AddQuiz(Quiz quiz)
-    {
-        try
-        {
-            _context.Quizes.Add(quiz);
-            _context.SaveChanges();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    //To Update the records of a particluar Quiz
-    public void UpdateQuiz(Quiz quiz)
-    {
-        try
-        {
-            _context.Entry(quiz).State = EntityState.Modified;
-            _context.SaveChanges();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public List<Instrument> GetInstruments()
-    {
-        try
-        {
-            return _context.Instruments.ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    public Quiz? GetQuiz(int id)
-    {
-        try
-        {
-            Quiz? quiz = _context.Quizes.Find(id);
-            if (quiz != null)
-            {
-                return quiz;
-            }
-            else
-            {
-                return null;
+                throw new Exception("Error adding module.", ex);
             }
         }
-        catch
-        {
-            throw;
-        }
 
-    }
+        #endregion
 
-
-    public List<Instructor> GetInstructors()
-    {
-        try
+        #region Quizes
+        /// <summary>
+        /// Get all quizes
+        /// </summary>
+        /// <returns></returns>
+        public List<Quiz> GetQuizes()
         {
-            return _context.Instructors.ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public bool DeleteQuiz(int id)
-    {
-        try
-        {
-            //get quiz questions
-            var questions = _context.Questions.Where(q => q.QuizId == id).ToList();
-            foreach (var question in questions)
+            try
             {
-                DeleteQuestion(question.Id);
+                return _context.Quizes.ToList();
             }
-
-            //delete quiz
-            Quiz? quiz = _context.Quizes.Find(id);
-            if (quiz != null)
+            catch
             {
-                _context.Quizes.Remove(quiz);
+                throw;
+            }
+        }
+
+        public List<Quiz> GetQuizes(int moduleId)
+        {
+            try
+            {
+                var quizes = _context.Quizes.Include(m => m.Module).Where(m => m.ModuleID == moduleId).ToList();
+                return quizes;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public void AddQuiz(Quiz quiz)
+        {
+            try
+            {
+                _context.Quizes.Add(quiz);
                 _context.SaveChanges();
-                return true;
             }
-            else
+            catch
             {
-                return false;
-                //throw new ArgumentNullException();
+                throw;
             }
         }
-        catch
+        //To Update the records of a particluar Quiz
+        public void UpdateQuiz(Quiz quiz)
         {
-            throw;
-        }
-    }
-    #endregion
-
-    #region Quiz Questions
-
-    /// <summary>
-    /// Get all Question
-    /// </summary>
-    /// <returns></returns>
-    public List<Question> GetAllQuestions()
-    {
-        try
-        {
-            return _context.Questions.ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public List<Payment> GetPayments()
-    {
-        try
-        {
-            return _context.Payments.ToList();
-        }
-        catch
-        {
-            throw;
-        }
-
-    }
-    /// <summary>
-    /// Get quiz Question
-    /// </summary>
-    /// <returns></returns>
-    public List<Question> GetQuizQuestions(int quizId)
-    {
-        try
-        {
-            return _context.Questions.Include(q => q.Quiz).Where(q => q.QuizId == quizId).ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public Question GetQuestion(int id)
-    {
-        try
-        {
-            return _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public QuestionChoiceViewModel GetQuestionWithChoices(int id)
-    {
-        try
-        {
-            QuestionChoiceViewModel model = new QuestionChoiceViewModel();
-            var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
-
-            if (question != null)
+            try
             {
-                model.QuestionText = question.QuestionText;
-                model.QuestionId = question.Id;
-                model.QuizId = question.QuizId;
+                _context.Entry(quiz).State = EntityState.Modified;
+                _context.SaveChanges();
             }
-
-            List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == id).ToList();
-            for (int count = 0; count < questionChoices.Count; count++)
+            catch
             {
-                if (count == 0)
+                throw;
+            }
+        }
+
+        public List<Instrument> GetInstruments()
+        {
+            try
+            {
+                return _context.Instruments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public Quiz? GetQuiz(int id)
+        {
+            try
+            {
+                Quiz? quiz = _context.Quizes.Find(id);
+                if (quiz != null)
                 {
-                    model.ChoiceText1 = questionChoices[count].ChoiceText;
+                    return quiz;
                 }
-                if (count == 1)
+                else
                 {
-                    model.ChoiceText2 = questionChoices[count].ChoiceText;
-                }
-                if (count == 2)
-                {
-                    model.ChoiceText3 = questionChoices[count].ChoiceText;
-                }
-                if (count == 3)
-                {
-                    model.ChoiceText4 = questionChoices[count].ChoiceText;
+                    return null;
                 }
             }
-            //delete answers
-            List<Answer> answers = _context.Answers.Where(x => x.QuestionId == id).ToList();
-            if (answers.Count > 0)
+            catch
             {
-                model.CorrectChoice = answers[0].AnswerText;
-                //model.Choices = answers[0].AnswerText;
+                throw;
             }
 
-            return model;
         }
-        catch
-        {
-            throw;
-        }
-    }
 
-    /// <summary>
-    /// Get question choices.
-    /// </summary>
-    /// <param name="id">Question Id</param>
-    /// <returns></returns>
-    public List<QuestionChoice> GetQuestionChoices(int id)
-    {
-        try
-        {
-            return _context.QuestionChoices.Where(m => m.QuestionId == id).ToList();
-        }
-        catch
-        {
-            throw;
-        }
-    }
 
-    public void AddQuestion(Question entity)
-    {
-        try
+        public List<Instructor> GetInstructors()
         {
-            _context.Questions.Add(entity);
-            _context.SaveChanges();
-            //return entity;
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public void AddQuestionWithChoices(QuestionChoiceViewModel entity)
-    {
-        try
-        {
-            //add question
-            Question question = new Question();
-            question.QuestionText = entity.QuestionText;
-            question.QuizId = entity.QuizId;
-            _context.Questions.Add(question);
-            _context.SaveChanges();
-
-            int questionId = question.Id;
-            //Add choice 1
-            if (!string.IsNullOrEmpty(entity.ChoiceText1))
+            try
             {
-                QuestionChoice questionChoice = new QuestionChoice();
-                questionChoice.ChoiceText = entity.ChoiceText1;
-                questionChoice.QuestionId = questionId;
-                _context.QuestionChoices.Add(questionChoice);
-                _context.SaveChanges();
+                return _context.Instructors.ToList();
             }
-            //Add choice 2
-            if (!string.IsNullOrEmpty(entity.ChoiceText2))
+            catch
             {
-                QuestionChoice questionChoice = new QuestionChoice();
-                questionChoice.ChoiceText = entity.ChoiceText2;
-                questionChoice.QuestionId = questionId;
-                _context.QuestionChoices.Add(questionChoice);
-                _context.SaveChanges();
-            }
-            //Add choice 3
-            if (!string.IsNullOrEmpty(entity.ChoiceText3))
-            {
-                QuestionChoice questionChoice = new QuestionChoice();
-                questionChoice.ChoiceText = entity.ChoiceText3;
-                questionChoice.QuestionId = questionId;
-                _context.QuestionChoices.Add(questionChoice);
-                _context.SaveChanges();
-            }
-            //Add choice 4
-            if (!string.IsNullOrEmpty(entity.ChoiceText4))
-            {
-                QuestionChoice questionChoice = new QuestionChoice();
-                questionChoice.ChoiceText = entity.ChoiceText4;
-                questionChoice.QuestionId = questionId;
-                _context.QuestionChoices.Add(questionChoice);
-                _context.SaveChanges();
-            }
-
-            if (!string.IsNullOrEmpty(entity.Choices.ToString()))
-            {
-                //Add answer.
-                Answer answer = new Answer();
-                //answer.AnswerText = entity.CorrectChoice;
-                answer.AnswerText = entity.Choices.ToString();
-                answer.QuestionId = questionId;
-                _context.Answers.Add(answer);
-                _context.SaveChanges();
+                throw;
             }
         }
-        catch
-        {
-            throw;
-        }
-    }
 
-    //To Update the records of a particluar question
-    public void UpdateQuestion(QuestionChoiceViewModel entity)
-    {
-        try
+        public bool DeleteQuiz(int id)
         {
-            DeleteQuestion(entity.QuestionId);
-            AddQuestionWithChoices(entity);
-            //_dbContext.Entry(entity).State = EntityState.Modified;
-            //_dbContext.SaveChanges();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public bool DeleteQuestion(int id)
-    {
-        try
-        {
-            Question? entity = _context.Questions.Find(id);
-            if (entity != null)
+            try
             {
-                //delete questionChoices
-                List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == id).ToList();
-                foreach (var choice in questionChoices)
+                //get quiz questions
+                var questions = _context.Questions.Where(q => q.QuizId == id).ToList();
+                foreach (var question in questions)
                 {
-                    _context.QuestionChoices.Remove(choice);
+                    DeleteQuestion(question.Id);
+                }
+
+                //delete quiz
+                Quiz? quiz = _context.Quizes.Find(id);
+                if (quiz != null)
+                {
+                    _context.Quizes.Remove(quiz);
                     _context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                    //throw new ArgumentNullException();
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region Quiz Questions
+
+        /// <summary>
+        /// Get all Question
+        /// </summary>
+        /// <returns></returns>
+        public List<Question> GetAllQuestions()
+        {
+            try
+            {
+                return _context.Questions.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public List<Payment> GetPayments()
+        {
+            try
+            {
+                return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
+        /// <summary>
+        /// Get quiz Question
+        /// </summary>
+        /// <returns></returns>
+        public List<Question> GetQuizQuestions(int quizId)
+        {
+            try
+            {
+                return _context.Questions.Include(q => q.Quiz).Where(q => q.QuizId == quizId).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Question GetQuestion(int id)
+        {
+            try
+            {
+                return _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public QuestionChoiceViewModel GetQuestionWithChoices(int id)
+        {
+            try
+            {
+                QuestionChoiceViewModel model = new QuestionChoiceViewModel();
+                var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
+
+                if (question != null)
+                {
+                    model.QuestionText = question.QuestionText;
+                    model.QuestionId = question.Id;
+                    model.QuizId = question.QuizId;
+                }
+
+                List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == id).ToList();
+                for (int count = 0; count < questionChoices.Count; count++)
+                {
+                    if (count == 0)
+                    {
+                        model.ChoiceText1 = questionChoices[count].ChoiceText;
+                    }
+                    if (count == 1)
+                    {
+                        model.ChoiceText2 = questionChoices[count].ChoiceText;
+                    }
+                    if (count == 2)
+                    {
+                        model.ChoiceText3 = questionChoices[count].ChoiceText;
+                    }
+                    if (count == 3)
+                    {
+                        model.ChoiceText4 = questionChoices[count].ChoiceText;
+                    }
                 }
                 //delete answers
                 List<Answer> answers = _context.Answers.Where(x => x.QuestionId == id).ToList();
-                foreach (var answer in answers)
+                if (answers.Count > 0)
                 {
-                    _context.Answers.Remove(answer);
-                    _context.SaveChanges();
+                    model.CorrectChoice = answers[0].AnswerText;
+                    //model.Choices = answers[0].AnswerText;
                 }
-                //Delete question
-                _context.Questions.Remove(entity);
-                _context.SaveChanges();
-                return true;
+
+                return model;
             }
-            else
+            catch
             {
-                return false;
+                throw;
             }
         }
-        catch
+
+        /// <summary>
+        /// Get question choices.
+        /// </summary>
+        /// <param name="id">Question Id</param>
+        /// <returns></returns>
+        public List<QuestionChoice> GetQuestionChoices(int id)
         {
-            throw;
+            try
+            {
+                return _context.QuestionChoices.Where(m => m.QuestionId == id).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public void AddQuestion(Question entity)
+        {
+            try
+            {
+                _context.Questions.Add(entity);
+                _context.SaveChanges();
+                //return entity;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public void AddQuestionWithChoices(QuestionChoiceViewModel entity)
+        {
+            try
+            {
+                //add question
+                Question question = new Question();
+                question.QuestionText = entity.QuestionText;
+                question.QuizId = entity.QuizId;
+                _context.Questions.Add(question);
+                _context.SaveChanges();
+
+                int questionId = question.Id;
+                //Add choice 1
+                if (!string.IsNullOrEmpty(entity.ChoiceText1))
+                {
+                    QuestionChoice questionChoice = new QuestionChoice();
+                    questionChoice.ChoiceText = entity.ChoiceText1;
+                    questionChoice.QuestionId = questionId;
+                    _context.QuestionChoices.Add(questionChoice);
+                    _context.SaveChanges();
+                }
+                //Add choice 2
+                if (!string.IsNullOrEmpty(entity.ChoiceText2))
+                {
+                    QuestionChoice questionChoice = new QuestionChoice();
+                    questionChoice.ChoiceText = entity.ChoiceText2;
+                    questionChoice.QuestionId = questionId;
+                    _context.QuestionChoices.Add(questionChoice);
+                    _context.SaveChanges();
+                }
+                //Add choice 3
+                if (!string.IsNullOrEmpty(entity.ChoiceText3))
+                {
+                    QuestionChoice questionChoice = new QuestionChoice();
+                    questionChoice.ChoiceText = entity.ChoiceText3;
+                    questionChoice.QuestionId = questionId;
+                    _context.QuestionChoices.Add(questionChoice);
+                    _context.SaveChanges();
+                }
+                //Add choice 4
+                if (!string.IsNullOrEmpty(entity.ChoiceText4))
+                {
+                    QuestionChoice questionChoice = new QuestionChoice();
+                    questionChoice.ChoiceText = entity.ChoiceText4;
+                    questionChoice.QuestionId = questionId;
+                    _context.QuestionChoices.Add(questionChoice);
+                    _context.SaveChanges();
+                }
+
+                if (!string.IsNullOrEmpty(entity.Choices.ToString()))
+                {
+                    //Add answer.
+                    Answer answer = new Answer();
+                    //answer.AnswerText = entity.CorrectChoice;
+                    answer.AnswerText = entity.Choices.ToString();
+                    answer.QuestionId = questionId;
+                    _context.Answers.Add(answer);
+                    _context.SaveChanges();
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         //To Update the records of a particluar question
@@ -687,8 +635,6 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        #endregion
-
         #region Student Courses
         public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
         {
@@ -702,7 +648,7 @@ namespace EffizyMusicSystem.Services
             //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
             studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
 
-            studentCourse.Modules = _context.Modules.Include(l=>l.Lessons).Include(q=>q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
             return studentCourse;
             // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
 
@@ -720,29 +666,6 @@ namespace EffizyMusicSystem.Services
             else
                 return null;
         }
-
-    }
-
-    #endregion
-
-    #region Student Courses
-    public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
-    {
-        return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
-    }
-
-    public StudentCourseDTO? GetStudentCourse(int enrollmentID)
-    {
-        StudentCourseDTO studentCourse;
-
-        //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
-        studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
-
-        studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
-        return studentCourse;
-        // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
-
     }
     #endregion
-}
 }
