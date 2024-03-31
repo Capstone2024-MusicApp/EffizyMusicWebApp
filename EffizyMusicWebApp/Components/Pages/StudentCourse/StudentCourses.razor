@@ -1,7 +1,14 @@
 ﻿@page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+@inject ILogger<StudentCourses> Logger
+
 
 <h2>Courses</h2>
 <br />
@@ -31,7 +38,6 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
                         @foreach (var course in enrolledCourses)
                         {
                         <tr>
@@ -42,7 +48,6 @@ else
                             <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
                         }
-                    </tr>
                 </tbody>
             </table>
         }
@@ -62,7 +67,6 @@ else
                 </tr>
             </thead>
             <tbody>
-                <tr>
                     @foreach (var course in availablecourses)
                     {
                     <tr>
@@ -72,7 +76,6 @@ else
                         <td><a href="">View Course</a></td>
                     </tr>
                     }
-                </tr>
             </tbody>
         </table>
     </div>
@@ -83,10 +86,23 @@ else
     private List<StudentCourseDTO>? enrolledCourses;
 
 
+    private User user = new User();
+
+
     protected override async Task OnInitializedAsync()
     {
         availablecourses = await EffizyService.GetCourses();
-        enrolledCourses = await EffizyService.GetEnrolledCourses(1);
+
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+
+        if(String.IsNullOrEmpty(user.UserID.ToString()))
+        {
+            Logger.LogWarning("Student Course being accessed but no login detected.");
+        }
+        else
+        {
+            enrolledCourses = await EffizyService.GetEnrolledCourses(user.UserID);
+        }
     }
 
     

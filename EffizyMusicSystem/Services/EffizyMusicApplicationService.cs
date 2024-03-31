@@ -705,9 +705,9 @@ namespace EffizyMusicSystem.Services
         }
 
         #region Student Courses
-        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
+        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int userID)
         {
-            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getEnrolledCourses {userID}").ToListAsync();
         }
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
