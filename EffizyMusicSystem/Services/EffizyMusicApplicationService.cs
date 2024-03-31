@@ -18,6 +18,10 @@ namespace EffizyMusicSystem.Services
         List<Instructor> GetInstructors();
 
         Task<bool> AddRating(InstructorRating rating);
+        public List<Feedback> GetFeedback();
+        public List<FeedbackDTO> GetFeedbackDTOs();
+        public void InsertFeedback(Feedback feedback);
+        public void DeleteFeedback(Feedback feedback);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -78,20 +82,7 @@ namespace EffizyMusicSystem.Services
         }
 
         //Add other methods here that directly connect to the database
-        public List<Feedback> GetFeedback()
-        {
-            return _context.Feedbacks.ToList();
-        }
-
-        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
-        {
-            await _context.Feedbacks.AddAsync(feedback);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-
-        //Add your methods here that directly connects to the dtabase
+        
 
         public void AddCourse(Course entity)
         {
@@ -611,6 +602,31 @@ namespace EffizyMusicSystem.Services
         }
         #endregion
 
+        #region Feedbacks
+        public List<FeedbackDTO> GetFeedbackDTOs()
+        {
+            return   _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
+
+        }
+
+        public List<Feedback> GetFeedback()
+        {
+            return _context.Feedbacks.ToList();
+        }
+
+
+        public void InsertFeedback(Feedback feedback)
+        {
+            _context.Feedbacks.Add(feedback);
+            _context.SaveChanges();
+        }
+
+        public void DeleteFeedback(Feedback feedback)
+        {
+            _context.Remove(feedback);
+            _context.SaveChanges();
+        }
+        #endregion
         //Login
         public User ValidateUser(string email, string password)
         {
