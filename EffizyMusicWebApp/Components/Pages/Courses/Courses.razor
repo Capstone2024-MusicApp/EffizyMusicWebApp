@@ -33,7 +33,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var course in CourseList)
+            @foreach (var course in GetItemsOnCurrentPage())
             {
                 <tr>
                     <td>@course.Title</td>
@@ -53,9 +53,14 @@
         </tbody>
     </table>
 </div>
-
+<PaginationComponent CurrentPage="@cp"
+                     TotalPages="@TotalPages"
+                     onPageChange="@HandlePageChange" />
 @code {
     private List<Course> CourseList = new List<Course>();
+    private int pageSize = 4;
+    private int cp = 1;
+    private int TotalPages => (int)Math.Ceiling((double)CourseList.Count / pageSize);
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,5 +68,16 @@
     }
 
     private void EditCourse(int CourseID) => NavigationManager.NavigateTo($"/editCourse/{CourseID}");
+
+    private IEnumerable<Course> GetItemsOnCurrentPage()
+    {
+        int startIndex = (cp - 1) * pageSize;
+        return CourseList.Skip(startIndex).Take(pageSize);
+    }
+
+    private void HandlePageChange(int newPage)
+    {
+        cp = newPage;
+    }
 
 }
