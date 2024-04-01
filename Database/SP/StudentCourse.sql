@@ -22,3 +22,24 @@ AS
 		END
 	END
 GO
+
+CREATE OR ALTER PROCEDURE sp_getQuestionnaire
+	@in_quizId INT
+AS
+	DECLARE @ProcedureName VARCHAR(30) = 'sp_getQuestionnaire';
+
+	BEGIN
+		select qz.id QuizId
+			  ,qs.id QuestionID
+			  ,qs.QuestionText
+		from quizes qz
+		inner join questions qs on qz.id = qs.QuizId
+		where qz.Id = @in_quizId;
+
+
+		IF @@ERROR <> 0 
+		BEGIN
+			RAISERROR('sp_getQuestionnaire - Error getting questionnaire.',16,1)
+		END
+	END
+GO
