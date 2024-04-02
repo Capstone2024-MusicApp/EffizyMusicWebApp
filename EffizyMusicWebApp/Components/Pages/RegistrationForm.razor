@@ -403,11 +403,6 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
 
     private bool paymentSuccessful = false; // Flag to track payment status
 
-    // private string ClientId = "Af9rn3sOsNDtyCwBZRlcQl3yNy_pPEc69KOJ3uJ1Ql5jHsdsKQKUYxMThkd_YBXKDBrrr1ymmVWUWBq6";
-    // private string ClientSecret = "EBbCW4OQZKIKa-kBssHSCkrHXhSKH-GeLE9spVrbPCCGey6jCrjuRO2tHYcfnpTRiIuJNDIizVLMZoxh";
-
-    private PayPalService payPalService;
-
     private int selectedInstrumentID;
 
     private int selectedSubscriptionID;
@@ -501,7 +496,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         catch (Exception ex)
         {
             // Log or handle the exception
-            Console.WriteLine("Error loading subscriptions: " + ex.Message);
+            ErrorMessage = "Error loading subscriptions: " + ex.Message;
         }
     }
 
@@ -536,11 +531,11 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
 
             if (courses == null)
             {
-                ErrorMessage = "Courses data is null or empty.";
+                ErrorMessage = "";
             }
             else
             {
-                ErrorMessage = "Courses fetched successfully";
+                ErrorMessage = "";
             }
 
             // Load subscriptions based on the new course selection
@@ -567,13 +562,13 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             }
             else
             {
-                Console.WriteLine("Invalid Course ID");
+                ErrorMessage = "Invalid Course ID";
             }
         }
         catch (Exception ex)
         {
             // Handle exceptions
-            Console.WriteLine("Error loading subscriptions: " + ex.Message);
+
             ErrorMessage = "Error loading subscriptions: " + ex.Message;
         }
     }
@@ -597,15 +592,14 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             }
             else
             {
-                Console.WriteLine("No Subscriptions found for CourseID: " + courseID);
+                ErrorMessage = "No Subscriptions found for CourseID: " + courseID;
             }
 
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            // Handle exceptions
-            Console.WriteLine("Error loading subscriptions: " + ex.Message);
+            // Handle exceptions         
             ErrorMessage = "Error loading subscriptions: " + ex.Message;
         }
     }
@@ -641,9 +635,6 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
-            // Hash the passwords before saving
-            user.Password = PasswordHasher.HashPassword(user.Password);
-            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 
@@ -681,11 +672,6 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
-            // Hash the passwords before saving
-            user.Password = PasswordHasher.HashPassword(user.Password);
-            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
-
-
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 
