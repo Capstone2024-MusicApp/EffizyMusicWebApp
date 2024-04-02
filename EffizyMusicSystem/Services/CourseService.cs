@@ -38,7 +38,6 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
-
         public async Task<List<Instrument>> GetInstrumentsAsync()
         {
             return await _context.Instruments.ToListAsync();
@@ -47,6 +46,28 @@ namespace EffizyMusicSystem.Services
         public async Task<List<Instructor>> GetInstructorsAsync()
         {
             return await _context.Instructors.ToListAsync();
+        }
+
+        public async Task<List<string>> GetDistinctSkillLevels()
+        {
+            return await _context.Courses
+                .Select(c => c.SkillLevel)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCourses(int instrumentID, string skillLevel)
+        {
+            return await _context.Courses
+                .Where(c => c.InstrumentID == instrumentID && c.SkillLevel == skillLevel)
+                .ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCoursesByInstrumentAndSkillLevel(int instrumentId, string skillLevel)
+        {
+            return await _context.Courses
+                .Where(c => c.InstrumentID == instrumentId && c.SkillLevel == skillLevel)
+                .ToListAsync();
         }
 
     }

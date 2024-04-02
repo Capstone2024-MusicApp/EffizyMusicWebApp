@@ -11,10 +11,10 @@ namespace EffizyMusicSystem.DAL
 {
     public class EffizyMusicContext : DbContext
     {
-
         public EffizyMusicContext(DbContextOptions<EffizyMusicContext> options) : base(options)
         {
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<UserType> UserTypes { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
@@ -25,27 +25,20 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<InstructorRating> InstructorRatings { get; set; }
         public DbSet<Payment> Payments { get; set; }
-
         public DbSet<Student> Students { get; set; }
-
         public DbSet<ViewLesson> ViewLessons { get; set; }
-
         public DbSet<Quiz> Quizes { get; set; }
-
-
-
+        public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Question> Questions { get; set; }
-
         public DbSet<QuestionChoice> QuestionChoices { get; set; }
-
         public DbSet<Answer> Answers { get; set; }
-
         public DbSet<Enrollment> Enrollments { get; set; }
-        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; } 
+        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Quiz>(entity =>
             {
                 entity.ToTable("Quizes");
@@ -92,6 +85,11 @@ namespace EffizyMusicSystem.DAL
                     .HasConstraintName("FK_Answer_Question");
             });
 
+            modelBuilder.Entity<Subscription>(entity =>
+            {
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)");
+            });
 
             modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);
         }
