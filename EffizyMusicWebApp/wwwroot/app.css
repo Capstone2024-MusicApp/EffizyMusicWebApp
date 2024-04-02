@@ -1,5 +1,5 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Raleway', sans-serif !important;
 }
 
 a, .btn-link {
@@ -114,5 +114,67 @@ h1:focus {
 .video-lesson-title{
     font-weight: 600;
     font-size: 30px;
+
+}
+
+.feedback-container {
+    display: block;
+    border-radius: 15px;
+    background: #efefef;
+    width: fit-content;
+    margin: auto;
+}
+
+.feedback-table {
+    padding: 10px;
+    min-width: 800px;
+    margin: auto;
+    max-width: 800px;
+}
+
+.feedback-table td{
+    padding: 10px 20px 5px 20px;
+}
+
+.feedback-name{
+    color: #043d78;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.feedback-date {
+    font-style: italic;
+    color: #043d78;
+    font-size: 14px;
+}
+
+.feedback-post{
+    padding: 10px;
+    margin: auto;
+    min-width: 800px;
+    align-content:center;
+}
+
+.feedback-post td{
+    margin: auto;
+    text-align: center;
+}
+
+.feedback-input{
+    width: 600px;
+    height: 80px;
+    margin: auto;
+    
+}
+
+.page-title {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 40px;
+    font-weight: 300;
+    text-align: center;
+    display: block;
+    padding-bottom: 60px;
+    padding-top: 30px;
+    color: darkslategray
 
 }

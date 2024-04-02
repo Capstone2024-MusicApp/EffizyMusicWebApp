@@ -1,0 +1,88 @@
+﻿@page "/AddModule/"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+<h3>Add Module</h3>
+<hr />
+<EditForm Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4" FormName="Add-Module">
+
+    <DataAnnotationsValidator />
+
+    <div class="form-outline mt-2 col-md-6">
+        <label class="form-label">Course Title:</label>
+
+        <InputText class="form-control" @bind-Value="ModuleData.Title" />
+
+        <ValidationMessage For="@(() => ModuleData.Title)" />
+    </div>
+
+    <div class="form-outline mt-2 col-md-6">
+        <label for="course" class="form-label">Choose Course:</label>
+        <select class="form-control" @onchange="HandleSelectedValue" required>
+            <option value="">[Please Choose the Course...]</option>
+
+            @foreach (var course in CourseList)
+            {
+                <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
+            }
+
+        </select>
+      </div>
+    <button type="submit" class="btn btn-primary mt-4"><i class="fa fa-plus-square" aria-hidden="true"></i>  Add Module</button>
+</EditForm>
+
+@if (!IsModuleAdded)
+{
+    <p class="text-center text-danger"><em>@ErrorMessage</em></p>
+} 
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+
+    [Parameter]
+    public bool IsModuleAdded { get; set; } = false;
+
+    [Parameter]
+    public string ErrorMessage { get; set; } = "";
+
+    [SupplyParameterFromForm]
+    protected Module ModuleData { get; set; } = new();
+    public List<Course> CourseList = new();
+    protected override void OnInitialized()
+    {
+        CourseList = EffizyService.GetCourseList();
+    }
+    public async Task SaveModuleInfo()
+    {
+        try
+        {
+            ModuleData.Course = await EffizyService.GetCourseByID(CourseId);
+            IsModuleAdded = await EffizyService.AddModules(ModuleData);
+            if (IsModuleAdded)
+            {
+                NavigationManager.NavigateTo("/Modules/");
+                ResetForm();
+            }
+            else
+            {
+                ErrorMessage = "Error in Adding Lesson";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error in Adding Lesson";
+        }
+
+    }
+    private void HandleSelectedValue(ChangeEventArgs e)
+    {
+        CourseId = Convert.ToInt32(e.Value);
+    }
+    private void ResetForm()
+    {
+        ModuleData = new();
+    }
+}

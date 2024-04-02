@@ -2,10 +2,15 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components.Authorization
-@inject IUserProfileService UserProfileService
+
 @inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
+
+@inject IUserService UserService
+@inject IUserProfileService UserProfileService
+@inject IUserProfileService InstructorService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container">
     <h3>User Profile</h3>

@@ -641,6 +641,9 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
+            // Hash the passwords before saving
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 
@@ -678,6 +681,11 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
+            // Hash the passwords before saving
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+
+
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 

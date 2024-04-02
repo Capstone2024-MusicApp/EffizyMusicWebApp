@@ -1,0 +1,58 @@
+﻿@inherits LayoutComponentBase
+@rendermode InteractiveServer
+<nav aria-label="Page navigation example">
+    <ul class="pagination d-flex justify-content-center">
+        <li class="page-item @((CurrentPage == 1) ? "disabled" : "")">
+            <button class="page-link" @onclick="PreviousPage">Previous</button>
+        </li>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            var pageNumber = i; // Capture the current value of i
+            <li class="page-item @(i == CurrentPage ? "active" : "")">
+                <button class="page-link" @onclick="(() => GoToPage(pageNumber))">@i</button>
+            </li>
+        }
+        <li class="page-item @((CurrentPage == TotalPages) ? "disabled" : "")">
+            <button class="page-link" @onclick="NextPage">Next</button>
+        </li>
+    </ul>
+</nav>
+
+@code {
+    [Parameter]
+    public int TotalPages { get; set; }
+
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+    [Parameter]
+    public EventCallback<int> onPageChange { get; set; }
+
+    private async Task PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+            await onPageChange.InvokeAsync(CurrentPage);
+        }
+    }
+
+    private async Task NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            await onPageChange.InvokeAsync(CurrentPage);
+        }
+    }
+
+    private async Task GoToPage(int page)
+    {
+        if (page >= 1 && page <= TotalPages)
+        {
+            CurrentPage = page;
+            await onPageChange.InvokeAsync(CurrentPage);
+            StateHasChanged();
+        }
+    }
+}

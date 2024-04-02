@@ -27,7 +27,6 @@ namespace EffizyMusicSystem.Models
         public string ConfirmPassword { get; set; }
 
         public int UserTypeID { get; set; }
-
         public UserType UserType { get; set; }
     }
 }

@@ -26,19 +26,19 @@ namespace EffizyMusicSystem.Services
                 .FirstOrDefaultAsync(u => u.UserID == userId);
         }
 
-        public async Task<Student> GetStudentProfileAsync(int studentID)
-        {
-            try
-            {
-                var student = await _context.Students.FindAsync(studentID);
-                return student;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting student profile: {ex.Message}");
-                throw new Exception($"Error updating student profile: {ex.Message}");
-            }
-        }
+        // public async Task<Student> GetStudentProfileAsync(int studentID)
+        // {
+        //     try
+        //     {
+        //         var student = await _context.Students.FindAsync(studentID);
+        //         return student;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Error getting student profile: {ex.Message}");
+        //         throw new Exception($"Error updating student profile: {ex.Message}");
+        //     }
+        // }
 
         public async Task<int?> GetStudentIDByUserIDAsync(int userId)
         {
@@ -52,18 +52,30 @@ namespace EffizyMusicSystem.Services
             return instructor?.InstructorID;
         }
 
-        public async Task<Instructor> GetInstructorProfileAsync(int instructorID)
+        // public async Task<Instructor> GetInstructorProfileAsync(int instructorID)
+        // {
+        //     try
+        //     {
+        //         var instructor =  await _context.Instructors.FindAsync(instructorID);
+        //         return instructor;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Error getting student profile: {ex.Message}");
+        //         throw;
+        //     }
+        public async Task<Student> GetStudentProfileAsync(int userId)
         {
-            try
-            {
-                var instructor =  await _context.Instructors.FindAsync(instructorID);
-                return instructor;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting student profile: {ex.Message}");
-                throw;
-            }
+            return await _context.Students
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.UserID == userId);
+        }
+
+        public async Task<Instructor> GetInstructorProfileAsync(int userId)
+        {
+            return await _context.Instructors
+                .Include(i => i.User)
+                .FirstOrDefaultAsync(i => i.UserID == userId);
         }
 
         public async Task<bool> UpdateStudentProfileAsync(Student student)

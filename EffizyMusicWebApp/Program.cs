@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddBlazorBootstrap();
 
 // Add your DbContext configuration
@@ -39,8 +38,15 @@ builder.Services.AddScoped<UserTypeService>();
 // Register UserInstrumentService
 builder.Services.AddScoped<InstrumentService>();
 builder.Services.AddScoped<EffizyMusicApplicationService>();
-// Register EffizyMusicApplicationService
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<UserTypeService>();
+builder.Services.AddScoped<InstrumentService>();
+
 builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 var app = builder.Build();
 

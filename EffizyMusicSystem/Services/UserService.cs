@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,21 +66,11 @@ namespace EffizyMusicSystem.Services
         }
         public async Task<User> GetUserByIdAsync(int userId)
         {
+            return await _context.Users
+                .Include(x => x.UserType)
+                .FirstOrDefaultAsync(x => x.UserID == userId);
             return await _context.Users.FindAsync(userId);
         }
-
-
-        // THIS METHOD IS TO GET THE SURRENT LOGGED IN USER ID
-        //public int GetCurrentUserId()
-        //{
-        //    var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
-        //    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
-        //    {
-        //        return userId;
-        //    }
-        //    Default user ID if not found
-        //    return 0;
-        //}
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
@@ -107,6 +98,7 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
+      
     }
 
 

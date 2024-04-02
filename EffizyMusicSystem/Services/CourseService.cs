@@ -38,6 +38,7 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
+
         public async Task<List<Instrument>> GetInstrumentsAsync()
         {
             return await _context.Instruments.ToListAsync();
