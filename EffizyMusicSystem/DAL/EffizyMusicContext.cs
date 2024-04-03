@@ -1,11 +1,6 @@
 ﻿using EffizyMusicSystem.Models;
 using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.DAL
 {
@@ -92,6 +87,46 @@ namespace EffizyMusicSystem.DAL
             });
 
             modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);
+
+            // Configure Enrollment table
+            modelBuilder.Entity<Enrollment>(entity =>
+            {
+                entity.ToTable("Enrollments");
+                entity.Property(e => e.EnrollmentID)
+                    .HasColumnName("EnrollmentID")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.StudentID)
+                    .HasColumnName("StudentID")
+                    .IsRequired();
+
+                entity.Property(e => e.CourseID)
+                    .HasColumnName("CourseID")
+                    .IsRequired();
+
+                entity.Property(e => e.EnrollmentDate)
+                    .HasColumnName("EnrollmentDate")
+                    .IsRequired();
+
+                entity.Property(e => e.ProgressStatus)
+                    .HasColumnName("ProgressStatus")
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                // Set up foreign key relationships
+                entity.HasOne(d => d.Student)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.StudentID)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Enrollments_Students");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.CourseID)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Enrollments_Courses");
+            });
         }
     }
 }

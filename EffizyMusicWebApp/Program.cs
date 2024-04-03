@@ -21,6 +21,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 // Register Subscription
 builder.Services.AddScoped<SubscriptionService>();
 
+// PayPal Service
+builder.Services.AddScoped<PayPalService>();
+
+builder.Services.AddHttpClient<PayPalService>();
+
 // Register UserProfileService
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 

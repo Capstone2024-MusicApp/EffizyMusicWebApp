@@ -26,12 +26,14 @@ namespace EffizyMusicSystem.Models
         [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; }
 
-        public string SkillLevel { get; set; }
+        //public string SkillLevel { get; set; }
         public double Grades { get; set; }
         public string PaymentPlan { get; set; }
         public bool TermsAndConditions { get; set; }
         public int UserID { get; set; }
         public int InstrumentID { get; set; }
         public User User { get; set; }
+
+        public ICollection<Enrollment> Enrollments { get; set; }
     }
 }

@@ -21,9 +21,17 @@ namespace EffizyMusicSystem.Services
             return await _context.Courses.ToListAsync();
         }
 
-        public async Task<Course> GetCourseByIdAsync(int CourseID)
+        public async Task<Course> GetCourseByIdAsync(int courseId)
         {
-            return await _context.Courses.FindAsync(CourseID);
+            return await _context.Courses.FindAsync(courseId);
+        }
+
+        public async Task<Course> GetCourseBySubscriptionIdAsync(int subscriptionCourseId)
+        {
+            // Assuming Subscriptions table has a CourseID
+            return await _context.Courses
+                .Where(c => c.CourseID == subscriptionCourseId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task AddCourseAsync(Course course)
@@ -37,7 +45,6 @@ namespace EffizyMusicSystem.Services
             _context.Courses.Update(course);
             await _context.SaveChangesAsync();
         }
-
 
         public async Task<List<Instrument>> GetInstrumentsAsync()
         {
@@ -71,5 +78,9 @@ namespace EffizyMusicSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<Course> GetCourseById(int courseId)
+        {
+            return await _context.Courses.FindAsync(courseId);
+        }
     }
 }
