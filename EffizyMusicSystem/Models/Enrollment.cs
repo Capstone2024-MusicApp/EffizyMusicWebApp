@@ -15,6 +15,9 @@ namespace EffizyMusicSystem.Models
         public int EnrollmentID { get; set; }
         public int StudentID { get; set; }
         public int CourseID { get; set; }
+        public int PaymentID { get; set; }
+
+        public string EnrollmentStatus { get; set; }
 
         public required DateTime EnrollmentDate { get; set; }
 

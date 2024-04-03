@@ -21,7 +21,7 @@ namespace EffizyMusicSystem.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [NotMapped] // Not mapped to database
+        //[NotMapped] // Not mapped to database
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }

@@ -21,7 +21,7 @@ namespace EffizyMusicSystem.Models
         public double Amount { get; set; }
         public string PaymentStatus {  get; set; }
 
-        public string BillingAddress {  get; set; }
+        public string BillingAddress { get; set; } = "Get from Pay Pal";
 
 
     }

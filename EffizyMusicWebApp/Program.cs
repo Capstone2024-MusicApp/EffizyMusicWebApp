@@ -32,6 +32,12 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 // Register EffizyMusicApplicationService
 builder.Services.AddScoped<EffizyMusicApplicationService>();
 
+// Register EnrollmentService
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
+builder.Services.AddScoped<EnrollmentService>();
+
+
 // Register CourseService
 builder.Services.AddScoped<ICourseService, CourseService>();
 

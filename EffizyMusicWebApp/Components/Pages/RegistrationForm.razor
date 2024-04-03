@@ -16,6 +16,7 @@
 @inject InstrumentService instrumentService
 @inject NavigationManager navigationManager
 @inject PayPalService PayPalService
+
 @rendermode InteractiveServer
 
 @if (CurrentStep == 1)
@@ -277,7 +278,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
 
 @if (user.UserTypeID == 12 && CurrentStep == 3) // Student
 {
-    <EditForm Model="@student" OnValidSubmit="@MakePayment" FormName="StudentPaymentForm">
+    <EditForm Model="@student" OnValidSubmit="@RegisterStudentAndCreatePaymentAsync" FormName="StudentPaymentForm">
         <div class="mb-4">
             <label for="SelectedSubscription" class="form-label">Subscription:</label>
             <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
@@ -330,31 +331,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     }
 }
 
-@if (user.UserTypeID == 12 && CurrentStep == 4) // Student Payment Confirmation
-{
-    <div class="container mt-4 mb-4">
-        @if (paymentSuccessful)
-        {
-            <h3>Payment Confirmation</h3>
-            <p>Your payment was successful. Thank you!</p>
-            <!-- Additional confirmation details or actions -->
-            <div id="payment-success">
-                <p>Payment successful! Your registration is complete.</p>
-                @* <button class="btn btn-primary" @onclick="CompleteRegistration">Complete Registration</button> *@
-            </div>
-        }
-        else
-        {
-            <h3>Payment Failed</h3>
-            <p>Unfortunately, your payment was not successful. Please try again.</p>
-            <!-- Payment Cancel Message -->
-            <div id="payment-cancel">
-                <p>Payment cancelled or failed. Please try again.</p>
-                <!-- You can add more details or actions here -->
-            </div>
-        }
-    </div>
-}
+
 
 <div class="container mt-4 mb-4">
     <div class="row">
@@ -447,53 +424,14 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             }
             await LoadSubscriptions();
 
-            var uri = new Uri(NavigationManager.Uri);
-            var query = uri.Query;
-            var queryString = System.Web.HttpUtility.ParseQueryString(query);
-
-            if (queryString["paymentStatus"] == "success")
-            {
-                var paymentId = queryString["paymentId"];
-                var payerId = queryString["PayerID"];
-
-                if (!string.IsNullOrEmpty(paymentId) && !string.IsNullOrEmpty(payerId))
-                {
-                    await HandlePayPalResponse(paymentId, payerId);
-                }
-                else
-                {
-                    ErrorMessage = "Missing paymentId or payerId.";
-                }
-
-                paymentSuccessful = true;
-            }
-            else if (queryString["paymentStatus"] == "cancel")
-            {
-                paymentSuccessful = false;
-            }
+           
         }
         catch (Exception ex)
         {
             ErrorMessage = "An error occurred while initializing: " + ex.Message;
         }
     }
-    private async Task LoadSubscriptions()
-    {
-        try
-        {
-            var subscriptions = await subscriptionService.GetSubscriptionsByCourseID(selectedCourseID);
-            subscriptions = subscriptions.Where(s => s.CourseID == selectedCourseID).ToList();
-            this.subscriptions = subscriptions;
-
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            // Log or handle the exception
-            ErrorMessage = "Error loading subscriptions: " + ex.Message;
-        }
-    }
-
+   
     async Task InstrumentChanged(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int instrumentID))
@@ -541,6 +479,22 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             ErrorMessage = "An error occurred while loading courses: " + ex.Message;
         }
     }
+    private async Task LoadSubscriptions()
+    {
+        try
+        {
+            var subscriptions = await subscriptionService.GetSubscriptionsByCourseID(selectedCourseID);
+            subscriptions = subscriptions.Where(s => s.CourseID == selectedCourseID).ToList();
+            this.subscriptions = subscriptions;
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the exception
+            ErrorMessage = "Error loading subscriptions: " + ex.Message;
+        }
+    }
 
     async Task CourseChanged(string courseId)
     {
@@ -569,9 +523,6 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             ErrorMessage = "Error loading subscriptions: " + ex.Message;
         }
     }
-
-
-
 
     async Task LoadSubscriptionDetails(int courseID)
     {
@@ -629,79 +580,12 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
     }
 
-    private async Task RegisterStudentAndPaymentAsync(decimal paymentAmount, Course selectedCourse)
-    {
-        try
-        {
-            // Create the user first
-            bool userCreated = await userService.CreateUserAsync(user);
-
-            if (!userCreated)
-            {
-                ErrorMessage = "Failed to create user.";
-                return;
-            }
-
-            // Use the generated User ID for the student
-            student.UserID = user.UserID;
-
-            // Create the student
-            bool studentCreated = await userService.CreateStudentAsync(student);
-
-            if (studentCreated)
-            {
-                // Get billing address from PayPal (replace "Get this from PayPal" with actual logic)
-                string billingAddress = await GetBillingAddressFromPayPal();
-
-                // Insert payment details into Payments table
-                Payment payment = new Payment
-                    {
-                        PaymentDate = DateTime.Now,
-                        PaymentMethod = "PayPal",
-                        Amount = (double)paymentAmount,
-                        PaymentStatus = "Pending", // Payment status is set to "Pending" initially
-                        BillingAddress = billingAddress, // Set the billing address from PayPal
-                        UserID = user.UserID
-                    };
-
-                _context.Payments.Add(payment);
-                await _context.SaveChangesAsync();
-
-                // Create enrollment record
-                Enrollment enrollment = new Enrollment
-                    {
-                        StudentID = student.StudentID, // Assign the student ID
-                        CourseID = selectedCourse.CourseID, // Assign the course ID
-                        EnrollmentDate = DateTime.Now,
-                        ProgressStatus = "Not Started" // Progress status can be set as needed
-                    };
-
-                _context.Enrollments.Add(enrollment);
-                await _context.SaveChangesAsync();
-
-                CurrentStep = 4; // Move to payment confirmation step
-                return;
-            }
-            else
-            {
-                // Handle case where student creation failed
-                ErrorMessage = "Failed to create student.";
-            }
-        }
-        catch (Exception ex)
-        {
-            // Handle exception, log, etc.
-            ErrorMessage = "An error occurred: " + ex.Message;
-        }
-    }
-
-
-
-
     async Task RegisterInstructor()
     {
         try
         {
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
 
@@ -721,7 +605,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
                 return;
             }
             else
-            {    
+            {
                 ErrorMessage = "Failed to create instructor.";
             }
         }
@@ -731,7 +615,98 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
     }
 
-   
+    private async Task RegisterStudentAndCreatePaymentAsync()
+    {
+        try
+        {
+            decimal amount = selectedSubscription?.Amount ?? 0; // Get the selected subscription amount
+            Course selectedCourse = selectedSubscription?.Course; // Get the selected course from the subscription
+
+            // If no subscription is selected or no amount, show error
+            if (selectedCourse == null || amount <= 0)
+            {
+                ErrorMessage = "Please select a valid subscription to make a payment.";
+                return;
+            }
+
+            // Register the student and create payment details
+            await RegisterStudentAndPaymentAsync(amount, selectedCourse);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during registration and payment: " + ex.Message;
+        }
+    }
+
+    private async Task RegisterStudentAndPaymentAsync(decimal amount, Course selectedCourse)
+    {
+        try
+        {
+            // Hash the passwords
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+
+            // Create the user first
+            bool userCreated = await userService.CreateUserAsync(user);
+
+            if (!userCreated)
+            {
+                ErrorMessage = "Failed to create user.";
+                return;
+            }
+
+            // Use the generated User ID for the student
+            student.UserID = user.UserID;
+
+            // Create the student
+            bool studentCreated = await userService.CreateStudentAsync(student);
+
+            if (studentCreated)
+            {
+                // Insert payment details into Payments table
+                Payment payment = new Payment
+                    {
+                        PaymentDate = DateTime.Now,
+                        PaymentMethod = "PayPal",
+                        Amount = (double)amount,
+                        PaymentStatus = "Pending",
+                        UserID = user.UserID
+                    };
+
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                // Create enrollment record
+                Enrollment enrollment = new Enrollment
+                    {
+                        StudentID = student.StudentID,
+                        CourseID = selectedCourse.CourseID,
+                        EnrollmentDate = DateTime.Now,
+                        ProgressStatus = "Not Started",
+                        EnrollmentStatus = "Uncompleted",
+                        PaymentID = payment.PaymentID
+                    };
+
+                _context.Enrollments.Add(enrollment);
+                await _context.SaveChangesAsync();
+
+                // Successful enrollment
+                ErrorMessage = "Registration successful!";
+
+                // Proceed to make payment after successful registration
+                await MakePayment();
+            }
+            else
+            {
+                ErrorMessage = "Failed to create student.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred: " + ex.Message;
+            Console.WriteLine("Exception in RegisterStudentAndPaymentAsync: " + ex.ToString());
+        }
+    }
 
     private async Task MakePayment()
     {
@@ -743,55 +718,34 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
 
                 if (selectedSubscription != null && selectedSubscription.Amount > 0)
                 {
-                    // Get the course associated with the selected subscription
-                    Course selectedCourse = await courseService.GetCourseBySubscriptionIdAsync(selectedSubscription.CourseID);
+                    decimal paymentAmount = selectedSubscription.Amount;
 
-                    if (selectedCourse != null)
-                    {
-                        decimal paymentAmount = selectedSubscription.Amount;
+                    string returnUrl = "https://localhost:7106/enrollmentConfirmation?paymentStatus=success";
+                    string cancelUrl = "https://localhost:7106/enrollmentConfirmation?paymentStatus=cancel";
+                    string paypalUrl = "https://www.sandbox.paypal.com";
 
-                        // Convert decimal paymentAmount to double
-                        double amountDouble = Convert.ToDouble(paymentAmount);
+                    string business = "sb-aq647o29855470@business.example.com";
+                    string itemName = "Student Registration Payment";
+                    string currencyCode = "CAD";
 
-                        // Construct PayPal redirect URL
-                        string returnUrl = "https://localhost:7106/registrationForm?paymentStatus=success";
-                        string cancelUrl = "https://localhost:7106/registrationForm?paymentStatus=cancel";
-                        string paypalUrl = "https://www.sandbox.paypal.com"; // PayPal sandbox URL
+                    var paypalParams = new Dictionary<string, string>
+                {
+                    { "cmd", "_xclick" },
+                    { "business", business },
+                    { "item_name", itemName },
+                    { "amount", paymentAmount.ToString("0.00", CultureInfo.InvariantCulture) },
+                    { "currency_code", currencyCode },
+                    { "return", returnUrl },
+                    { "cancel_return", cancelUrl }
+                };
 
-                        // PayPal business email or merchant ID
-                        string business = "sb-tzn0i30025715@business.example.com";
+                    var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr?{String.Join("&", paypalParams.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"))}";
 
-                        // Item name or description
-                        string itemName = "Student Registration Payment";
+                    // Log to console for debugging
+                    Console.WriteLine("Redirecting to PayPal with URL: " + paypalRedirectUrl);
 
-                        // Currency code (e.g., USD)
-                        string currencyCode = "CAD";
-
-                        // PayPal parameters
-                        var paypalParams = new Dictionary<string, string>
-                    {
-                        { "cmd", "_xclick" },
-                        { "business", business },
-                        { "item_name", itemName },
-                        { "amount", amountDouble.ToString("0.00", CultureInfo.InvariantCulture) }, // Use the converted amount
-                        { "currency_code", currencyCode },
-                        { "return", returnUrl },
-                        { "cancel_return", cancelUrl }
-                    };
-
-                        // Construct PayPal redirect URL with parameters
-                        var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr?{String.Join("&", paypalParams.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"))}";
-
-                        // Register student and update payment status to "Pending" before redirecting to PayPal
-                        await RegisterStudentAndPaymentAsync(paymentAmount, selectedCourse);
-
-                        // Redirect user to PayPal
-                        NavigationManager.NavigateTo(paypalRedirectUrl);
-                    }
-                    else
-                    {
-                        ErrorMessage = "No course found for the selected subscription.";
-                    }
+                    // Navigate to PayPal
+                    NavigationManager.NavigateTo(paypalRedirectUrl);
                 }
                 else
                 {
@@ -805,160 +759,10 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
-            // Handle payment failure
-            paymentSuccessful = false;
             ErrorMessage = "Payment failed: " + ex.Message;
         }
     }
 
-
-
-    private async Task HandlePayPalResponse(string paymentId, string payerId)
-    {
-        try
-        {
-            var response = await PayPalService.GetOrderAsync(paymentId);
-
-            if (response != null)
-            {
-                var shippingDetails = response.ShippingDetail;
-
-                // Extract shipping address details
-                string billingName = shippingDetails.Name.FullName;
-                string billingAddressLine1 = shippingDetails.Address.AddressLine1;
-                string billingAddressLine2 = shippingDetails.Address.AddressLine2;
-                string billingCity = shippingDetails.Address.AdminArea2;
-                string billingState = shippingDetails.Address.AdminArea1;
-                string billingPostalCode = shippingDetails.Address.PostalCode;
-                string billingCountryCode = shippingDetails.Address.CountryCode;
-                string billingPhoneNumber = shippingDetails.Phone.Number;
-
-                // Construct the full billing address
-                string billingAddress = $"{billingAddressLine1}, {billingAddressLine2}, {billingCity}, {billingState}, {billingPostalCode}, {billingCountryCode}";
-
-                // Update the payment record with the billing address
-                int.TryParse(paymentId, out int paymentIdInt); // Parse paymentId to int
-                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.PaymentID == paymentIdInt);
-
-                if (payment != null)
-                {
-                    // payment.BillingName = billingName;
-                    payment.BillingAddress = billingAddress;
-                    // payment.BillingPhoneNumber = billingPhoneNumber;
-
-                    // Update the payment status to "Paid"
-                    payment.PaymentStatus = "Paid";
-
-                    // Save changes to the database
-                    await _context.SaveChangesAsync();
-
-                    // Create enrollment record here if needed
-
-                    // Set payment success flag
-                    paymentSuccessful = true;
-                }
-                else
-                {
-                    // Handle case where payment record is not found
-                    ErrorMessage = "Payment record not found.";
-                }
-            }
-            else
-            {
-                // Handle case where response is null
-                ErrorMessage = "Failed to retrieve PayPal order details.";
-            }
-        }
-        catch (Exception ex)
-        {
-            // Handle exception
-            ErrorMessage = "An error occurred: " + ex.Message;
-        }
-    }
-
-
-   private async Task<string> GetBillingAddressFromPayPal()
-{
-    // Your logic to retrieve billing address from PayPal
-    // This could involve calling PayPal API or retrieving it from the query parameters
-    // For example, if PayPal redirects back with billing address in query parameters:
-    var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
-    var query = QueryHelpers.ParseQuery(uri.Query);
-
-    // Try to get the value of "billing_address" from the query parameters
-    if (query.TryGetValue("billing_address", out var billingAddressValues))
-    {
-        // Get the first value if it exists
-        var billingAddress = billingAddressValues.FirstOrDefault();
-
-        if (!string.IsNullOrEmpty(billingAddress))
-        {
-            // If billing address is found, return it
-            return billingAddress;
-        }
-    }
-
-    try
-    {
-        // If billing address is not in the query parameters, try to retrieve it from PayPal response
-        // Get payment ID from query parameters
-        var paymentId = NavigationManager.Uri.Split(new[] { "paymentId=" }, StringSplitOptions.None)[1].Split("&")[0];
-
-        // Parse paymentId to int
-        if (int.TryParse(paymentId, out int paymentIdInt))
-        {
-            // Convert paymentIdInt to string
-            var paymentIdString = paymentIdInt.ToString();
-
-            // Call PayPal API to get order details
-            var response = await PayPalService.GetOrderAsync(paymentIdString);
-
-            if (response != null && response.ShippingDetail != null)
-            {
-                var shippingDetails = response.ShippingDetail;
-
-                // Extract billing address details
-                string billingName = shippingDetails.Name.FullName;
-                string billingAddressLine1 = shippingDetails.Address.AddressLine1;
-                string billingAddressLine2 = shippingDetails.Address.AddressLine2;
-                string billingCity = shippingDetails.Address.AdminArea2;
-                string billingState = shippingDetails.Address.AdminArea1;
-                string billingPostalCode = shippingDetails.Address.PostalCode;
-                string billingCountryCode = shippingDetails.Address.CountryCode;
-                string billingPhoneNumber = shippingDetails.Phone.Number;
-
-                // Construct the full billing address
-                var constructedBillingAddress = $"{billingAddressLine1}, {billingAddressLine2}, {billingCity}, {billingState}, {billingPostalCode}, {billingCountryCode}";
-
-                // Update the payment record with the billing address
-                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.PaymentID == paymentIdInt);
-
-                if (payment != null)
-                {
-                    // payment.BillingName = billingName;
-                    payment.BillingAddress = constructedBillingAddress;
-                    // payment.BillingPhoneNumber = billingPhoneNumber;
-
-                    // Update the payment status to "Paid"
-                    payment.PaymentStatus = "Paid";
-
-                    // Save changes to the database
-                    await _context.SaveChangesAsync();
-
-                    // Return the constructed billing address
-                    return constructedBillingAddress;
-                }
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        ErrorMessage = "An error occurred while retrieving billing address: " + ex.Message;
-    }
-
-    // If no billing address is found, return an empty string or handle as needed
-    return string.Empty;
-}
 
 
     public async Task<bool> CreateInstructorAsync(Instructor instructor)

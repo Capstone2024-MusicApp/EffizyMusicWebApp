@@ -1,0 +1,223 @@
+﻿@page "/enrollmentConfirmation"
+@using System.Linq
+@using Microsoft.EntityFrameworkCore
+@using System.Threading.Tasks
+@using EffizyMusicSystem.DAL
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Models
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject PayPalService PayPalService
+
+<h3>Enrollment Confirmation</h3>
+
+@if (paymentSuccessful)
+{
+    <div class="container mt-4 mb-4">
+        <h3>Payment Confirmation</h3>
+        <p>Your payment was successful. Thank you!</p>
+        <!-- Additional confirmation details or actions -->
+        <div id="payment-success">
+            <p>Payment successful! Your registration is complete.</p>
+            @* <button class="btn btn-primary" @onclick="CompleteEnrollment">Complete Enrollment</button> *@
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-4 mb-4">
+        <h3>Payment Failed</h3>
+        <p>Unfortunately, your payment was not successful. Please try again.</p>
+        <!-- Payment Cancel Message -->
+        <div id="payment-cancel">
+            <p>Payment cancelled or failed. Please try again.</p>
+            <!-- You can add more details or actions here -->
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool paymentSuccessful { get; set; }
+
+    public string ErrorMessage = "";
+
+    [Inject]
+    private EffizyMusicContext _context { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            var query = uri.Query;
+            var queryString = System.Web.HttpUtility.ParseQueryString(query);
+
+            if (queryString["paymentStatus"] == "success")
+            {
+                var paymentId = queryString["PaymentID"];
+                var studentIdStr = queryString["UserID"]; // Assuming this is a string
+
+                if (!string.IsNullOrEmpty(paymentId) && !string.IsNullOrEmpty(studentIdStr))
+                {
+                    if (int.TryParse(studentIdStr, out int studentId))
+                    {
+                        await HandlePayPalResponse(paymentId, studentId);
+                        paymentSuccessful = true;
+                    }
+                    else
+                    {
+                        ErrorMessage = "Invalid StudentID format.";
+                    }
+                }
+                else
+                {
+                    ErrorMessage = "Missing paymentId or studentId.";
+                }
+            }
+            else if (queryString["paymentStatus"] == "cancel")
+            {
+                paymentSuccessful = false;
+            }
+            else
+            {
+                paymentSuccessful = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while initializing: " + ex.Message;
+        }
+    }
+
+    private async Task HandlePayPalResponse(string paymentId, int studentId)
+    {
+        try
+        {
+            // Convert paymentId to int
+            if (int.TryParse(paymentId, out int paymentIdInt))
+            {
+                // Find the enrollment based on paymentId and studentId
+                var enrollment = await _context.Enrollments
+                    .FirstOrDefaultAsync(e => e.PaymentID == paymentIdInt && e.StudentID == studentId);
+
+                if (enrollment != null)
+                {
+                    // Update the EnrollmentStatus to "Completed"
+                    enrollment.EnrollmentStatus = "Completed";
+
+                    // Update the PaymentStatus to "Paid"
+                    var payment = await _context.Payments.FindAsync(enrollment.PaymentID);
+                    string billingAddress = await GetBillingAddressFromPayPal();
+                    if (payment != null)
+                    {
+                        payment.PaymentStatus = "Paid";
+                        payment.BillingAddress = billingAddress;
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    // Log successful enrollment completion
+                    Console.WriteLine("Enrollment status updated to Completed.");
+                }
+                else
+                {
+                    ErrorMessage = "Enrollment not found.";
+                }
+            }
+            else
+            {
+                ErrorMessage = "Invalid paymentId format.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while handling PayPal response: " + ex.Message;
+        }
+    }
+
+    private async Task<string> GetBillingAddressFromPayPal()
+    {
+        // Your logic to retrieve billing address from PayPal
+        // This could involve calling PayPal API or retrieving it from the query parameters
+        // For example, if PayPal redirects back with billing address in query parameters:
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        // Try to get the value of "billing_address" from the query parameters
+        if (query.TryGetValue("billing_address", out var billingAddressValues))
+        {
+            // Get the first value if it exists
+            var billingAddress = billingAddressValues.FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(billingAddress))
+            {
+                // If billing address is found, return it
+                return billingAddress;
+            }
+        }
+
+        try
+        {
+            // If billing address is not in the query parameters, try to retrieve it from PayPal response
+            // Get payment ID from query parameters
+            var paymentId = NavigationManager.Uri.Split(new[] { "paymentId=" }, StringSplitOptions.None)[1].Split("&")[0];
+
+            // Parse paymentId to int
+            if (int.TryParse(paymentId, out int paymentIdInt))
+            {
+                // Convert paymentIdInt to string
+                var paymentIdString = paymentIdInt.ToString();
+
+                // Call PayPal API to get order details
+                var response = await PayPalService.GetOrderAsync(paymentIdString);
+
+                if (response != null && response.ShippingDetail != null)
+                {
+                    var shippingDetails = response.ShippingDetail;
+
+                    // Extract billing address details
+                    string billingName = shippingDetails.Name.FullName;
+                    string billingAddressLine1 = shippingDetails.Address.AddressLine1;
+                    string billingAddressLine2 = shippingDetails.Address.AddressLine2;
+                    string billingCity = shippingDetails.Address.AdminArea2;
+                    string billingState = shippingDetails.Address.AdminArea1;
+                    string billingPostalCode = shippingDetails.Address.PostalCode;
+                    string billingCountryCode = shippingDetails.Address.CountryCode;
+                    string billingPhoneNumber = shippingDetails.Phone.Number;
+
+                    // Construct the full billing address
+                    var constructedBillingAddress = $"{billingAddressLine1}, {billingAddressLine2}, {billingCity}, {billingState}, {billingPostalCode}, {billingCountryCode}";
+
+                    // Update the payment record with the billing address
+                    var payment = await _context.Payments.FirstOrDefaultAsync(p => p.PaymentID == paymentIdInt);
+
+                    if (payment != null)
+                    {
+                        // payment.BillingName = billingName;
+                        payment.BillingAddress = constructedBillingAddress;
+                        // payment.BillingPhoneNumber = billingPhoneNumber;
+
+                        // Update the payment status to "Paid"
+                        payment.PaymentStatus = "Paid";
+
+                        // Save changes to the database
+                        await _context.SaveChangesAsync();
+
+                        // Return the constructed billing address
+                        return constructedBillingAddress;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while retrieving billing address: " + ex.Message;
+        }
+
+        // If no billing address is found, return an empty string or handle as needed
+        return string.Empty;
+    }
+}
