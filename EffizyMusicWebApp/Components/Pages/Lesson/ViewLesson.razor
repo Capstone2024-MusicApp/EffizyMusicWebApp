@@ -10,7 +10,7 @@
 {
     <p class="text-center"><em>Loading...</em></p>
 }
-<table class="table table-striped align-middle table-bordered">
+<table class="table table-hover align-middle table-bordered">
     <thead class="table-success">
         <tr>
             <th>Lesson Number</th>
@@ -18,10 +18,9 @@
             <th>Lesson Mode</th>
             <th>Lesson Content</th>
             <th></th>
-            <th></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="table-group-divider">
         @foreach (var lesson in GetItemsOnCurrentPage())
         {
             <tr>
@@ -37,21 +36,16 @@
                             <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
                             Your browser does not support the video tag.
                         </video> *@
-                        <video controls>
+                        <video controls width="400px" height="300px">
                             <source src="@src" type="video/mp4" />
                             Your browser does not support the video tag.
                         </video> 
+                        @* FileName *@
                     }
                     else
                     {
                         <p>No video available.</p>
                     }
-                </td>
-                <td>
-                    <video controls>
-                        <source src="@videoUrl" type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
                 </td>
                 <td>
                     <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
@@ -79,22 +73,9 @@
     protected override async Task OnInitializedAsync()
     {
         // Populate items with your data asynchronously
-        LessonList = await EffizyService.GetLessons();
-        getBase();
+        LessonList = await EffizyService.GetLessons();        
     }
-    private void getBase()
-    {
-        foreach (var i in LessonList.OrderByDescending(Less => Less.LessonNumber))
-        {
-            var base64String = Convert.ToBase64String(i.LessonContent);
-            videoUrl = $"data:video/mp4;base64,{base64String}";
-
-            // var base64 = Convert.ToBase64String(i.LessonContent);
-            // var src = $"data:video/mp4;base64,{base64}";
-            
-        }
-      
-    }
+  
     private IEnumerable<Lesson> GetItemsOnCurrentPage()
     {
         int startIndex = (cp - 1) * pageSize;
