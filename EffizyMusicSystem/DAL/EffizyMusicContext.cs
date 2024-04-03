@@ -26,6 +26,7 @@ namespace EffizyMusicSystem.DAL
         public DbSet<InstructorRating> InstructorRatings { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
+        public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Student> Students { get; set; }
 
         public DbSet<ViewLesson> ViewLessons { get; set; }
