@@ -4,6 +4,10 @@
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
 @rendermode InteractiveServer
+
+<Animate Animation="Animations.ZoomIn" Duration="TimeSpan.FromSeconds(0.5)" >
+    
+
 <h3 class="text-center">Lessons List</h3>
 <hr />
 @if (LessonList == null)
@@ -61,7 +65,7 @@
     <PaginationComponent CurrentPage="@cp"
                          TotalPages="@TotalPages"
                          onPageChange="@HandlePageChange" />
-
+</Animate>
 
 @code {
     private List<Lesson> LessonList = new();

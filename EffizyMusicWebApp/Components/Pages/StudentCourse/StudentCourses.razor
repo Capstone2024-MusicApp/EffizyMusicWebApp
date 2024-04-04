@@ -32,7 +32,7 @@ else
                 </thead>
                 <tbody>
                     <tr>
-                        @foreach (var course in GetEnrolledOnCurrentPage())
+                        @foreach (var course in enrolledCourses)
                         {
                         <tr>
                             <td>@course.Title</td>
@@ -46,9 +46,9 @@ else
                 </tbody>
             </table>
         }
-        <PaginationComponent CurrentPage="@cp"
+       @*  <PaginationComponent CurrentPage="@cp"
                              TotalPages="@TotalPagesEnrolledCourse"
-                             onPageChange="@HandlePageChange" />
+                             onPageChange="@HandlePageChange" /> *@
         <br />
         <br />
         <br />
@@ -65,7 +65,7 @@ else
             </thead>
             <tbody>
                 <tr>
-                    @foreach (var course in GetCoursesOnCurrentPage())
+                    @foreach (var course in availablecourses)
                     {
                     <tr>
                         <td>@course.Title</td>
@@ -79,9 +79,9 @@ else
         </table>
     </div>
 }
-<PaginationComponent CurrentPage="@cp"
+@* <PaginationComponent CurrentPage="@cp"
                      TotalPages="@TotalPagesCourse"
-                     onPageChange="@HandlePageChange" />
+                     onPageChange="@HandlePageChange" /> *@
 
 @code {
     private List<Course>? availablecourses;
@@ -89,13 +89,13 @@ else
 
     private int pageSize = 4;
     private int cp = 1;
-    private int TotalPagesCourse => (int)Math.Ceiling((double)availablecourses.Count / pageSize);
+    // private int TotalPagesCourse => (int)Math.Ceiling((double)availablecourses.Count / pageSize);
 
-    private int TotalPagesEnrolledCourse => (int)Math.Ceiling((double)enrolledCourses.Count / pageSize);
+    // private int TotalPagesEnrolledCourse => (int)Math.Ceiling((double)enrolledCourses.Count / pageSize);
     protected override async Task OnInitializedAsync()
     {
         availablecourses = await EffizyService.GetCourses();
-        enrolledCourses = await EffizyService.GetEnrolledCourses(1);
+        enrolledCourses = await EffizyService.GetEnrolledCourses(3);
     }
     private IEnumerable<Course> GetCoursesOnCurrentPage()
     {
