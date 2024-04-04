@@ -343,63 +343,38 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     </div>
 </div>
 @code {
-
     int CurrentStep = 1;
     private User user = new User();
-
     private Student student = new Student();
-
     private Course course = new Course();
-
     private Subscription subscription = new Subscription();
-
     private Instrument instrument = new Instrument();
-
     private List<Instrument> instruments;
     private List<Course> courses;
     private List<string> skillLevels;
-
     private List<Subscription> subscriptions;
-
     private string ErrorMessage { get; set; } = "";
     private List<UserType> userTypes;
-
     private List<string> distinctSkillLevels = new List<string>();
-
     private bool paymentSuccessful = false; // Flag to track payment status
-
     private int selectedInstrumentID;
-
     private int selectedSubscriptionID;
-
     private int selectedCourseID = 0;
-
     private Subscription selectedSubscription;
-    
     private Course selectedCourse = new Course();
-
-    [Inject]
-    private EffizyMusicContext _context { get; set; } // Inject EffizyMusicContext
-
-    [Inject]
-    private IUserService userService { get; set; }
-
-    [Inject]
-    private CourseService courseService { get; set; }
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    private SubscriptionService subscriptionService { get; set; }
-
+    [Inject] private EffizyMusicContext _context { get; set; } // Inject EffizyMusicContext
+    [Inject] private IUserService userService { get; set; }
+    [Inject] private CourseService courseService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private SubscriptionService subscriptionService { get; set; }
     private Instructor instructor = new Instructor();
-
     decimal amount = 0.00M;
-
     decimal paymentAmount = 0; // Initialize paymentAmount
-
     int userId = 0;
+    private int CourseID { get; set; }
+    private int PaymentID { get; set; }
+    private int StudentID { get; set; }
+    private int UserID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -408,48 +383,55 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             ErrorMessage = "";
             userTypes = await userTypeService.GetUserTypes();
             user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0; // Set default UserTypeID
-
             instruments = await instrumentService.GetInstruments();
             selectedInstrumentID = instruments?.FirstOrDefault()?.InstrumentID ?? 0;
-
             distinctSkillLevels = await courseService.GetDistinctSkillLevels();
-
             await LoadCourses(selectedInstrumentID, course.SkillLevel);
-          
-           int selectedCourseID = 0;
-
+            int selectedCourseID = 0;
             if (course.CourseID != 0)
             {
                 await LoadSubscriptionDetails(course.CourseID);
             }
             await LoadSubscriptions();
-
-           
         }
         catch (Exception ex)
         {
             ErrorMessage = "An error occurred while initializing: " + ex.Message;
         }
     }
-   
+
     async Task InstrumentChanged(ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value?.ToString(), out int instrumentID))
+        try
         {
-            course.InstrumentID = instrumentID;
-            await LoadCourses(course.InstrumentID, course.SkillLevel); 
-            await LoadSubscriptionDetails(course.CourseID); //Use the new selected course
+            if (int.TryParse(e.Value?.ToString(), out int instrumentID))
+            {
+                course.InstrumentID = instrumentID;
+                await LoadCourses(course.InstrumentID, course.SkillLevel);
+                await LoadSubscriptionDetails(course.CourseID); //Use the new selected course
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during instrument change: " + ex.Message;
         }
     }
 
     async Task SkillLevelChanged(ChangeEventArgs e)
     {
-        course.SkillLevel = e.Value?.ToString();
-        await LoadCourses(course.InstrumentID, course.SkillLevel);
-        if (int.TryParse(e.Value?.ToString(), out int selectedSubscription))
+        try
         {
-            subscription.CourseID = selectedSubscription;
-            await LoadSubscriptionDetails(subscription.CourseID); // use the new selected course
+            course.SkillLevel = e.Value?.ToString();
+            await LoadCourses(course.InstrumentID, course.SkillLevel);
+            if (int.TryParse(e.Value?.ToString(), out int selectedSubscription))
+            {
+                subscription.CourseID = selectedSubscription;
+                await LoadSubscriptionDetails(subscription.CourseID); // use the new selected course
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during skill level change: " + ex.Message;
         }
     }
 
@@ -458,10 +440,9 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         try
         {
             courses = await courseService.GetCourses(instrumentID, skillLevel);
-
             if (courses == null)
             {
-                ErrorMessage = "";
+                ErrorMessage = "No courses found.";
             }
             else
             {
@@ -479,6 +460,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             ErrorMessage = "An error occurred while loading courses: " + ex.Message;
         }
     }
+
     private async Task LoadSubscriptions()
     {
         try
@@ -486,12 +468,10 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             var subscriptions = await subscriptionService.GetSubscriptionsByCourseID(selectedCourseID);
             subscriptions = subscriptions.Where(s => s.CourseID == selectedCourseID).ToList();
             this.subscriptions = subscriptions;
-
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            // Log or handle the exception
             ErrorMessage = "Error loading subscriptions: " + ex.Message;
         }
     }
@@ -505,7 +485,6 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
                 selectedCourse = await courseService.GetCourseById(courseID);
                 if (selectedCourse != null)
                 {
-                    // Call RegisterStudentAndPaymentAsync with selectedCourse
                     await RegisterStudentAndPaymentAsync(paymentAmount, selectedCourse);
                 }
                 else
@@ -520,7 +499,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Error loading subscriptions: " + ex.Message;
+            ErrorMessage = "An error occurred during course change: " + ex.Message;
         }
     }
 
@@ -528,55 +507,55 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
-            // Call the SubscriptionService to get subscriptions for the course ID
             subscriptions = await subscriptionService.GetSubscriptionsByCourseID(courseID);
-
             if (subscriptions != null && subscriptions.Count > 0)
             {
-                // Log the first subscription's payment details for debugging
-                Console.WriteLine("First Subscription: " + JsonConvert.SerializeObject(subscriptions[0]));
-
-                // Set the selected subscription to the first one
                 selectedSubscription = subscriptions[0];
             }
             else
             {
                 ErrorMessage = "No Subscriptions found for CourseID: " + courseID;
             }
-
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            // Handle exceptions         
-            ErrorMessage = "Error loading subscriptions: " + ex.Message;
+            ErrorMessage = "An error occurred while loading subscriptions: " + ex.Message;
         }
     }
 
-
-
-
-
     void NextStep()
     {
-        if (user.UserTypeID == 12 || user.UserTypeID == 13)
+        try
         {
-            student.InstrumentID = selectedInstrumentID;
-            CurrentStep++;
-
-            // Call LoadSubscriptionDetails with the selected course ID
-            if (course.CourseID != 0)
+            if (user.UserTypeID == 12 || user.UserTypeID == 13)
             {
-                LoadSubscriptionDetails(course.CourseID);
+                student.InstrumentID = selectedInstrumentID;
+                CurrentStep++;
+                if (course.CourseID != 0)
+                {
+                    LoadSubscriptionDetails(course.CourseID);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during next step: " + ex.Message;
         }
     }
 
     void GoBack()
     {
-        if (CurrentStep > 1)
+        try
         {
-            CurrentStep--;
+            if (CurrentStep > 1)
+            {
+                CurrentStep--;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during going back: " + ex.Message;
         }
     }
 
@@ -586,19 +565,14 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
             user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
-            // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
-
             if (!userCreated)
             {
                 ErrorMessage = "Failed to create user.";
                 return;
             }
-
             instructor.UserID = user.UserID;
-
-            bool instructorCreated = await CreateInstructorAsync(instructor); // Changed to local method
-
+            bool instructorCreated = await CreateInstructorAsync(instructor);
             if (instructorCreated)
             {
                 CurrentStep = 3;
@@ -611,7 +585,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred: " + ex.Message;
+            ErrorMessage = "An error occurred during instructor registration: " + ex.Message;
         }
     }
 
@@ -619,22 +593,18 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
-            decimal amount = selectedSubscription?.Amount ?? 0; // Get the selected subscription amount
-            Course selectedCourse = selectedSubscription?.Course; // Get the selected course from the subscription
-
-            // If no subscription is selected or no amount, show error
+            decimal amount = selectedSubscription?.Amount ?? 0;
+            Course selectedCourse = selectedSubscription?.Course;
             if (selectedCourse == null || amount <= 0)
             {
                 ErrorMessage = "Please select a valid subscription to make a payment.";
                 return;
             }
-
-            // Register the student and create payment details
             await RegisterStudentAndPaymentAsync(amount, selectedCourse);
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during registration and payment: " + ex.Message;
+            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
         }
     }
 
@@ -642,28 +612,18 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     {
         try
         {
-            // Hash the passwords
             user.Password = PasswordHasher.HashPassword(user.Password);
             user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
-
-            // Create the user first
             bool userCreated = await userService.CreateUserAsync(user);
-
             if (!userCreated)
             {
                 ErrorMessage = "Failed to create user.";
                 return;
             }
-
-            // Use the generated User ID for the student
             student.UserID = user.UserID;
-
-            // Create the student
             bool studentCreated = await userService.CreateStudentAsync(student);
-
             if (studentCreated)
             {
-                // Insert payment details into Payments table
                 Payment payment = new Payment
                     {
                         PaymentDate = DateTime.Now,
@@ -672,29 +632,9 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
                         PaymentStatus = "Pending",
                         UserID = user.UserID
                     };
-
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
-
-                // Create enrollment record
-                Enrollment enrollment = new Enrollment
-                    {
-                        StudentID = student.StudentID,
-                        CourseID = selectedCourse.CourseID,
-                        EnrollmentDate = DateTime.Now,
-                        ProgressStatus = "Not Started",
-                        EnrollmentStatus = "Uncompleted",
-                        PaymentID = payment.PaymentID
-                    };
-
-                _context.Enrollments.Add(enrollment);
-                await _context.SaveChangesAsync();
-
-                // Successful enrollment
-                ErrorMessage = "Registration successful!";
-
-                // Proceed to make payment after successful registration
-                await MakePayment();
+                await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
             }
             else
             {
@@ -703,48 +643,38 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred: " + ex.Message;
-            Console.WriteLine("Exception in RegisterStudentAndPaymentAsync: " + ex.ToString());
+            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
         }
     }
 
-    private async Task MakePayment()
+    private async Task MakePayment(int courseID, int studentID, int paymentID, int userID)
     {
         try
         {
             if (selectedSubscriptionID != 0 && subscriptions != null && subscriptions.Count > 0)
             {
                 var selectedSubscription = subscriptions.FirstOrDefault(sub => sub.SubscriptionID == selectedSubscriptionID);
-
                 if (selectedSubscription != null && selectedSubscription.Amount > 0)
                 {
                     decimal paymentAmount = selectedSubscription.Amount;
-
-                    string returnUrl = "https://localhost:7106/enrollmentConfirmation?paymentStatus=success";
-                    string cancelUrl = "https://localhost:7106/enrollmentConfirmation?paymentStatus=cancel";
+                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}";
+                    string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
+                    returnUrl = WebUtility.UrlEncode(returnUrl);
+                    cancelUrl = WebUtility.UrlEncode(cancelUrl);
                     string paypalUrl = "https://www.sandbox.paypal.com";
-
                     string business = "sb-aq647o29855470@business.example.com";
                     string itemName = "Student Registration Payment";
                     string currencyCode = "CAD";
-
-                    var paypalParams = new Dictionary<string, string>
-                {
-                    { "cmd", "_xclick" },
-                    { "business", business },
-                    { "item_name", itemName },
-                    { "amount", paymentAmount.ToString("0.00", CultureInfo.InvariantCulture) },
-                    { "currency_code", currencyCode },
-                    { "return", returnUrl },
-                    { "cancel_return", cancelUrl }
-                };
-
-                    var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr?{String.Join("&", paypalParams.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"))}";
-
-                    // Log to console for debugging
+                    var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr" +
+                        $"?cmd=_xclick" +
+                        $"&business={business}" +
+                        $"&item_name={itemName}" +
+                        $"&amount={paymentAmount.ToString("0.00", CultureInfo.InvariantCulture)}" +
+                        $"&currency_code={currencyCode}" +
+                        $"&return={returnUrl}" +
+                        $"&cancel_return={cancelUrl}" +
+                        $"&address_override=1";
                     Console.WriteLine("Redirecting to PayPal with URL: " + paypalRedirectUrl);
-
-                    // Navigate to PayPal
                     NavigationManager.NavigateTo(paypalRedirectUrl);
                 }
                 else
@@ -759,11 +689,9 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Payment failed: " + ex.Message;
+            ErrorMessage = "An error occurred during payment: " + ex.Message;
         }
     }
-
-
 
     public async Task<bool> CreateInstructorAsync(Instructor instructor)
     {
@@ -775,7 +703,9 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
         catch (Exception ex)
         {
+            ErrorMessage = "An error occurred during instructor creation: " + ex.Message;
             return false;
         }
     }
 }
+

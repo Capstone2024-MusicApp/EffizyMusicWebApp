@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 
 namespace EffizyMusicSystem.Models
 {
@@ -23,8 +26,14 @@ namespace EffizyMusicSystem.Models
 
         public  required string ProgressStatus { get; set; }
 
-        public virtual Course Course { get; set; }
+        public int UserID { get; set; }
 
-        public virtual Student Student { get; set; }
+        public string PayerID { get; set; }
+
+
+        public Student Student { get; set; }
+        [JsonIgnore]
+        public Course Course { get; set; }
+        public Payment Payment { get; set; }
     }
 }
