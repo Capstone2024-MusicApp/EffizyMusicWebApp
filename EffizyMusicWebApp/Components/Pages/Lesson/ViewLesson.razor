@@ -5,8 +5,7 @@
 @inject NavigationManager NavService
 @rendermode InteractiveServer
 
-<Animate Animation="Animations.ZoomIn" Duration="TimeSpan.FromSeconds(0.5)" >
-    
+
 
 <h3 class="text-center">Lessons List</h3>
 <hr />
@@ -14,58 +13,60 @@
 {
     <p class="text-center"><em>Loading...</em></p>
 }
-<table class="table table-hover align-middle table-bordered">
-    <thead class="table-success">
-        <tr>
-            <th>Lesson Number</th>
-            <th>Lesson Title</th>
-            <th>Lesson Mode</th>
-            <th>Lesson Content</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody class="table-group-divider">
-        @foreach (var lesson in GetItemsOnCurrentPage())
-        {
+else
+{
+    <table class="table table-hover align-middle table-bordered">
+        <thead class="table-success">
             <tr>
-                <td>@lesson.LessonNumber</td>
-                <td>@lesson.Title</td>
-                <td>@lesson.LessonMode</td>
-                <td>
-                    @if (lesson.LessonContent != null)
-                    {
-                        var base64 = Convert.ToBase64String(lesson.LessonContent);
-                        var src = $"data:video/mp4;base64,{base64}";
-                       @*  <video controls>
-                            <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video> *@
-                        <video controls width="400px" height="300px">
-                            <source src="@src" type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video> 
-                        @* FileName *@
-                    }
-                    else
-                    {
-                        <p>No video available.</p>
-                    }
-                </td>
-                <td>
-                    <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
-                        <Icon Name="IconName.PencilSquare"></Icon>
-                    </a>
-                    @* <button class="btn btn-danger" role="button"> Delete</button> *@
-                </td>
+                <th>Lesson Number</th>
+                <th>Lesson Title</th>
+                <th>Lesson Mode</th>
+                <th>Lesson Content</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var lesson in GetItemsOnCurrentPage())
+            {
+                <tr>
+                    <td>@lesson.LessonNumber</td>
+                    <td>@lesson.Title</td>
+                    <td>@lesson.LessonMode</td>
+                    <td>
+                        @if (lesson.LessonContent != null)
+                        {
+                            var base64 = Convert.ToBase64String(lesson.LessonContent);
+                            var src = $"data:video/mp4;base64,{base64}";
+                            @*  <video controls>
+                <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
+                Your browser does not support the video tag.
+                </video> *@
+                            <video controls width="400px" height="300px">
+                                <source src="@src" type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                            @* FileName *@
+                        }
+                        else
+                        {
+                            <p>No video available.</p>
+                        }
+                    </td>
+                    <td>
+                        <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
+                            <Icon Name="IconName.PencilSquare"></Icon>
+                        </a>
+                        @* <button class="btn btn-danger" role="button"> Delete</button> *@
+                    </td>
+                </tr>
+            }
+        </tbody>
 
-</table>
-    <PaginationComponent CurrentPage="@cp"
-                         TotalPages="@TotalPages"
-                         onPageChange="@HandlePageChange" />
-</Animate>
+    </table>
+}
+<PaginationComponent CurrentPage="@cp"
+                     TotalPages="@TotalPages"
+                     onPageChange="@HandlePageChange" />
 
 @code {
     private List<Lesson> LessonList = new();
@@ -77,9 +78,9 @@
     protected override async Task OnInitializedAsync()
     {
         // Populate items with your data asynchronously
-        LessonList = await EffizyService.GetLessons();        
+        LessonList = await EffizyService.GetLessons();
     }
-  
+
     private IEnumerable<Lesson> GetItemsOnCurrentPage()
     {
         int startIndex = (cp - 1) * pageSize;
