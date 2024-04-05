@@ -24,33 +24,39 @@
             <br />
             <br />
 
+            <label class="video-lesson-title">@selectedLesson.Title</label>
+            <br />
             <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
         }
         else
         {
-            <label class="video-lesson-title">Quiz</label>
+            <label class="video-lesson-title">Quiz - @selectedQuiz.QuizTitle</label>
             <br />
-            <!--<img src="/img/drums.png" width="600" height="400"/>-->
             <br />
-            <p>@selectedQuiz.QuestionText</p>
-            <br />
-            <InputRadioGroup Name="selectedQuiz" @bind-Value="@testString">
-                <InputRadio Value="selectedQuiz.ChoiceText1" />   -    @selectedQuiz.ChoiceText1
-                    <br />
-                <InputRadio Value="selectedQuiz.ChoiceText2" />   -    @selectedQuiz.ChoiceText2
+            int questionNumber = 1;
+            @foreach(var question in quesionnaire)
+            {
+                
+                <label>@questionNumber. @question.questionText</label>
                 <br />
-                <InputRadio Value="selectedQuiz.ChoiceText3" />   -    @selectedQuiz.ChoiceText3
-                    <br />
-                <InputRadio Value="selectedQuiz.ChoiceText4" />   -    @selectedQuiz.ChoiceText4
-            </InputRadioGroup>
+                <InputRadioGroup Name="selectedQuiz" @bind-Value="@testString">
+                    @foreach(var choice in question.questionChoices)
+                    {
+                        <InputRadio @bind-Value="choice.ChoiceText" />  <label> - @choice.ChoiceText</label>
+                        <br />
+                    }
+                </InputRadioGroup>
+
                 <br />
+                questionNumber++;
+            }
 
         }
     </div>
 
 
     <div class="module-list">
-        <Accordion AlwaysOpen="true" >
+        <Accordion AlwaysOpen="false" >
             @foreach (var module in studentCourse.Modules)
             {
                 <AccordionItem>
@@ -63,20 +69,15 @@
                             @foreach(var lesson in module.Lessons)
                             {
                                 <tr>
-                                    <td class="lesson-title"><Button Class="accordion-item" @onclick="() => UpdateLesson(lesson.Title)">Lesson - @lesson.Title </Button></td>
-                                        <td>
-                                            @if (lesson.LessonContent != null)
+                                    <td class="lesson-title">
+                                        @if(selectedLesson.LessonNumber == lesson.LessonNumber)
                                         {
-                                            var base64 = Convert.ToBase64String(lesson.LessonContent);
-                                            var src = $"data:video/mp4;base64,{base64}";                                            
-                                            <video controls width="400px" height="300px">
-                                                <source src="@src" type="video/mp4" />
-                                                Your browser does not support the video tag.
-                                            </video>
+
+                                            <Button Class="accordion-item "  Style="background-color: yellowgreen;" @onclick="() => UpdateLesson(lesson)">Lesson - @lesson.Title </Button>
                                         }
                                         else
                                         {
-                                            <p>No video available.</p>
+                                        <Button Class="accordion-item" @onclick="() => UpdateLesson(lesson)">Lesson - @lesson.Title </Button>
                                         }
                                     </td>
                                  </tr>
@@ -84,8 +85,8 @@
                             @foreach (var quiz in module.Quizzes)
                             {
                                 <tr>
-                                    <td class="lesson-title"><Button Class="accordion-item btn-info" @onclick="() => selectQuiz(quiz.Id)"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
-                                    </tr>
+                                    <td class="lesson-title"><Button Class="accordion-item btn-info" @onclick="() => selectQuiz(quiz)"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
+                                 </tr>
                             }
                         </table>
                     </Content>
@@ -103,30 +104,32 @@
     public int EnrollmentID { get; set; }
 
     public StudentCourseDTO? studentCourse;
+    public Lesson selectedLesson = new Lesson();
+    public List<QuestionnaireDTO>? quesionnaire;
+    public Quiz selectedQuiz = new Quiz();
 
     public String? lessonTitle;
     public String? testString;
     public Boolean DisplayLesson { get; set; } = true;
 
-    public QuestionChoiceViewModel selectedQuiz;
 
     protected override async Task OnInitializedAsync()
     {
         studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
-        // lessonTitle = studentCourse.Modules.First().Lessons.First().Title;
+        selectedLesson = studentCourse.Modules.First().Lessons.First();
+        lessonTitle = studentCourse.Modules.First().Lessons.First().Title;
     }
 
-    public void UpdateLesson(string title)
+    public void UpdateLesson(Lesson lesson)
     {
-        lessonTitle = title;
+        selectedLesson = lesson;
         DisplayLesson = true;
     }
 
-    public void selectQuiz(int quizID)
+    public void selectQuiz(Quiz quiz)
     {
-
         DisplayLesson = false;
-        System.Console.WriteLine("the quiz ID: " + quizID);
-        selectedQuiz = EffizyService.GetQuestionWithChoices(quizID);
+        selectedQuiz = quiz;
+        quesionnaire = EffizyService.GetQuestionnaire(quiz.Id);
     }
 }

@@ -77,6 +77,7 @@ h1:focus {
 .access-course-main{
     display: block;
     width: 100%;
+    min-height: max-content;
 }
 .course-title {
     text-align: center;
@@ -88,20 +89,19 @@ h1:focus {
 
 .lesson-frame {
     width: 900px;
-    display: block;
+    display: inline-block;
     margin-left: 20px;
-    vertical-align: middle;
-    float: left;
 }
 
 .module-list {
-    display: block;
+    display: inline-block;
     margin-left: 100px;
     text-align: left;
-    vertical-align: middle;
-    float:inline-start;
     border-radius: 10px;
-    width: 1000px;
+    width: 500px;
+    vertical-align: top;
+    overflow:scroll;
+    max-height: 800px;
 }
 
 

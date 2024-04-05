@@ -1,7 +1,14 @@
 ﻿@page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+@inject ILogger<StudentCourses> Logger
+
 
 <h2>Courses</h2>
 <br />
@@ -31,7 +38,6 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
                         @foreach (var course in enrolledCourses)
                         {
                         <tr>
@@ -42,7 +48,6 @@ else
                             <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
                         }
-                    </tr>
                 </tbody>
             </table>
         }
@@ -64,7 +69,6 @@ else
                 </tr>
             </thead>
             <tbody>
-                <tr>
                     @foreach (var course in availablecourses)
                     {
                     <tr>
@@ -74,7 +78,6 @@ else
                         <td><a href="">View Course</a></td>
                     </tr>
                     }
-                </tr>
             </tbody>
         </table>
     </div>
@@ -91,26 +94,23 @@ else
     private int cp = 1;
     // private int TotalPagesCourse => (int)Math.Ceiling((double)availablecourses.Count / pageSize);
 
-    // private int TotalPagesEnrolledCourse => (int)Math.Ceiling((double)enrolledCourses.Count / pageSize);
+    private User user = new User();
+
+
     protected override async Task OnInitializedAsync()
     {
         availablecourses = await EffizyService.GetCourses();
-        enrolledCourses = await EffizyService.GetEnrolledCourses(3);
-    }
-    private IEnumerable<Course> GetCoursesOnCurrentPage()
-    {
-        int startIndex = (cp - 1) * pageSize;
-        return availablecourses.Skip(startIndex).Take(pageSize);
-    }
-    private IEnumerable<StudentCourseDTO> GetEnrolledOnCurrentPage()
-    {
-        int startIndex = (cp - 1) * pageSize;
-        return enrolledCourses.Skip(startIndex).Take(pageSize);
-    }
 
-    private void HandlePageChange(int newPage)
-    {
-        cp = newPage;
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+
+        if(String.IsNullOrEmpty(user.UserID.ToString()))
+        {
+            Logger.LogWarning("Student Course being accessed but no login detected.");
+        }
+        else
+        {
+            enrolledCourses = await EffizyService.GetEnrolledCourses(user.UserID);
+        }
     }
 
     
