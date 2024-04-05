@@ -1,0 +1,113 @@
+﻿@page "/feedback"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject IJSRuntime JsRuntime
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+@rendermode InteractiveServer
+
+<div class="feedback-container">
+    @if (feedbacks == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <label class="page-title">Feedback</label>
+        <div style="max-height: 600px; overflow: auto; margin: auto; width:fit-content;">
+        <table class="feedback-table">
+            @foreach (var feedback in feedbacks)
+            {
+                <tr>
+                    <td>
+                        <label class="feedback-name">@feedback.FirstName @feedback.LastName</label> -
+                        <label class="feedback-date" >@feedback.FeedbackDate.ToString("MMMM, dd yyyy HH:mm")</label>
+                    </td>
+                    <td align="right">
+                        @if(user.UserTypeID == Constants.UserType_Administrator || user.UserID == feedback.UserID)
+                        {
+                            <button type="button" class="btn-close" aria-label="Close" @onclick="() => DeleteFeedback(feedback)" />
+                        }
+                    </td>
+                </tr>
+                <tr >
+                    <td colspan="2">@feedback.Comments</td>
+                </tr>
+                <tr>
+                    
+                    <td colspan="2"><div style="border-bottom: solid 2px gray;"></div></td>
+                </tr>
+            }
+        </table>
+        </div>
+        <br />
+        <EditForm Model="@feedbackpost" OnValidSubmit="@Submit" FormName="feedbackForm">
+            <table class="feedback-post">
+                <tr>
+                    <td>
+                        <InputTextArea class="feedback-input" @bind-Value="feedbackpost.Comments" placeholder="Enter feedback here." />
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary" style="width: 300px;">Submit</button>
+                    </td>
+                </tr>
+            </table>
+        </EditForm>
+    }
+</div>
+
+@code {
+
+    private User user = new User();
+    private List<FeedbackDTO>? feedbacks;
+
+    [SupplyParameterFromForm]
+    private Feedback feedbackpost { get; set; } = new Feedback();
+
+    protected override async Task OnInitializedAsync()
+    {
+        feedbacks = EffizyService.GetFeedbackDTOs();
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+    }
+
+
+    private void Submit()
+    {
+        feedbackpost.UserID = user.UserID;
+        feedbackpost.FeedbackDate = DateTime.Now;
+        feedbackpost.Comments = feedbackpost.Comments;
+
+        EffizyService.InsertFeedback(feedbackpost);
+        feedbacks = EffizyService.GetFeedbackDTOs();
+        feedbackpost = new Feedback();
+    }
+
+    private async Task DeleteFeedback(FeedbackDTO feedback)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete feedback?");
+        if (confirmed)
+        {
+            Feedback deleteFeedback = new Feedback();
+            deleteFeedback.FeedbackID = feedback.FeedbackID;
+            deleteFeedback.UserID = feedback.UserID;
+            deleteFeedback.Comments = feedback.Comments;
+            deleteFeedback.FeedbackDate = feedback.FeedbackDate;
+
+
+            EffizyService.DeleteFeedback(deleteFeedback);
+            feedbacks = EffizyService.GetFeedbackDTOs();
+        }
+        
+    }
+
+}

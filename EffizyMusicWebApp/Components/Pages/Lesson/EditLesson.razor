@@ -1,0 +1,127 @@
+﻿@page "/EditLesson"
+@page "/EditLesson/{LessonNumber:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@rendermode InteractiveServer
+<h3>Edit Lesson</h3>
+<hr />
+
+<EditForm Model="@LessonData" OnValidSubmit="UpdateLesson" formname="Edit-Lesson">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="col-6">
+    <div class="form-group">
+        <label>Title</label>
+        <InputText @bind-Value="LessonData.Title" class="form-control" />
+        <ValidationMessage For="@(() => LessonData.Title)" />
+    </div>
+
+    <div class="form-outline mt-2">
+        <label for="lessonMode" class="form-label">Lesson Mode:</label>
+        <InputText @bind-Value="LessonData.LessonMode" class="form-control" />
+    </div>
+         <div class="form-outline mt-2">
+            <label for="content" class="form-label">Lesson Content:</label>
+            <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon>
+            @if (LessonData.LessonContent != null)
+        {
+            <p>File Name: @GetFileNameFromContent(LessonData.LessonContent)</p>           
+        }
+        else
+        {
+            <p>No file uploaded</p>
+        }
+    </div> 
+    <div class="form-group">
+        <label>Module</label>
+        <select class="form-control" @onchange="HandleSelectedModule">
+            @foreach (var module in ModuleList)
+            {
+                <option value="@module">@module.Title</option>
+            }
+        </select>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-danger" @onclick="RemoveLesson">Delete</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    </div>
+    </div>
+</EditForm> 
+@* @if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+} *@
+@code {
+    [Parameter]
+    public int LessonNumber { get; set; }
+
+    private Module SelectedModule { get; set; }
+
+    public List<Module> ModuleList = new();
+    private Lesson LessonData = new();
+    private string ErrorMessage { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {            
+            LessonData = await EffizyService.GetLessonById(LessonNumber);
+            ModuleList = await EffizyService.GetModules();     
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error loading lesson data: " + ex.Message;
+        }
+    }
+    public async Task UpdateLesson()
+    {
+        try
+        {
+            LessonData.Module = SelectedModule;
+            await EffizyService.UpdateLesson(LessonData);
+            NavigationManager.NavigateTo("/ViewLesson");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error updating lesson: " + ex.Message;
+        }
+    }
+    private void HandleSelectedModule(ChangeEventArgs e)
+    {     
+        string selectedModuleName = e.Value.ToString();
+        SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
+    }
+
+    private string GetFileNameFromContent(byte[] lessonContent)
+    {
+        return "example_filename.txt";
+    }
+    public async Task RemoveLesson()
+    {
+        try
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the Lesson named {LessonData.Title}?");
+            if (confirmed)
+            {
+                await EffizyService.DeleteLesson(LessonNumber);
+                NavigationManager.NavigateTo("/ViewLesson");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error deleting Lesson: " + ex.Message;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        NavigationManager.NavigateTo("/ViewLesson");
+    }
+}
