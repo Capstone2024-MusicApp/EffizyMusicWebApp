@@ -21,7 +21,7 @@ else
     <div class="main-student-course">
         <h3>Your Enrolled Courses</h3>
         <br />
-        @if(enrolledCourses == null)
+        @if (enrolledCourses == null)
         {
             <p><em>No enrolled courses.</em></p>
         }
@@ -38,8 +38,8 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                        @foreach (var course in enrolledCourses)
-                        {
+                    @foreach (var course in enrolledCourses)
+                    {
                         <tr>
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
@@ -47,13 +47,13 @@ else
                             <td>@course.ProgressStatus</td>
                             <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
-                        }
+                    }
                 </tbody>
             </table>
         }
-       @*  <PaginationComponent CurrentPage="@cp"
-                             TotalPages="@TotalPagesEnrolledCourse"
-                             onPageChange="@HandlePageChange" /> *@
+        @*  <PaginationComponent CurrentPage="@cp"
+    TotalPages="@TotalPagesEnrolledCourse"
+    onPageChange="@HandlePageChange" /> *@
         <br />
         <br />
         <br />
@@ -69,15 +69,15 @@ else
                 </tr>
             </thead>
             <tbody>
-                    @foreach (var course in availablecourses)
-                    {
+                @foreach (var course in availablecourses)
+                {
                     <tr>
                         <td>@course.Title</td>
                         <td>@course.CourseDescription</td>
                         <td>@course.CourseCode</td>
                         <td><a href="">View Course</a></td>
                     </tr>
-                    }
+                }
             </tbody>
         </table>
     </div>
@@ -93,7 +93,7 @@ else
     private int pageSize = 4;
     private int cp = 1;
     // private int TotalPagesCourse => (int)Math.Ceiling((double)availablecourses.Count / pageSize);
-
+    // private int TotalPagesEnrolledCourse => (int)Math.Ceiling((double)enrolledCourses.Count / pageSize);
     private User user = new User();
 
 
@@ -103,7 +103,7 @@ else
 
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
-        if(String.IsNullOrEmpty(user.UserID.ToString()))
+        if (String.IsNullOrEmpty(user.UserID.ToString()))
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
         }
@@ -112,7 +112,21 @@ else
             enrolledCourses = await EffizyService.GetEnrolledCourses(user.UserID);
         }
     }
+    private IEnumerable<Course> GetCoursesOnCurrentPage()
+    {
+        int startIndex = (cp - 1) * pageSize;
+        return availablecourses.Skip(startIndex).Take(pageSize);
+    }
+    private IEnumerable<StudentCourseDTO> GetEnrolledOnCurrentPage()
+    {
+        int startIndex = (cp - 1) * pageSize;
+        return enrolledCourses.Skip(startIndex).Take(pageSize);
+    }
 
-    
+    private void HandlePageChange(int newPage)
+    {
+        cp = newPage;
+    }
+
 
 }
