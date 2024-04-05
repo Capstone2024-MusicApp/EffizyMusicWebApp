@@ -14,7 +14,7 @@ namespace EffizyMusicSystem.Models
         public int UserID { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [RegularExpression(@"^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$", ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
