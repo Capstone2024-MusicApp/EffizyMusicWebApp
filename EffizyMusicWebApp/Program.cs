@@ -12,11 +12,42 @@ builder.Services.AddRazorComponents()
 builder.Services.AddBlazorBootstrap();
 
 // Add your DbContext configuration
-
 builder.Services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
-// Register Services
+// Register UserService
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Register Subscription
+builder.Services.AddScoped<SubscriptionService>();
+
+// PayPal Service
+builder.Services.AddScoped<PayPalService>();
+
+builder.Services.AddHttpClient<PayPalService>();
+
+// Register UserProfileService
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
+// Register EffizyMusicApplicationService
+builder.Services.AddScoped<EffizyMusicApplicationService>();
+
+// Register EnrollmentService
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
+builder.Services.AddScoped<EnrollmentService>();
+
+
+// Register CourseService
+builder.Services.AddScoped<ICourseService, CourseService>();
+
+builder.Services.AddScoped<CourseService>();
+
+// Register UserTypeService
+builder.Services.AddScoped<UserTypeService>();
+
+// Register UserInstrumentService
+builder.Services.AddScoped<InstrumentService>();
 builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<UserTypeService>();
