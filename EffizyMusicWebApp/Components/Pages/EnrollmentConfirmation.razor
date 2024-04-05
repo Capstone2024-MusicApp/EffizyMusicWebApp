@@ -1,0 +1,226 @@
+﻿@page "/enrollmentConfirmation"
+@using EffizyMusicSystem.DAL;
+@using EffizyMusicSystem.Models
+@using Newtonsoft.Json
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h3>Enrollment Confirmation</h3>
+
+@if (paymentStatus == "success")
+{
+    <p class="text-success">Payment Successful!</p>
+    <p>Thank you for your enrollment.</p>
+}
+else if (paymentStatus == "cancel")
+{
+    <p class="text-warning">Payment Cancelled!</p>
+    <p>Your enrollment process was cancelled.</p>
+}
+else
+{
+    <p class="text-danger">Error occurred during payment processing.</p>
+    <p>Please try again later or contact support.</p>
+}
+
+@code {
+    [Parameter]
+    public string paymentStatus { get; set; }
+
+    [Inject]
+    private EffizyMusicContext _context { get; set; }
+
+    private string ErrorMessage = "";
+
+    [Parameter]
+    public string CourseID { get; set; }
+
+    [Parameter]
+    public string StudentID { get; set; }
+
+    [Parameter]
+    public string PaymentID { get; set; }
+
+    [Parameter]
+    public int UserID { get; set; }
+
+    private Enrollment newEnrollment;
+    private string payerID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            paymentStatus = queryParameters.TryGetValue("paymentStatus", out var statusValues) ? statusValues.FirstOrDefault() : "";
+
+            if (paymentStatus == "success")
+            {
+                StudentID = queryParameters.TryGetValue("StudentID", out var studentIdValues) ? studentIdValues.FirstOrDefault() : "";
+                CourseID = queryParameters.TryGetValue("CourseID", out var courseIdValues) ? courseIdValues.FirstOrDefault() : "";
+                PaymentID = queryParameters.TryGetValue("PaymentID", out var paymentIdValues) ? paymentIdValues.FirstOrDefault() : "";
+                UserID = queryParameters.TryGetValue("UserID", out var userIdValues) ? int.Parse(userIdValues.FirstOrDefault()) : 0;
+
+                // Check if required parameters are not null
+                if (string.IsNullOrEmpty(StudentID) || string.IsNullOrEmpty(CourseID) || string.IsNullOrEmpty(PaymentID) || UserID == 0)
+                {
+                    ErrorMessage = "One or more required parameters are missing.";
+                    NavigationManager.NavigateTo("/error");
+                    return;
+                }
+
+                // Create a new Enrollment with the provided details
+                newEnrollment = new Enrollment
+                    {
+                        CourseID = int.Parse(CourseID),
+                        StudentID = int.Parse(StudentID),
+                        PaymentID = int.Parse(PaymentID),
+                        UserID = UserID,
+                        EnrollmentDate = DateTime.Now,
+                        ProgressStatus = "Not Started",
+                        EnrollmentStatus = "Enrolled",
+                        PayerID = payerID
+                    };
+
+                // Add the new enrollment to the database
+                _context.Enrollments.Add(newEnrollment);
+                await _context.SaveChangesAsync();
+
+                ErrorMessage = "Enrollment status updated to Completed.";
+            }
+            else
+            {
+                ErrorMessage = "PaymentStatus is not 'success'. Skipping enrollment creation.";
+            }
+
+        
+            await HandlePayPalResponse();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error handling PayPal response: " + ex.Message;
+        }
+    }
+
+    private async Task HandlePayPalResponse()
+    {
+        try
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            var responsePaymentStatus = queryParameters.TryGetValue("paymentStatus", out var statusValues) ? statusValues.FirstOrDefault() : null;
+
+            if (responsePaymentStatus == "success")
+            {
+                var paymentId = queryParameters.TryGetValue("PaymentID", out var paymentIdValues) ? paymentIdValues.FirstOrDefault() : "";
+                var billingAddress = ExtractBillAddressFromPayPalResponse(uri.ToString());
+                payerID = ExtractPayerIdFromPayPalResponse(uri.ToString()); 
+
+                if (!string.IsNullOrEmpty(paymentId))
+                {
+                    if (int.TryParse(paymentId, out int paymentIdInt))
+                    {
+                        var payment = await _context.Payments
+                            .FirstOrDefaultAsync(p => p.PaymentID == paymentIdInt);
+
+                        if (payment != null)
+                        {
+                           
+                            payment.PaymentStatus = "Paid";
+                            payment.BillingAddress = billingAddress;
+
+                            _context.Payments.Update(payment);
+                            await _context.SaveChangesAsync();
+
+                            ErrorMessage = "Payment status updated to Paid.";
+                            await ProcessPaymentConfirmation(newEnrollment.CourseID, newEnrollment.StudentID, payerID);
+                        }
+                        else
+                        {
+                            ErrorMessage = "Payment not found for PaymentID: " + paymentId;
+                        }
+                    }
+                    else
+                    {
+                        ErrorMessage = "Invalid PaymentID format: " + paymentId;
+                    }
+                }
+                else
+                {
+                    ErrorMessage = "Missing or empty PaymentID.";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error handling PayPal response: " + ex.Message;
+        }
+    }
+
+    private string ExtractPayerIdFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            var payerId = queryParameters.TryGetValue("PayerID", out var payerIdValues) ? payerIdValues.FirstOrDefault() : "";
+            return payerId;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting PayerID from PayPal response: " + ex.Message;
+            return string.Empty;
+        }
+    }
+
+    private string ExtractBillAddressFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            if (!Uri.TryCreate(payPalResponse, UriKind.Absolute, out var uri))
+            {
+                throw new ArgumentException("Invalid PayPal response URL format");
+            }
+
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            var addressOverride = queryParameters.TryGetValue("address_override", out var addressOverrideValues) ? addressOverrideValues.FirstOrDefault() : null;
+
+            return !string.IsNullOrEmpty(addressOverride) ? addressOverride : "Default Billing Address";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting billing address from PayPal response: " + ex.Message;
+            return "Default Billing Address";
+        }
+    }
+
+    private async Task ProcessPaymentConfirmation(int courseID, int studentID, string payerID)
+    {
+        try
+        {
+            var enrollment = _context.Enrollments.FirstOrDefault(e => e.StudentID == studentID && e.CourseID == courseID);
+
+            if (enrollment != null)
+            {
+                enrollment.PayerID = payerID;
+
+                _context.Enrollments.Update(enrollment);
+                await _context.SaveChangesAsync();
+
+                ErrorMessage = "Payment processed successfully.";
+            }
+            else
+            {
+                ErrorMessage = "Enrollment record not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error processing payment confirmation: " + ex.Message;
+        }
+    }
+}

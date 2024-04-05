@@ -21,9 +21,17 @@ namespace EffizyMusicSystem.Services
             return await _context.Courses.ToListAsync();
         }
 
-        public async Task<Course> GetCourseByIdAsync(int CourseID)
+        public async Task<Course> GetCourseByIdAsync(int courseId)
         {
-            return await _context.Courses.FindAsync(CourseID);
+            return await _context.Courses.FindAsync(courseId);
+        }
+
+        public async Task<Course> GetCourseBySubscriptionIdAsync(int subscriptionCourseId)
+        {
+            // Assuming Subscriptions table has a CourseID
+            return await _context.Courses
+                .Where(c => c.CourseID == subscriptionCourseId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task AddCourseAsync(Course course)
@@ -38,7 +46,6 @@ namespace EffizyMusicSystem.Services
             await _context.SaveChangesAsync();
         }
 
-
         public async Task<List<Instrument>> GetInstrumentsAsync()
         {
             return await _context.Instruments.ToListAsync();
@@ -49,5 +56,31 @@ namespace EffizyMusicSystem.Services
             return await _context.Instructors.ToListAsync();
         }
 
+        public async Task<List<string>> GetDistinctSkillLevels()
+        {
+            return await _context.Courses
+                .Select(c => c.SkillLevel)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCourses(int instrumentID, string skillLevel)
+        {
+            return await _context.Courses
+                .Where(c => c.InstrumentID == instrumentID && c.SkillLevel == skillLevel)
+                .ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCoursesByInstrumentAndSkillLevel(int instrumentId, string skillLevel)
+        {
+            return await _context.Courses
+                .Where(c => c.InstrumentID == instrumentId && c.SkillLevel == skillLevel)
+                .ToListAsync();
+        }
+
+        public async Task<Course> GetCourseById(int courseId)
+        {
+            return await _context.Courses.FindAsync(courseId);
+        }
     }
 }

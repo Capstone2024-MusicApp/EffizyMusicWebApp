@@ -10,8 +10,10 @@ namespace EffizyMusicSystem.Services
     public interface IUserProfileService
     {
         Task<User> GetUserById(int userId);
-        Task<Student> GetStudentProfileAsync(int userId);
-        Task<Instructor> GetInstructorProfileAsync(int userId);
+        Task<Student> GetStudentProfileAsync(int studentID);
+        Task<Instructor> GetInstructorProfileAsync(int instructorID);
+        Task<int?> GetStudentIDByUserIDAsync(int userID);
+        Task<int?> GetInstructorIDByUserIDAsync(int userID);
         Task<bool> UpdateStudentProfileAsync(Student student);
         Task<bool> UpdateInstructorProfileAsync(Instructor instructor);
     }
