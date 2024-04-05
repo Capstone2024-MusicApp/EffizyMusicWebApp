@@ -17,7 +17,19 @@
     <div class="lesson-frame">
         @if (DisplayLesson)
         {
-            <video controls="controls" width="800px" height="600px"></video>
+            @if (selectedLesson.LessonContent != null)
+            {
+                var base64 = Convert.ToBase64String(selectedLesson.LessonContent);
+                var src = $"data:video/mp4;base64,{base64}";
+
+                <video controls="controls" width="800px" height="600px">
+                    <source src="@src" type="video/mp4" />
+                </video>
+            }
+            else
+            {
+                <p>No video available.</p>
+            }
             <br />
             <br />
 
