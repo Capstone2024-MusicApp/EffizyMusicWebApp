@@ -32,7 +32,8 @@ namespace EffizyMusicSystem.DAL
         public DbSet<ViewLesson> ViewLessons { get; set; }
 
         public DbSet<Quiz> Quizes { get; set; }
-
+        public DbSet<QuizProgress> QuizesProgress { get; set; }
+        public DbSet<LessonProgress> LessonsProgress { get; set; }
 
 
         public DbSet<Question> Questions { get; set; }

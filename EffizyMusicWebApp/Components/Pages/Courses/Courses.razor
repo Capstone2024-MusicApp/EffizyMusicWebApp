@@ -1,17 +1,4 @@
-﻿@page "/courses/"
-@using EffizyMusicSystem.Models
-@using EffizyMusicSystem.Services
-@inject ICourseService CourseService
-@inject NavigationManager NavigationManager
-<h3>Courses</h3>
-<hr />
-<div class="col-md-12">
-    <a href='/course/add/' class="btn btn-primary" role="button" style="float:right;">
-        <i class="fas fa-user-plus"></i>
-        ADD COURSE
-    </a>
-</div>
-
+﻿@page "/courses"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @inject ICourseService CourseService
@@ -19,6 +6,11 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
 <div class="container">
     <h1>Courses</h1>
+    <div class="mb-3">
+        <a href="/course/add" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Course
+        </a>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -63,5 +55,4 @@
     }
 
     private void EditCourse(int CourseID) => NavigationManager.NavigateTo($"/editCourse/{CourseID}");
-
 }
