@@ -22,7 +22,9 @@ namespace EffizyMusicSystem.Models
         public string PaymentStatus {  get; set; }
 
         public string BillingAddress { get; set; } = "Get from Pay Pal";
-
-
+        public string City { get; set; }
+        public string Province { get; set; }
+        public string PostalCode {  get; set; }
+        public string Country { get; set; } = string.Empty;
     }
 }
