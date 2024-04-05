@@ -1,0 +1,117 @@
+﻿@page "/StudentCourse/AccessCourse/{EnrollmentID:int}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@rendermode InteractiveServer
+
+
+<br />
+<br />
+<div class="access-course-main">
+    <label class="course-title">@studentCourse.Title</label>
+    <br /> 
+    <br />
+    <br />
+    <br />
+    <div class="lesson-frame">
+        @if (DisplayLesson)
+        {
+            <label class="video-lesson-title">@lessonTitle</label>
+            <br />
+            <!--<img src="/img/drums.png" width="600" height="400"/>-->
+            <video controls="controls" width="800px" height="600px"></video>
+            <br />
+            <br />
+
+            <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
+        }
+        else
+        {
+            <label class="video-lesson-title">Quiz</label>
+            <br />
+            <!--<img src="/img/drums.png" width="600" height="400"/>-->
+            <br />
+            <p>@selectedQuiz.QuestionText</p>
+            <br />
+            <InputRadioGroup Name="selectedQuiz" @bind-Value="@testString">
+                <InputRadio Value="selectedQuiz.ChoiceText1" />   -    @selectedQuiz.ChoiceText1
+                    <br />
+                <InputRadio Value="selectedQuiz.ChoiceText2" />   -    @selectedQuiz.ChoiceText2
+                <br />
+                <InputRadio Value="selectedQuiz.ChoiceText3" />   -    @selectedQuiz.ChoiceText3
+                    <br />
+                <InputRadio Value="selectedQuiz.ChoiceText4" />   -    @selectedQuiz.ChoiceText4
+            </InputRadioGroup>
+                <br />
+
+        }
+    </div>
+
+
+    <div class="module-list">
+        <Accordion AlwaysOpen="true" >
+            @foreach (var module in studentCourse.Modules)
+            {
+                <AccordionItem>
+                    <TitleTemplate>
+                        <Icon Name="IconName.MusicNote" Class="me-1" />
+                        @module.Title
+                    </TitleTemplate>
+                    <Content>
+                        <table>
+                            @foreach(var lesson in module.Lessons)
+                            {
+                                <tr>
+                                    <td class="lesson-title"><Button Class="accordion-item" @onclick="() => UpdateLesson(lesson.Title)">Lesson - @lesson.Title </Button></td>
+                                 </tr>
+                            }
+                            @foreach (var quiz in module.Quizzes)
+                            {
+                                <tr>
+                                    <td class="lesson-title"><Button Class="accordion-item btn-info" @onclick="() => selectQuiz(quiz.Id)"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
+                                    </tr>
+                            }
+                        </table>
+                    </Content>
+                </AccordionItem>
+            }
+            
+        </Accordion>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public int EnrollmentID { get; set; }
+
+    public StudentCourseDTO? studentCourse;
+
+    public String? lessonTitle;
+    public String? testString;
+    public Boolean DisplayLesson { get; set; } = true;
+
+    public QuestionChoiceViewModel selectedQuiz;
+
+    protected override async Task OnInitializedAsync()
+    {
+        studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
+        lessonTitle = studentCourse.Modules.First().Lessons.First().Title;
+    }
+
+    public void UpdateLesson(string title)
+    {
+        lessonTitle = title;
+        DisplayLesson = true;
+    }
+
+    public void selectQuiz(int quizID)
+    {
+
+        DisplayLesson = false;
+        System.Console.WriteLine("the quiz ID: " + quizID);
+        selectedQuiz = EffizyService.GetQuestionWithChoices(quizID);
+    }
+}

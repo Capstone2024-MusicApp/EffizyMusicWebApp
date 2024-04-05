@@ -1,0 +1,79 @@
+﻿@page "/profile"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IUserService UserService
+@inject IUserProfileService UserProfileService
+@inject IUserProfileService InstructorService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="container">
+    <h3>User Profile</h3>
+
+    @if (CurrentUserType == "Student")
+    {
+        <EditStudentProfileForm StudentProfile="@StudentProfile" OnSubmit="@UpdateStudentProfile" />
+    }
+    else if (CurrentUserType == "Instructor")
+    {
+        <EditInstructorProfileForm InstructorProfile="@InstructorProfile" OnSubmit="@UpdateInstructorProfile" />
+    }
+    else
+    {
+        <p>Error: Invalid User Type</p>
+    }
+</div>
+
+@code {
+    private Student StudentProfile { get; set; }
+    private Instructor InstructorProfile { get; set; }
+    private string CurrentUserType { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = 1; // Replace with your actual logged-in user ID
+        CurrentUserType = "Student"; // Assume default to Student for demo
+
+        var user = await UserProfileService.GetUserById(userId);
+        if (user != null)
+        {
+            CurrentUserType = user.UserType.Description;
+
+            if (user.UserType.Description == "Student")
+            {
+                StudentProfile = await UserProfileService.GetStudentProfileAsync(userId);
+            }
+            else if (user.UserType.Description == "Instructor")
+            {
+                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(userId);
+            }
+        }
+    }
+
+    private async Task UpdateStudentProfile(Student student)
+    {
+        var success = await UserProfileService.UpdateStudentProfileAsync(student);
+        if (success)
+        {
+            // Optional: Show success message
+        }
+        else
+        {
+            // Optional: Show error message
+        }
+    }
+
+    private async Task UpdateInstructorProfile(Instructor instructor)
+    {
+        var success = await UserProfileService.UpdateInstructorProfileAsync(instructor);
+        if (success)
+        {
+            // Optional: Show success message
+        }
+        else
+        {
+            // Optional: Show error message
+        }
+    }
+}

@@ -1,0 +1,51 @@
+﻿<style>
+    /* Styles.css */
+    .rating {
+        display: inline-block;
+        font-size: 24px;
+    }
+
+    .star {
+        cursor: pointer;
+        color: gray;
+        transition: color 0.3s;
+    }
+
+        .star:hover, .selected {
+            color: gold;
+        }
+</style>
+<!-- RatingComponent.razor -->
+<div class="rating">
+    @for (int i = 0; i < 5; i++)
+    {
+        <span class="star @(i < SelectedRating ? "selected" : "")"
+              @onclick="()=>SetRating(i + 1)">
+            &#9733;
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public double CurrentRating { get; set; }
+
+    [Parameter]
+    public EventCallback<int> RatingChanged { get; set; }
+
+    private int SelectedRating = 0;
+
+    private async Task SetRating(int rating)
+    {
+        if (SelectedRating == rating)
+        {
+            // If the same star is clicked again, deselect it
+            SelectedRating = 0;
+        }
+        else
+        {
+            SelectedRating = rating;
+        }
+        await RatingChanged.InvokeAsync(SelectedRating);
+    }
+}

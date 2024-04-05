@@ -1,6 +1,8 @@
-﻿using EffizyMusicSystem.DAL;
+using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
 using Microsoft.AspNetCore.Mvc;
+using EffizyMusicSystem.Models.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
@@ -13,7 +15,27 @@ namespace EffizyMusicSystem.Services
 {
     public interface IEffizyMusicApplicationService
     {
-        //Task<List<Lesson>> GetLessons();
+        Task<List<Lesson>> GetLessons();
+        List<Instructor> GetInstructors();
+        Task<bool> AddModules(Module module);
+        Task<bool> AddLesson(Lesson lessonData);
+        Task<bool> UpdateLesson(Lesson lessonData);
+        Task<bool> DeleteLesson(int id);
+        Task<Lesson> GetLessonById(int id);
+        Task<bool> AddRating(InstructorRating rating);
+        Task<List<Course>> GetCourses();
+        List<Course> GetCourseList();
+
+        Task<List<Module>> GetModules();
+        Task<Module> GetModuleByID(int id);
+
+        Task<Course> GetCourseByID(int id);
+        Task DeleteCourse(int id);
+
+        public List<Feedback> GetFeedback();
+        public List<FeedbackDTO> GetFeedbackDTOs();
+        public void InsertFeedback(Feedback feedback);
+        public void DeleteFeedback(Feedback feedback);
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -22,21 +44,135 @@ namespace EffizyMusicSystem.Services
 
         public EffizyMusicApplicationService(EffizyMusicContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public List<Feedback> GetFeedback()
+        //public List<Instructor> GetInstructors()
+        //{
+        //    return _context.Instructors.ToList();
+        //}
+        public List<Course> GetCourseList()
         {
-            return _context.Feedbacks.ToList();
+            return _context.Courses.ToList();
         }
-
-        public async Task<bool> InsertFeedbackAsync(Feedback feedback)
+        public async Task<bool> AddRating(InstructorRating rating)
         {
-            await _context.Feedbacks.AddAsync(feedback);
+            if (rating == null)
+            {
+                return false; //Can Add exception
+            }
+            _context.InstructorRatings.Add(rating);
             await _context.SaveChangesAsync();
             return true;
         }
 
+        #region Lesson
+        public async Task<bool> AddLesson(Lesson lessonData)
+        {
+            try
+            {
+                if (lessonData == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    _context.Lessons.Add(lessonData);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
+        public async Task<bool> UpdateLesson(Lesson lessonData)
+        {
+            try
+            {
+                _context.Entry(lessonData).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) { return false; }
+        }
+        public async Task<bool> DeleteLesson(int id)
+        {
+            var existingID = _context.Lessons.Find(id);
+            if (existingID != null)
+            {
+                _context.Remove(existingID);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        public async Task<List<Lesson>> GetLessons()
+        {
+            return await _context.Lessons.ToListAsync();
+        }
+
+        public async Task<Lesson> GetLessonById(int id)
+        {
+            return await _context.Lessons.Where(x => x.LessonNumber == id).FirstOrDefaultAsync();
+        }
+        #endregion
+
+
+        public async Task<bool> CreateUserAsync(User user)
+        {
+            try
+            {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<List<UserType>> GetUserTypes()
+        {
+            return await _context.UserTypes.ToListAsync();
+        }
+
+        public async Task<User> GetUserByIdAsync(int userTypeID)
+        {
+            return await _context.Users
+                .Include(x => x.UserType)
+                .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
+        }
+
+        //Add other methods here that directly connect to the database
+        
+        #region Course
+        public async Task<List<Course>> GetCourses()
+        {
+
+            var courses = await _context.Courses.ToListAsync();
+            return courses != null ? courses : new List<Course>();
+
+
+        }
+        public async Task DeleteCourse(int id)
+        {
+            var existingID = _context.Courses.Find(id);
+            if (existingID != null)
+            {
+                _context.Remove(existingID);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        #endregion
         //Add your methods here that directly connects to the dtabase
         #region Lesson
         
@@ -58,6 +194,17 @@ namespace EffizyMusicSystem.Services
 
         
         #endregion
+        public void AddCourse(Course entity)
+        {
+            try
+            {
+                _context.Courses.Add(entity);
+            }
+            catch
+            {
+                throw;
+            }
+        }
         #region Modules
         /// <summary>
         /// Get all modules
@@ -72,6 +219,117 @@ namespace EffizyMusicSystem.Services
             catch
             {
                 throw;
+            }
+        }
+        public async Task<Module> GetModuleByID(int id)
+        {
+            try
+            {
+                return await _context.Modules.Where(x => x.ModuleID == id).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Module GetModule(int id)
+        {
+            try
+            {
+                return _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public bool DeleteModule(int id)
+        {
+            try
+            {
+                //Get all quizes of the module.
+                var quizes = _context.Quizes.Where(x => x.ModuleID == id).ToList();
+                foreach (var quiz in quizes)
+                {
+                    //get all questions of the quiz
+                    var questions = _context.Questions.Where(q => q.QuizId == quiz.Id).ToList();
+                    //delete all quations.
+                    foreach (var entity in questions)
+                    {
+                        //delete questionChoices
+                        List<QuestionChoice> questionChoices = _context.QuestionChoices.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var choice in questionChoices)
+                        {
+                            _context.QuestionChoices.Remove(choice);
+                            _context.SaveChanges();
+                        }
+                        //delete answers
+                        List<Answer> answers = _context.Answers.Where(x => x.QuestionId == entity.Id).ToList();
+                        foreach (var answer in answers)
+                        {
+                            _context.Answers.Remove(answer);
+                            _context.SaveChanges();
+                        }
+                        //Delete question
+                        _context.Questions.Remove(entity);
+                        _context.SaveChanges();
+                    }
+
+                    //Delete quiz
+                    _context.Quizes.Remove(quiz);
+                    _context.SaveChanges();
+                }
+
+                //Delete lessons
+                //Get all lessons of the module.
+                var lessons = _context.Lessons.Where(x => x.Module.ModuleID == id).ToList();
+                foreach (var lsn in lessons)
+                {
+                    _context.Lessons.Remove(lsn);
+                    _context.SaveChanges();
+
+                }
+
+                //remove module.
+                var module = _context.Modules.Where(m => m.ModuleID == id).FirstOrDefault();
+                if (module != null)
+                {
+                    _context.Modules.Remove(module);
+                    _context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<Course> GetCourseByID(int id)
+        {
+            return await _context.Courses.Where(x => x.CourseID == id).FirstOrDefaultAsync();
+        }
+        public async Task<bool> AddModules(Module module)
+        {
+            try
+            {
+                if (module != null)
+                {
+                    _context.Modules.Add(module);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding module.", ex);
             }
         }
 
@@ -279,6 +537,17 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<Instrument> GetInstruments()
+        {
+            try
+            {
+                return _context.Instruments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public Quiz? GetQuiz(int id)
         {
             try
@@ -297,6 +566,20 @@ namespace EffizyMusicSystem.Services
             {
                 throw;
             }
+
+        }
+
+
+        public List<Instructor> GetInstructors()
+        {
+            try
+            {
+                return _context.Instructors.ToList();
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public bool DeleteQuiz(int id)
@@ -305,7 +588,7 @@ namespace EffizyMusicSystem.Services
             {
                 //get quiz questions
                 var questions = _context.Questions.Where(q => q.QuizId == id).ToList();
-                foreach(var question  in questions)
+                foreach (var question in questions)
                 {
                     DeleteQuestion(question.Id);
                 }
@@ -349,6 +632,18 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<Payment> GetPayments()
+        {
+            try
+            {
+                return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
         /// <summary>
         /// Get quiz Question
         /// </summary>
@@ -578,6 +873,24 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        #region Student Courses
+        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
+        {
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+        }
+
+        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
+        {
+            StudentCourseDTO studentCourse;
+
+            //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
+            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+
+            studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            return studentCourse;
+            // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
+
+        }
         #endregion
 
         #region Courses
@@ -643,12 +956,39 @@ namespace EffizyMusicSystem.Services
 
         #region User Login
 
+        #region Feedbacks
+        public List<FeedbackDTO> GetFeedbackDTOs()
+        {
+            return   _context.Database.SqlQuery<FeedbackDTO>($"EXECUTE sp_getFeedbackView").ToList();
+
+        }
+
+        public List<Feedback> GetFeedback()
+        {
+            return _context.Feedbacks.ToList();
+        }
+
+
+        public void InsertFeedback(Feedback feedback)
+        {
+            _context.Feedbacks.Add(feedback);
+            _context.SaveChanges();
+        }
+
+        public void DeleteFeedback(Feedback feedback)
+        {
+            _context.Remove(feedback);
+            _context.SaveChanges();
+        }
+        #endregion
+        //Login
         public User ValidateUser(string email, string password)
         {
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
                 string hashPassword = PasswordHasher.HashPassword(password);
                 return  _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
+                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
             }
             else
                 return null;
@@ -656,4 +996,5 @@ namespace EffizyMusicSystem.Services
 
         #endregion
     }
+    #endregion
 }

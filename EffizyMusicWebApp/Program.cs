@@ -15,13 +15,26 @@ builder.Services.AddScoped<EffizyMusicApplicationService>();
 
 // Add services to the container.
 var services = builder.Services;
+builder.Services.AddBlazorBootstrap();
 
 // Add your DbContext configuration
-services.AddDbContext<EffizyMusicContext>(options =>
+
+builder.Services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
-var app = builder.Build();
+// Register Services
+builder.Services.AddScoped<EffizyMusicApplicationService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<UserTypeService>();
+builder.Services.AddScoped<InstrumentService>();
 
+builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -34,6 +47,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

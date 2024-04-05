@@ -1,8 +1,8 @@
-﻿@page "/course/add"
-@using EffizyMusicSystem.Models
+@page "/course/add"
+@using EffizyMusicSystem.Models 
 @using EffizyMusicSystem.Enum
-@inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
 <h3>Add Course</h3>
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
@@ -20,6 +20,18 @@
             <InputText class="form-control" @bind-Value="model.CourseMode" />
         </div>
         <ValidationMessage For="@(() => model.CourseMode)" />
+        <label class="form-label">Course Title:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.Title" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Course Mode:</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="model.CourseCode" />
+        </div>
+        <ValidationMessage For="@(() => model.CourseCode)" />
     </div>
     <div class="mb-3">
         <label class="form-label">Description:</label>
@@ -29,18 +41,18 @@
         <ValidationMessage For="@(() => model.CourseDescription)" />
     </div>
 
-     <div class="mb-3">
+    <div class="mb-3">
         <label class="form-label">Select Instrument:</label>
         <div class="col-md-4">
             <select class="form-select" name="model.InstrumentID">
-            @if (Instruments != null)
-            {
-                foreach (var entity in Instruments)
+                @if (Instruments != null)
                 {
-                    <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                    foreach (var entity in Instruments)
+                    {
+                        <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                    }
                 }
-            }
-        </select>
+            </select>
         </div>
     </div>
 
@@ -48,14 +60,14 @@
         <label class="form-label">Select Instructor:</label>
         <div class="col-md-4">
             <select class="form-select" name="model.InstructorID">
-            @if (Instructors != null)
-            {
-                foreach (var entity in Instructors)
+                @if (Instructors != null)
                 {
-                    <option value="@entity.InstructorID">@entity.Location</option>
+                    foreach (var entity in Instructors)
+                    {
+                        <option value="@entity.InstructorID">@entity.Location</option>
+                    }
                 }
-            }
-        </select>
+            </select>
         </div>
     </div>
 
@@ -66,6 +78,7 @@
         </a>
     </div>
 </EditForm>
+
 @code {
 
     [SupplyParameterFromForm]
@@ -73,13 +86,9 @@
 
     protected List<Instrument> Instruments { get; set; }
 
-    protected List<Instructor> Instructors { get; set; }
-
-    //protected override void OnInitialized() => model ??= new();
-
     protected override async Task OnInitializedAsync()
     {
-        if (model == null) // && string.IsNullOrEmpty(model.Title)
+        if (model == null) // && string.IsNullOrEmpty(model.Title) 
         {
             model = new Course();
 
@@ -91,6 +100,7 @@
 
             //apiUrl = "https://localhost:7164/api/Courses/GetInstructors/";
             //Instructors = await Http.GetFromJsonAsync<List<Instructor>>(apiUrl);
+
         }
     }
 
@@ -101,6 +111,7 @@
             EffizyService.AddCourse(model);
             //string apiUrl = "https://localhost:7164/api/Courses/";
             //await Http.PostAsJsonAsync(apiUrl, model);
+
             Cancel();
         }
     }

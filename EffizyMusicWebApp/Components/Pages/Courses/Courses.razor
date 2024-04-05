@@ -1,4 +1,8 @@
-﻿@page "/courses/"
+@page "/courses/"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
 <h3>Courses</h3>
 <hr />
 <div class="col-md-12">
@@ -8,7 +12,56 @@
     </a>
 </div>
 
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+<div class="container">
+    <h1>Courses</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Course Code</th>
+                <th>Description</th>
+                <th>Instrument ID</th>
+                <th>Instructor ID</th>
+                <th>Skill Level</th>
+                <th>Estimated Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in CourseList)
+            {
+                <tr>
+                    <td>@course.Title</td>
+                    <td>@course.CourseCode</td>
+                    <td>@course.CourseDescription</td>
+                    <td>@course.InstrumentID</td>
+                    <td>@course.InstructorID</td>
+                    <td>@course.SkillLevel</td>
+                    <td>@course.EstimatedTime</td>
+                    <td>
+                        <a href="@($"editcourse/{course.CourseID}")" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>&nbsp;&nbsp;
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
+    private List<Course> CourseList = new List<Course>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        CourseList = await CourseService.GetCoursesAsync();
+    }
+
+    private void EditCourse(int CourseID) => NavigationManager.NavigateTo($"/editCourse/{CourseID}");
 
 }

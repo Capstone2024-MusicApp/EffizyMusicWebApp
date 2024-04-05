@@ -39,6 +39,8 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuestionId");
+
                     b.ToTable("Answers");
                 });
 
@@ -46,17 +48,20 @@ namespace EffizyMusicSystem.Migrations
                 {
                     b.Property<int>("CourseID")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseID"));
 
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("CourseDescription")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CourseMode")
+                    b.Property<string>("EstimatedTime")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -67,10 +72,14 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<int>("InstrumentID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("SkillLevel")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CourseID");
 
@@ -79,6 +88,38 @@ namespace EffizyMusicSystem.Migrations
                     b.HasIndex("InstrumentID");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.DTO.StudentCourseDTO", b =>
+                {
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourseDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnrollmentID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProgressStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Enrollment", b =>
@@ -92,8 +133,12 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<int>("CourseID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EnrollmentDate")
+                    b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ProgressStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StudentID")
                         .HasColumnType("int");
@@ -134,8 +179,7 @@ namespace EffizyMusicSystem.Migrations
                 {
                     b.Property<int>("InstructorID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InstructorID"));
 
@@ -143,15 +187,26 @@ namespace EffizyMusicSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("HighestMusicQualification")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InstrumentID")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -163,6 +218,10 @@ namespace EffizyMusicSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
@@ -170,6 +229,10 @@ namespace EffizyMusicSystem.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("InstructorID");
+
+                    b.HasIndex("InstrumentID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Instructors");
                 });
@@ -288,12 +351,16 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
 
                     b.HasKey("PaymentID");
 
@@ -317,6 +384,8 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuizId");
+
                     b.ToTable("Questions");
                 });
 
@@ -337,6 +406,8 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuestionId");
+
                     b.ToTable("QuestionChoices");
                 });
 
@@ -350,26 +421,29 @@ namespace EffizyMusicSystem.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<int>("ModuleID")
                         .HasColumnType("int");
 
                     b.Property<string>("QuizTitle")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quizes");
+                    b.HasIndex("ModuleID");
+
+                    b.ToTable("Quizes", (string)null);
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.Student", b =>
                 {
                     b.Property<int>("StudentID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"));
 
@@ -377,14 +451,25 @@ namespace EffizyMusicSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Grades")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Instrument")
+                    b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Grades")
+                        .HasColumnType("float");
+
+                    b.Property<int>("InstrumentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentPlan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -400,7 +485,34 @@ namespace EffizyMusicSystem.Migrations
 
                     b.HasKey("StudentID");
 
+                    b.HasIndex("UserID");
+
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Subscription", b =>
+                {
+                    b.Property<int>("SubscriptionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubscriptionID"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SubscriptionID");
+
+                    b.HasIndex("CourseID");
+
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("EffizyMusicSystem.Models.User", b =>
@@ -411,31 +523,13 @@ namespace EffizyMusicSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
-                    b.Property<string>("ConfirmPassword")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Phone")
                         .IsRequired()
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserTypeID")
                         .HasColumnType("int");
@@ -489,6 +583,17 @@ namespace EffizyMusicSystem.Migrations
                     b.ToTable("ViewLessons");
                 });
 
+            modelBuilder.Entity("EffizyMusicSystem.Models.Answer", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Answer_Question");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("EffizyMusicSystem.Models.Course", b =>
                 {
                     b.HasOne("EffizyMusicSystem.Models.Instructor", "Instructor")
@@ -527,6 +632,25 @@ namespace EffizyMusicSystem.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("EffizyMusicSystem.Models.Instructor", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Instrument", "Instrument")
+                        .WithMany()
+                        .HasForeignKey("InstrumentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EffizyMusicSystem.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Instrument");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EffizyMusicSystem.Models.Lesson", b =>
                 {
                     b.HasOne("EffizyMusicSystem.Models.Module", "Module")
@@ -542,6 +666,61 @@ namespace EffizyMusicSystem.Migrations
                 {
                     b.HasOne("EffizyMusicSystem.Models.Course", "Course")
                         .WithMany("Modules")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Question", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Quiz", "Quiz")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Question_Quiz");
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.QuestionChoice", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Question", "Question")
+                        .WithMany("QuestionChoices")
+                        .HasForeignKey("QuestionId")
+                        .IsRequired()
+                        .HasConstraintName("FK_QuestionChoices_Question");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Quiz", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Module", "Module")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("ModuleID")
+                        .IsRequired()
+                        .HasConstraintName("FK_Module_Quiz");
+
+                    b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Student", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Subscription", b =>
+                {
+                    b.HasOne("EffizyMusicSystem.Models.Course", "Course")
+                        .WithMany()
                         .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -568,6 +747,20 @@ namespace EffizyMusicSystem.Migrations
             modelBuilder.Entity("EffizyMusicSystem.Models.Module", b =>
                 {
                     b.Navigation("Lessons");
+
+                    b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Question", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("QuestionChoices");
+                });
+
+            modelBuilder.Entity("EffizyMusicSystem.Models.Quiz", b =>
+                {
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

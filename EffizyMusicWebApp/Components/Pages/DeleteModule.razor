@@ -1,4 +1,4 @@
-﻿@page "/module/delete/{moduleId:int}"
+@page "/module/delete/{moduleId:int}"
 @using EffizyMusicSystem.Models
 @inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
@@ -22,18 +22,36 @@
             Cancel
         </a>
 </div>
+    <div class="form-group">
+        <h5 style="color:red">Are you sure you want to delete this module? It will delete related Lessons, Quizzes (Questions, choices, and answer) and all other related records!</h5>
+        <hr />
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><b>Module Title:</b> @model.Title</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a class="btn btn-light" href="/modules/">
+            Cancel
+        </a>
+    </div>
 </EditForm>
 @code {
     [Parameter]
     public int moduleId { get; set; }
 
     Module model = new Module();
+    EffizyMusicSystem.Models.Module model = new EffizyMusicSystem.Models.Module();
 
     protected override async Task OnInitializedAsync()
     {
         //string apiUrl = "https://localhost:7164/api/Modules/GetModule/" + moduleId;
         //await Http.GetFromJsonAsync<Module>(apiUrl);
-        model = EffizyService.GetModule(moduleId); 
+        model = EffizyService.GetModule(moduleId);
     }
 
     protected async Task RemoveModule()
