@@ -26,7 +26,7 @@
     public int moduleId { get; set; }
 
     [SupplyParameterFromForm]
-    protected Module model { get; set; }
+    protected EffizyMusicSystem.Models.Module model { get; set; }
 
     protected override void OnInitialized() => model ??= new();
 
