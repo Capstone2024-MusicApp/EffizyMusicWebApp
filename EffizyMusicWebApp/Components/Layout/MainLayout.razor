@@ -9,8 +9,7 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-2">
             @if (isLogin == false)
             {
                 <a href="/loginForm">Login</a>
@@ -19,12 +18,12 @@
             {
                 <button @onclick="@Logout" class="btn-link">Logout</button>
             }
-            
         </div>
 
         <article class="content px-4">
             @Body
         </article>
+        <Footer></Footer>
     </main>
 </div>
 
@@ -45,7 +44,7 @@
     protected async Task<bool> IsUserLogin()
     {
         var email = await ProtectedSessionStore.GetAsync<String>("Email");
-        if(email.Value != null)
+        if (email.Value != null)
         {
             return true;
         }
@@ -60,8 +59,8 @@
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
-        //await ProtectedSessionStore.DeleteAsync("FirstName");
-        //await ProtectedSessionStore.DeleteAsync("LastName");
+        await ProtectedSessionStore.DeleteAsync("FirstName");
+        await ProtectedSessionStore.DeleteAsync("LastName");
 
         //Redirect to specific page.
         NavigationManager.NavigateTo("/loginForm", true);

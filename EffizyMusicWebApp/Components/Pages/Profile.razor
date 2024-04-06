@@ -1,0 +1,185 @@
+﻿@page "/profile"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+@inject IUserService UserService
+@inject IUserProfileService UserProfileService
+@inject IUserProfileService InstructorService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="container">
+    <h3>User Profile</h3>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ErrorMessage
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">
+            Profile
+        </div>
+        <div class="card-body">
+            @if (CurrentUserType == "Student")
+            {
+                @if (StudentProfile != null)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@GetAvatarUrl(StudentProfile.Gender)" class="rounded-circle" alt="Avatar" width="150" height="150" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-3">First Name:</dt>
+                                <dd class="col-sm-9">@StudentProfile.FirstName</dd>
+                                <dt class="col-sm-3">Last Name:</dt>
+                                <dd class="col-sm-9">@StudentProfile.LastName</dd>
+                                <dt class="col-sm-3">Gender:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Gender</dd>
+                                <dt class="col-sm-3">Phone:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Phone</dd>
+                                @* <dt class="col-sm-3">Skill Level:</dt>
+                                <dd class="col-sm-9">@StudentProfile.SkillLevel</dd> *@
+                                <dt class="col-sm-3">Grades:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Grades</dd>
+                                <dt class="col-sm-3">Payment Plan:</dt>
+                                <dd class="col-sm-9">@StudentProfile.PaymentPlan</dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Student profile not found.</p>
+                }
+            }
+            else if (CurrentUserType == "Instructor")
+            {
+                @if (InstructorProfile != null)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@GetAvatarUrl(InstructorProfile.Gender)" class="rounded-circle" alt="Avatar" width="150" height="150" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-3">First Name:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.FirstName</dd>
+                                <dt class="col-sm-3">Last Name:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.LastName</dd>
+                                <dt class="col-sm-3">Gender:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Gender</dd>
+                                <dt class="col-sm-3">Phone:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Phone</dd>
+                                <dt class="col-sm-3">Highest Qualification:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.HighestMusicQualification</dd>
+                                <dt class="col-sm-3">Years of Experience:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.YearsOfExperience</dd>
+                                <dt class="col-sm-3">Reference Email:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.ReferenceEmail</dd>
+                                <dt class="col-sm-3">Reference Phone:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.ReferencePhone</dd>
+                                <dt class="col-sm-3">Status:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Status</dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Instructor profile not found.</p>
+                }
+            }
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <button class="btn btn-primary" @onclick="EditProfile">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Student StudentProfile { get; set; }
+    private Instructor InstructorProfile { get; set; }
+    private string CurrentUserType { get; set; }
+    private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var userId = 59; // I need to change this back to the actual logged-in user ID 
+            //var userId = UserService.GetCurrentUserId()
+            var user = await UserProfileService.GetUserById(userId);
+
+            if (user != null)
+            {
+                CurrentUserType = user.UserType.Description;
+
+                if (user.UserType.Description == "Student")
+                {
+                    var studentId = await UserProfileService.GetStudentIDByUserIDAsync(user.UserID);
+                    if (studentId.HasValue)
+                    {
+                        StudentProfile = await UserProfileService.GetStudentProfileAsync(studentId.Value);
+                    }
+                    else
+                    {
+                        ErrorMessage = "Student profile not found.";
+                    }
+                }
+                else if (user.UserType.Description == "Instructor")
+                {
+                    var instructorId = await UserProfileService.GetInstructorIDByUserIDAsync(user.UserID);
+                    if (instructorId.HasValue)
+                    {
+                        InstructorProfile = await UserProfileService.GetInstructorProfileAsync(instructorId.Value);
+                    }
+                    else
+                    {
+                        ErrorMessage = "Instructor profile not found.";
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error retrieving user profile: {ex.Message}";
+        }
+    }
+
+    private async Task EditProfile()
+    {
+        try
+        {
+            if (CurrentUserType == "Student" && StudentProfile != null)
+            {
+                NavigationManager.NavigateTo("/admin/edit-student-profile/" + StudentProfile.StudentID);
+            }
+            else if (CurrentUserType == "Instructor" && InstructorProfile != null)
+            {
+                NavigationManager.NavigateTo("/admin/edit-instructor-profile/" + InstructorProfile.InstructorID);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error navigating to edit profile: {ex.Message}";
+        }
+    }
+
+    private string GetAvatarUrl(string gender)
+    {
+        //male and female avatar images
+        return gender.ToLower() == "male"
+            ? "https://example.com/male-avatar.png"
+            : "https://example.com/female-avatar.png";
+    }
+}

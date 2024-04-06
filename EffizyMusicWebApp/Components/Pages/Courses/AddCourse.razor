@@ -1,25 +1,25 @@
 ﻿@page "/course/add"
-@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models 
 @using EffizyMusicSystem.Enum
-@inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
 <h3>Add Course</h3>
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
     <DataAnnotationsValidator />
     <div class="mb-3">
-        <label class="form-label">Course Title</label>
+        <label class="form-label">Course Title:</label>
         <div class="col-md-4">
             <InputText class="form-control" @bind-Value="model.Title" />
         </div>
-        <ValidationMessage For="@(() => model.Title)" />
     </div>
+
     <div class="mb-3">
-        <label class="form-label">Course Code:</label>
+        <label class="form-label">Course Mode:</label>
         <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.CourseMode" />
+            <InputText class="form-control" @bind-Value="model.CourseCode" />
         </div>
-        <ValidationMessage For="@(() => model.CourseMode)" />
+        <ValidationMessage For="@(() => model.CourseCode)" />
     </div>
     <div class="mb-3">
         <label class="form-label">Description:</label>
@@ -29,18 +29,18 @@
         <ValidationMessage For="@(() => model.CourseDescription)" />
     </div>
 
-     <div class="mb-3">
+    <div class="mb-3">
         <label class="form-label">Select Instrument:</label>
         <div class="col-md-4">
             <select class="form-select" name="model.InstrumentID">
-            @if (Instruments != null)
-            {
-                foreach (var entity in Instruments)
+                @if (Instruments != null)
                 {
-                    <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                    foreach (var entity in Instruments)
+                    {
+                        <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                    }
                 }
-            }
-        </select>
+            </select>
         </div>
     </div>
 
@@ -48,14 +48,14 @@
         <label class="form-label">Select Instructor:</label>
         <div class="col-md-4">
             <select class="form-select" name="model.InstructorID">
-            @if (Instructors != null)
-            {
-                foreach (var entity in Instructors)
+                @if (Instructors != null)
                 {
-                    <option value="@entity.InstructorID">@entity.Location</option>
+                    foreach (var entity in Instructors)
+                    {
+                        <option value="@entity.InstructorID">@entity.Location</option>
+                    }
                 }
-            }
-        </select>
+            </select>
         </div>
     </div>
 
@@ -75,22 +75,15 @@
 
     protected List<Instructor> Instructors { get; set; }
 
-    //protected override void OnInitialized() => model ??= new();
-
     protected override async Task OnInitializedAsync()
     {
-        if (model == null) // && string.IsNullOrEmpty(model.Title)
+        if (model == null) // && string.IsNullOrEmpty(model.Title) 
         {
             model = new Course();
 
             Instruments = EffizyService.GetInstruments();
 
             Instructors = EffizyService.GetInstructors();
-            //string apiUrl = "https://localhost:7164/api/Courses/GetInstruments/";
-            //Instruments = await Http.GetFromJsonAsync<List<Instrument>>(apiUrl);
-
-            //apiUrl = "https://localhost:7164/api/Courses/GetInstructors/";
-            //Instructors = await Http.GetFromJsonAsync<List<Instructor>>(apiUrl);
         }
     }
 
@@ -99,8 +92,6 @@
         if (!string.IsNullOrEmpty(model.Title))
         {
             EffizyService.AddCourse(model);
-            //string apiUrl = "https://localhost:7164/api/Courses/";
-            //await Http.PostAsJsonAsync(apiUrl, model);
             Cancel();
         }
     }

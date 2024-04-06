@@ -1,5 +1,5 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Raleway', sans-serif !important;
 }
 
 a, .btn-link {
@@ -47,5 +47,134 @@ h1:focus {
     }
 
 .darker-border-checkbox.form-check-input {
-    border-color: #929292;
+    border-color: #929295;
+}
+
+
+.student-course-list{
+    margin:0px;
+    border: 3px solid gray;
+
+}
+
+.student-course-list th{
+    padding: 10px 10px 10px 20px;
+    font-size: 15px;
+    border-bottom: 2px solid black;
+    background-color: #043d78;
+    color: white;
+}
+
+    .student-course-list tr:nth-child(odd) {
+        background-color: #eeeeee;
+    }
+
+.student-course-list td{
+    padding: 8px 20px 8px 20px;
+    
+}
+
+.access-course-main{
+    display: block;
+    width: 100%;
+    min-height: max-content;
+}
+.course-title {
+    text-align: center;
+    display: block;
+    font-weight: bold;
+    font-size: 50px;
+    color: #1f1e8b;
+}
+
+.lesson-frame {
+    width: 900px;
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.module-list {
+    display: inline-block;
+    margin-left: 100px;
+    text-align: left;
+    border-radius: 10px;
+    width: 500px;
+    vertical-align: top;
+    overflow:scroll;
+    max-height: 800px;
+}
+
+
+.lesson-title {
+    padding: 10px 20px 0px 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.video-lesson-title{
+    font-weight: 600;
+    font-size: 30px;
+
+}
+
+.feedback-container {
+    display: block;
+    border-radius: 15px;
+    background: #efefef;
+    width: fit-content;
+    margin: auto;
+}
+
+.feedback-table {
+    padding: 10px;
+    min-width: 800px;
+    margin: auto;
+    max-width: 800px;
+}
+
+.feedback-table td{
+    padding: 10px 20px 5px 20px;
+}
+
+.feedback-name{
+    color: #043d78;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.feedback-date {
+    font-style: italic;
+    color: #043d78;
+    font-size: 14px;
+}
+
+.feedback-post{
+    padding: 10px;
+    margin: auto;
+    min-width: 800px;
+    align-content:center;
+}
+
+.feedback-post td{
+    margin: auto;
+    text-align: center;
+}
+
+.feedback-input{
+    width: 600px;
+    height: 80px;
+    margin: auto;
+    
+}
+
+.page-title {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 40px;
+    font-weight: 300;
+    text-align: center;
+    display: block;
+    padding-bottom: 60px;
+    padding-top: 30px;
+    color: darkslategray
+
 }

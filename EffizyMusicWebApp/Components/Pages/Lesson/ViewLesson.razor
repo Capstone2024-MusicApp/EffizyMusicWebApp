@@ -1,0 +1,82 @@
+﻿@page "/ViewLesson"
+@using EffizyMusicSystem.Models
+@using EffizyMusicWebApp.Components.Shared
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavService
+@rendermode InteractiveServer
+<h3 class="text-center">Lessons List</h3>
+<hr />
+@if (LessonList == null)
+{
+    <p class="text-center"><em>Loading...</em></p>
+}
+<table class="table table-striped align-middle table-bordered">
+    <thead class="table-success">
+        <tr>
+            <th>Lesson Number</th>
+            <th>Lesson Title</th>
+            <th>Lesson Mode</th>
+            <th>Lesson Content</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lesson in GetItemsOnCurrentPage())
+        {
+            <tr>
+                <td>@lesson.LessonNumber</td>
+                <td>@lesson.Title</td>
+                <td>@lesson.LessonMode</td>
+                <td>
+                    @if (lesson.LessonContent != null)
+                    {
+                        <video controls>
+                            <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    }
+                    else
+                    {
+                        <p>No video available.</p>
+                    }
+                </td>
+                <td>
+                    <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
+                        <Icon Name="IconName.PencilSquare"></Icon>
+                    </a>
+                    @* <button class="btn btn-danger" role="button"> Delete</button> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+    <PaginationComponent CurrentPage="@cp"
+                         TotalPages="@TotalPages"
+                         onPageChange="@HandlePageChange" />
+
+
+@code {
+    private List<Lesson> LessonList = new();
+    private int pageSize = 4;
+    private int cp = 1;
+    private int TotalPages => (int)Math.Ceiling((double)LessonList.Count / pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Populate items with your data asynchronously
+        LessonList = await EffizyService.GetLessons();
+    }
+
+    private IEnumerable<Lesson> GetItemsOnCurrentPage()
+    {
+        int startIndex = (cp - 1) * pageSize;
+        return LessonList.Skip(startIndex).Take(pageSize);
+    }
+
+    private void HandlePageChange(int newPage)
+    {
+        cp = newPage;
+    }
+}

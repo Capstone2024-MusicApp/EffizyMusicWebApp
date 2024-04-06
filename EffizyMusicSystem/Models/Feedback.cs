@@ -13,7 +13,8 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int FeedbackID { get; set; }
 
-        public string Comments {  get; set; }
+        [Required(ErrorMessage = "Feedback cannot be empty. Please enter feedback before submitting.")]
+        public string? Comments {  get; set; }
 
         public DateTime FeedbackDate { get; set; } = DateTime.Now;
 

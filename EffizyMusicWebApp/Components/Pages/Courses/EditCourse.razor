@@ -1,0 +1,143 @@
+﻿@page "/editCourse"
+@page "/editCourse/{CourseID:int}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+
+<h3>Edit Course</h3>
+@inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+@rendermode InteractiveServer
+
+<h3 class="display-3">Edit Course</h3>
+<hr />
+
+@if (course != null)
+{
+    <EditForm Model="@course" OnValidSubmit="UpdateCourse" formname="editCourseForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Title</label>
+            <InputText @bind-Value="course.Title" class="form-control" />
+            <ValidationMessage For="@(() => course.Title)" />
+        </div>
+
+        <div class="form-group">
+            <label>Course Code</label>
+            <InputText @bind-Value="course.CourseCode" class="form-control" />
+            <ValidationMessage For="@(() => course.CourseCode)" />
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <InputTextArea @bind-Value="course.CourseDescription" class="form-control" />
+            <ValidationMessage For="@(() => course.CourseDescription)" />
+        </div>
+
+        <div class="form-group">
+            <label>Instrument</label>
+            <select class="form-control" @bind="course.InstrumentID">
+                @foreach (var instrum in Instruments)
+                {
+                    <option value="@instrum.InstrumentID">@instrum.InstrumentType</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Instructor</label>
+            <select class="form-control" @bind="course.InstructorID">
+                @foreach (var instruc in Instructors)
+                {
+                    <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Skill Level</label>
+            <select class="form-control" @bind="course.SkillLevel">
+                @foreach (var skill in Skills)
+                {
+                    <option value="@skill">@skill</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => course.SkillLevel)" />
+        </div>
+
+        <div class="form-group">
+            <label>Estimated Time</label>
+            <InputText @bind-Value="course.EstimatedTime" class="form-control" />
+            <ValidationMessage For="@(() => course.EstimatedTime)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ErrorMessage
+        </div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int CourseID { get; set; }
+
+    private Course course;
+    private List<Instrument> Instruments = new List<Instrument>();
+    private List<Instructor> Instructors = new List<Instructor>();
+    private List<string> Skills = new List<string> { "Beginner", "Intermediate", "Advanced" }; // Sample SkillLevels
+
+    private string ErrorMessage { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            course = await CourseService.GetCourseByIdAsync(CourseID);
+            Instruments = await CourseService.GetInstrumentsAsync();
+            Instructors = await CourseService.GetInstructorsAsync();
+
+            if (course != null)
+            {
+                course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
+                course.InstructorID = course.Instructor?.InstructorID ?? 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error loading course data: " + ex.Message;
+        }
+    }
+
+    private async Task UpdateCourse()
+    {
+        try
+        {
+            await CourseService.UpdateCourseAsync(course);
+            NavigationManager.NavigateTo("/courses");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error updating course: " + ex.Message;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        NavigationManager.NavigateTo("/courses");
+    }
+}

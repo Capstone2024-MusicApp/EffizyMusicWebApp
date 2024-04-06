@@ -1,0 +1,711 @@
+﻿@page "/registrationForm"
+@using EffizyMusicSystem.DAL
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Net.Http
+@using System.Net
+@using System.Globalization
+@using System.Web
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject UserTypeService userTypeService
+@inject InstrumentService instrumentService
+@inject NavigationManager navigationManager
+@inject PayPalService PayPalService
+
+@rendermode InteractiveServer
+
+@if (CurrentStep == 1)
+{
+    <div class="container justify-content-center mt-4 mb-4">
+        <EditForm Model="@user" OnValidSubmit="NextStep" FormName="RegistrationForm" class="row g-3 justify-content-center">
+            <DataAnnotationsValidator />
+
+            <h3 class="text-center">User Registration</h3>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Email" class="form-label">Email:</label>
+                    <InputText id="Email" @bind-Value="user.Email" class="form-control" />
+                    <ValidationMessage For="@(() => user.Email)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Password" class="form-label">Password:</label>
+                    <InputText id="Password" @bind-Value="user.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => user.Password)" />
+                </div>
+                <div class="mb-4">
+                    <label for="ConfirmPassword" class="form-label">Confirm Password:</label>
+                    <InputText id="ConfirmPassword" @bind-Value="user.ConfirmPassword" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => user.ConfirmPassword)" />
+                </div>
+
+                @if (userTypes != null)
+                {
+                    <div class="mb-4">
+                        <label for="UserType" class="form-label">User Type:</label>
+                        <InputSelect id="UserTypeID" @bind-Value="user.UserTypeID" class="form-select">
+                            <option value="0" disabled selected>select role</option>
+                            @foreach (var userType in userTypes)
+                            {
+                                <option value="@userType.UserTypeID">@userType.Description</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => user.UserTypeID)" />
+                    </div>
+                }
+
+                <div class="col-12">
+                    <button class="btn btn-primary">Next</button>
+                </div>
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+    </div>
+}
+
+@if (user.UserTypeID == 12 && CurrentStep == 2) // Student
+{
+    <div class="containerd-flex justify-content-center  mt-4 mb-4">
+        <h3 class="text-center">Student Registration</h3>
+        <EditForm Model="@student" OnValidSubmit="NextStep" FormName="StudentRegistrationForm" class="row g-3">
+            <DataAnnotationsValidator />
+
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="FirstName" class="form-label">First Name:</label>
+                    <InputText id="FirstName" @bind-Value="@student.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => student.FirstName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="LastName" class="form-label">Last Name:</label>
+                    <InputText id="LastName" @bind-Value="@student.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => student.LastName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Gender" class="form-label">Gender:</label>
+                    <InputSelect id="Gender" @bind-Value="student.Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.Gender)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <InputText id="Phone" @bind-Value="@student.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => student.Phone)" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Instrument" class="form-label">Instrument:</label>
+                    <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select">
+                        <option value="0" disabled selected>Select Instrument</option>
+                        @foreach (var inst in instruments)
+                        {
+                            <option value="@inst.InstrumentID">@inst.InstrumentType</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => course.InstrumentID)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="SkillLevel" class="form-label">Skill Level:</label>
+                    <InputSelect id="SkillLevel" @bind-Value="course.SkillLevel" class="form-select" @oninput="SkillLevelChanged">
+                        <option value="" disabled selected>Select Skill Level</option>
+                        @foreach (var skillLevel in distinctSkillLevels)
+                        {
+                            <option value="@skillLevel">@skillLevel</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => course.SkillLevel)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="Course" class="form-label">Course:</label>
+                    @if (courses != null)
+                    {
+                        <InputSelect id="Course" @bind-Value="course.CourseID" class="form-select" @oninput="@(async (args) => await CourseChanged(args.Value.ToString()))">
+                            <option value="" disabled selected>Select Course</option>
+                            @foreach (var course in courses)
+                            {
+                                <option value="@course.CourseID">@course.Title</option>
+                            }
+                        </InputSelect>
+
+                        <ValidationMessage For="@(() => course.Title)" />
+                    }
+                    else
+                    {
+                        <p>Loading courses...</p>
+                    }
+                </div>
+
+                <div class="form-check mb-4">
+                    <input type="checkbox" class="form-check-input" id="termsAndConditions" @bind="student.TermsAndConditions" />
+                    <label class="form-check-label" for="termsAndConditions">Agree to Terms and Conditions</label>
+                </div>
+
+                <div class="col-12">
+                    <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+                    <button class="btn btn-primary">Next</button>
+                </div>
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+    </div>
+}
+else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
+{
+    <div class="container justify-content-center mt-4 mb-4">
+        <h3 class="text-center">Instructor Registration</h3>
+        <EditForm Model="@instructor" OnValidSubmit="RegisterInstructor" FormName="InstructorRegistrationForm" class="row g-3">
+            <DataAnnotationsValidator />
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="FirstName" class="form-label">First Name:</label>
+                    <InputText id="FirstName" @bind-Value="@instructor.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.FirstName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="LastName" class="form-label">Last Name:</label>
+                    <InputText id="LastName" @bind-Value="@instructor.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.LastName)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Gender" class="form-label">Gender:</label>
+                    <InputSelect id="Gender" @bind-Value="instructor.Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => instructor.Gender)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <InputText id="Phone" @bind-Value="@instructor.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.Phone)" />
+                </div>
+                <div class="mb-4">
+                    <label for="Location" class="form-label">Location:</label>
+                    <InputText id="Location" @bind-Value="instructor.Location" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.Location)" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label for="Instrument" class="form-label">Instrument:</label>
+                    <InputSelect id="Instrument" @bind-Value="instructor.InstrumentID" class="form-select">
+                        <option value="0">Select Instrument</option>
+                        @foreach (var inst in instruments)
+                        {
+                            <option value="@inst.InstrumentID">@inst.InstrumentType</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => student.InstrumentID)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="HighestMusicQualification" class="form-label">Highest Musical Qualification:</label>
+                    <InputSelect id="HighestMusicQualification" @bind-Value="instructor.HighestMusicQualification" class="form-select">
+                        <option value="">Select Highest Music Qualification</option>
+                        <option value="High School Diploma">High School Diploma</option>
+                        <option value="Post Secondary Diploma">Post Secondary Diploma</option>
+                        <option value="BA">BA</option>
+                        <option value="MSc">MSc</option>
+                        <option value="Ph D">Ph D</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => instructor.HighestMusicQualification)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="YearsOfExperience" class="form-label">Years of Experience:</label>
+                    <InputNumber id="YearsOfExperience" @bind-Value="instructor.YearsOfExperience" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.YearsOfExperience)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="ReferenceEmail" class="form-label">Reference Email:</label>
+                    <InputText id="ReferenceEmail" @bind-Value="instructor.ReferenceEmail" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.ReferenceEmail)" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="ReferencePhone" class="form-label">Reference Phone:</label>
+                    <InputText id="ReferencePhone" @bind-Value="instructor.ReferencePhone" class="form-control" />
+                    <ValidationMessage For="@(() => instructor.ReferencePhone)" />
+                </div>
+            </div>
+            <!-- Hidden field for Status -->
+            <input type="hidden" @bind="instructor.Status" />
+
+            <div class="col-12">
+                <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+                <button type="submit" @onclick="RegisterInstructor" class="btn btn-primary">Register</button>
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+    </div>
+}
+@if (user.UserTypeID == 13 && CurrentStep == 3) // Instructor
+{
+    <div class="mt-4 mb-4">
+        <h3>Instructor Registration</h3>
+        <p>Registration Successful, Click here to login.</p>
+    </div>
+}
+
+@if (user.UserTypeID == 12 && CurrentStep == 3) // Student
+{
+    <EditForm Model="@student" OnValidSubmit="@RegisterStudentAndCreatePaymentAsync" FormName="StudentPaymentForm">
+        <div class="mb-4">
+            <label for="SelectedSubscription" class="form-label">Subscription:</label>
+            <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
+                <option value="0">Select Subscription</option>
+                @if (subscriptions != null && subscriptions.Count > 0)
+                {
+                    @foreach (var sub in subscriptions)
+                    {
+                        <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
+                    }
+                }
+                else
+                {
+                    <p>No subscriptions found for CourseID: @selectedCourseID</p>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => selectedSubscriptionID)" />
+
+            @if (!string.IsNullOrEmpty(selectedSubscriptionID.ToString()) && selectedSubscriptionID.ToString() != "0" && subscriptions != null && subscriptions.Count > 0)
+            {
+                var selectedSubscription = subscriptions.FirstOrDefault(sub => sub.SubscriptionID == selectedSubscriptionID);
+
+                if (selectedSubscription != null && selectedSubscription.Amount > 0)
+                {
+                    decimal paymentAmount = selectedSubscription.Amount;
+                    string formattedPaymentAmount = paymentAmount != 0 ? string.Format("{0:C}", paymentAmount) : "0.00";
+                    <p>Please make a payment of @formattedPaymentAmount for student registration.</p>
+                }
+                else
+                {
+                    <p>Please select a subscription with a valid amount to view payment details.</p>
+                }
+            }
+            else
+            {
+                <p>Please select a valid subscription to view payment details.</p>
+            }
+
+        </div>
+
+        <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>&nbsp;&nbsp;
+        <button type="submit" class="btn btn-primary">Make Payment</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ErrorMessage
+        </div>
+    }
+}
+
+
+
+<div class="container mt-4 mb-4">
+    <div class="row">
+        <div class="col text-center">
+            <!-- Add music images here -->
+            <img src="your-music-image-1.jpg" alt="Music Image 1" class="img-fluid" />
+            <img src="your-music-image-2.jpg" alt="Music Image 2" class="img-fluid" />
+        </div>
+    </div>
+</div>
+@code {
+    int CurrentStep = 1;
+    private User user = new User();
+    private Student student = new Student();
+    private Course course = new Course();
+    private Subscription subscription = new Subscription();
+    private Instrument instrument = new Instrument();
+    private List<Instrument> instruments;
+    private List<Course> courses;
+    private List<string> skillLevels;
+    private List<Subscription> subscriptions;
+    private string ErrorMessage { get; set; } = "";
+    private List<UserType> userTypes;
+    private List<string> distinctSkillLevels = new List<string>();
+    private bool paymentSuccessful = false; // Flag to track payment status
+    private int selectedInstrumentID;
+    private int selectedSubscriptionID;
+    private int selectedCourseID = 0;
+    private Subscription selectedSubscription;
+    private Course selectedCourse = new Course();
+    [Inject] private EffizyMusicContext _context { get; set; } // Inject EffizyMusicContext
+    [Inject] private IUserService userService { get; set; }
+    [Inject] private CourseService courseService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private SubscriptionService subscriptionService { get; set; }
+    private Instructor instructor = new Instructor();
+    decimal amount = 0.00M;
+    decimal paymentAmount = 0; // Initialize paymentAmount
+    int userId = 0;
+    private int CourseID { get; set; }
+    private int PaymentID { get; set; }
+    private int StudentID { get; set; }
+    private int UserID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ErrorMessage = "";
+            userTypes = await userTypeService.GetUserTypes();
+            user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0; // Set default UserTypeID
+            instruments = await instrumentService.GetInstruments();
+            selectedInstrumentID = instruments?.FirstOrDefault()?.InstrumentID ?? 0;
+            distinctSkillLevels = await courseService.GetDistinctSkillLevels();
+            await LoadCourses(selectedInstrumentID, course.SkillLevel);
+            int selectedCourseID = 0;
+            if (course.CourseID != 0)
+            {
+                await LoadSubscriptionDetails(course.CourseID);
+            }
+            await LoadSubscriptions();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while initializing: " + ex.Message;
+        }
+    }
+
+    async Task InstrumentChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            if (int.TryParse(e.Value?.ToString(), out int instrumentID))
+            {
+                course.InstrumentID = instrumentID;
+                await LoadCourses(course.InstrumentID, course.SkillLevel);
+                await LoadSubscriptionDetails(course.CourseID); //Use the new selected course
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during instrument change: " + ex.Message;
+        }
+    }
+
+    async Task SkillLevelChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            course.SkillLevel = e.Value?.ToString();
+            await LoadCourses(course.InstrumentID, course.SkillLevel);
+            if (int.TryParse(e.Value?.ToString(), out int selectedSubscription))
+            {
+                subscription.CourseID = selectedSubscription;
+                await LoadSubscriptionDetails(subscription.CourseID); // use the new selected course
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during skill level change: " + ex.Message;
+        }
+    }
+
+    async Task LoadCourses(int instrumentID, string skillLevel)
+    {
+        try
+        {
+            courses = await courseService.GetCourses(instrumentID, skillLevel);
+            if (courses == null)
+            {
+                ErrorMessage = "No courses found.";
+            }
+            else
+            {
+                ErrorMessage = "";
+            }
+            // Load subscriptions based on the new course selection
+            if (courses != null && courses.Count > 0)
+            {
+                await LoadSubscriptionDetails(courses[0].CourseID);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while loading courses: " + ex.Message;
+        }
+    }
+
+    private async Task LoadSubscriptions()
+    {
+        try
+        {
+            var subscriptions = await subscriptionService.GetSubscriptionsByCourseID(selectedCourseID);
+            subscriptions = subscriptions.Where(s => s.CourseID == selectedCourseID).ToList();
+            this.subscriptions = subscriptions;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error loading subscriptions: " + ex.Message;
+        }
+    }
+
+    async Task CourseChanged(string courseId)
+    {
+        try
+        {
+            if (int.TryParse(courseId, out int courseID))
+            {
+                selectedCourse = await courseService.GetCourseById(courseID);
+                if (selectedCourse != null)
+                {
+                    await RegisterStudentAndPaymentAsync(paymentAmount, selectedCourse);
+                }
+                else
+                {
+                    ErrorMessage = "Invalid Course ID";
+                }
+            }
+            else
+            {
+                ErrorMessage = "Invalid Course ID";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during course change: " + ex.Message;
+        }
+    }
+
+    async Task LoadSubscriptionDetails(int courseID)
+    {
+        try
+        {
+            subscriptions = await subscriptionService.GetSubscriptionsByCourseID(courseID);
+            if (subscriptions != null && subscriptions.Count > 0)
+            {
+                selectedSubscription = subscriptions[0];
+            }
+            else
+            {
+                ErrorMessage = "No Subscriptions found for CourseID: " + courseID;
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while loading subscriptions: " + ex.Message;
+        }
+    }
+
+    void NextStep()
+    {
+        try
+        {
+            if (user.UserTypeID == 12 || user.UserTypeID == 13)
+            {
+                student.InstrumentID = selectedInstrumentID;
+                CurrentStep++;
+                if (course.CourseID != 0)
+                {
+                    LoadSubscriptionDetails(course.CourseID);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during next step: " + ex.Message;
+        }
+    }
+
+    void GoBack()
+    {
+        try
+        {
+            if (CurrentStep > 1)
+            {
+                CurrentStep--;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during going back: " + ex.Message;
+        }
+    }
+
+    async Task RegisterInstructor()
+    {
+        try
+        {
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            bool userCreated = await userService.CreateUserAsync(user);
+            if (!userCreated)
+            {
+                ErrorMessage = "Failed to create user.";
+                return;
+            }
+            instructor.UserID = user.UserID;
+            bool instructorCreated = await CreateInstructorAsync(instructor);
+            if (instructorCreated)
+            {
+                CurrentStep = 3;
+                return;
+            }
+            else
+            {
+                ErrorMessage = "Failed to create instructor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during instructor registration: " + ex.Message;
+        }
+    }
+
+    private async Task RegisterStudentAndCreatePaymentAsync()
+    {
+        try
+        {
+            decimal amount = selectedSubscription?.Amount ?? 0;
+            Course selectedCourse = selectedSubscription?.Course;
+            if (selectedCourse == null || amount <= 0)
+            {
+                ErrorMessage = "Please select a valid subscription to make a payment.";
+                return;
+            }
+            await RegisterStudentAndPaymentAsync(amount, selectedCourse);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
+        }
+    }
+
+    private async Task RegisterStudentAndPaymentAsync(decimal amount, Course selectedCourse)
+    {
+        try
+        {
+            user.Password = PasswordHasher.HashPassword(user.Password);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            bool userCreated = await userService.CreateUserAsync(user);
+            if (!userCreated)
+            {
+                ErrorMessage = "Failed to create user.";
+                return;
+            }
+            student.UserID = user.UserID;
+            bool studentCreated = await userService.CreateStudentAsync(student);
+            if (studentCreated)
+            {
+                Payment payment = new Payment
+                    {
+                        PaymentDate = DateTime.Now,
+                        PaymentMethod = "PayPal",
+                        Amount = (double)amount,
+                        PaymentStatus = "Pending",
+                        UserID = user.UserID
+                    };
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync();
+                await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
+            }
+            else
+            {
+                ErrorMessage = "Failed to create student.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
+        }
+    }
+
+    private async Task MakePayment(int courseID, int studentID, int paymentID, int userID)
+    {
+        try
+        {
+            if (selectedSubscriptionID != 0 && subscriptions != null && subscriptions.Count > 0)
+            {
+                var selectedSubscription = subscriptions.FirstOrDefault(sub => sub.SubscriptionID == selectedSubscriptionID);
+                if (selectedSubscription != null && selectedSubscription.Amount > 0)
+                {
+                    decimal paymentAmount = selectedSubscription.Amount;
+                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}";
+                    string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
+                    returnUrl = WebUtility.UrlEncode(returnUrl);
+                    cancelUrl = WebUtility.UrlEncode(cancelUrl);
+                    string paypalUrl = "https://www.sandbox.paypal.com";
+                    string business = "sb-aq647o29855470@business.example.com";
+                    string itemName = "Student Registration Payment";
+                    string currencyCode = "CAD";
+                    var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr" +
+                        $"?cmd=_xclick" +
+                        $"&business={business}" +
+                        $"&item_name={itemName}" +
+                        $"&amount={paymentAmount.ToString("0.00", CultureInfo.InvariantCulture)}" +
+                        $"&currency_code={currencyCode}" +
+                        $"&return={returnUrl}" +
+                        $"&cancel_return={cancelUrl}" +
+                        $"&address_override=1";
+                    Console.WriteLine("Redirecting to PayPal with URL: " + paypalRedirectUrl);
+                    NavigationManager.NavigateTo(paypalRedirectUrl);
+                }
+                else
+                {
+                    ErrorMessage = "Selected subscription does not have a valid amount.";
+                }
+            }
+            else
+            {
+                ErrorMessage = "Please select a valid subscription to make a payment.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during payment: " + ex.Message;
+        }
+    }
+
+    public async Task<bool> CreateInstructorAsync(Instructor instructor)
+    {
+        try
+        {
+            _context.Instructors.Add(instructor);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during instructor creation: " + ex.Message;
+            return false;
+        }
+    }
+}
+

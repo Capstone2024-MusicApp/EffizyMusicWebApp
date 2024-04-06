@@ -11,24 +11,31 @@ namespace EffizyMusicSystem.Models
     public class Course
     {
         [Key]
-        //[StringLength(10)]
         public int CourseID { get; set; }
-        [StringLength(30)]
 
         public string Title { get; set; }
 
         [StringLength(30)]
-        public string CourseMode { get; set; } = string.Empty;
-
-        [StringLength(100)]
+        public string CourseCode { get; set; } = string.Empty;
+       
         public string CourseDescription { get; set; }
-        
-        public int InstrumentID {  get; set; }
+
+        public int InstrumentID { get; set; }
+
         public int InstructorID { get; set; }
+      
+        [StringLength(30)]
+        public string SkillLevel { get; set; } = string.Empty;
+        [StringLength(30)]
+        public string EstimatedTime { get; set; } = string.Empty;
 
         public Instrument Instrument { get; set; }
 
         public Instructor Instructor { get; set; }
+
         public virtual ICollection<Module> Modules { get; set; }
+
+        public ICollection<Enrollment> Enrollments { get; set; }
+
     }
 }
