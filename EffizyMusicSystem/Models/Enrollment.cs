@@ -28,6 +28,9 @@ namespace EffizyMusicSystem.Models
 
         public int UserID { get; set; }
 
+        public string PayerID { get; set; }
+
+
         public Student Student { get; set; }
         [JsonIgnore]
         public Course Course { get; set; }
