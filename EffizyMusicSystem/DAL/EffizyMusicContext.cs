@@ -45,6 +45,8 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; } 
 
+        public virtual DbSet<QuizResult> QuizResults { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

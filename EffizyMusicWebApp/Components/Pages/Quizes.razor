@@ -48,6 +48,9 @@ else
                         <a href='/questions/@quiz.Id' class="btn btn-dark" role="button">
                             Questions
                         </a>
+                        <a href='/takeQuiz/@quiz.Id/0' class="btn btn-dark" role="button">
+                            Take Quiz
+                        </a>
                     </td>
                 </tr>
             }
@@ -58,6 +61,10 @@ else
                      TotalPages="@TotalPages"
                      onPageChange="@HandlePageChange" />
 @code {
+    
+    [Parameter]
+    public int moduleId { get; set; }
+
     protected List<Quiz> moduleQuizList = new();
     private int pageSize = 4;
     private int cp = 1;
@@ -76,9 +83,4 @@ else
     {
         cp = newPage;
     }
-}
-@code {
-    [Parameter]
-    public int moduleId { get; set; }
-
 }
