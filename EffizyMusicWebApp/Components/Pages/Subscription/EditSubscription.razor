@@ -1,0 +1,139 @@
+﻿@page "/subscription/editSubscription/{SubscriptionID:int}"
+@inject SubscriptionService subscriptionService
+@inject CourseService courseService
+@inject NavigationManager NavigationManager
+
+<h3>Edit Subscription</h3>
+
+@if (subscription == null || courses == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="@subscription" OnValidSubmit="SaveSubscription">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <select id="Description" @onchange="OnDescriptionChanged" class="form-control">
+                <option value="0" disabled selected>Select Subscription</option>
+                <option value="Monthly Payment" selected="@IsSelected("Monthly Payment")">Monthly Payment</option>
+                <option value="Full Payment" selected="@IsSelected("Full Payment")">Full Payment</option>
+            </select>
+            <ValidationMessage For="@(() => subscription.Description)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Amount">Amount:</label>
+            <input id="Amount" @bind="@subscription.Amount" class="form-control mb-3" type="number" step="0.01" />
+            <ValidationMessage For="@(() => subscription.Amount)" />
+        </div>
+
+        <div class="form-group">
+            <label for="CourseID">Course:</label>
+            <select id="CourseID" @bind="@subscription.CourseID" class="form-control mb-5">
+                <option value="0" disabled selected>Select Course</option>
+                @foreach (var course in courses)
+                {
+                    <option value="@course.CourseID">@course.Title</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => subscription.CourseID)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <p class="text-danger mt-3">@Message</p>
+        }
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int SubscriptionID { get; set; }
+
+    private SubscriptionPlan subscription = new SubscriptionPlan();
+    private List<Course> courses;
+    private List<SubscriptionPlan> subscriptions;
+    private string selectedSubscriptionDescription;
+    private string Message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        subscriptions = await subscriptionService.GetSubscriptionsAsync();
+        if (subscriptions != null)
+        {
+            var selectedSubscription = subscriptions.FirstOrDefault(s => s.SubscriptionID == SubscriptionID);
+            if (selectedSubscription != null)
+            {
+                selectedSubscriptionDescription = selectedSubscription.Description;
+                subscription = selectedSubscription;
+            }
+        }
+
+        courses = await courseService.GetCoursesAsync();
+
+        if (subscription == null)
+        {
+ 
+            NavigationManager.NavigateTo("/subscription/viewSubscriptions");
+        }
+    }
+
+    private bool IsSelected(string description)
+    {
+        return description == selectedSubscriptionDescription;
+    }
+
+    private async Task SaveSubscription()
+    {
+        Message = "";
+
+        if (string.IsNullOrEmpty(subscription.Description))
+        {
+            Message = "Please select a subscription description.";
+            return;
+        }
+
+        if (subscription.Amount <= 0)
+        {
+            Message = "Please enter a valid amount.";
+            return;
+        }
+
+        if (subscription.CourseID == 0)
+        {
+            Message = "Please select a course.";
+            return;
+        }
+
+        try
+        {
+   
+            subscription.Amount = Math.Round(subscription.Amount, 2);
+
+            await subscriptionService.UpdateSubscriptionAsync(subscription);
+            NavigationManager.NavigateTo("/subscription/viewSubscriptions");
+        }
+        catch (Exception ex)
+        {
+            Message = $"An error occurred: {ex.Message}";
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/subscription/viewSubscriptions");
+    }
+
+    private void OnDescriptionChanged(ChangeEventArgs e)
+    {
+        selectedSubscriptionDescription = e.Value.ToString();
+        subscription.Description = selectedSubscriptionDescription;
+    }
+}
