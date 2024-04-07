@@ -46,10 +46,9 @@ namespace EffizyMusicSystem.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        //public List<Instructor> GetInstructors()
-        //{
-        //    return _context.Instructors.ToList();
-        //}
+
+        //Add your methods here that directly connects to the dtabase
+
         public List<Course> GetCourseList()
         {
             return _context.Courses.ToList();
@@ -148,8 +147,6 @@ namespace EffizyMusicSystem.Services
                 .Include(x => x.UserType)
                 .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
         }
-
-        //Add other methods here that directly connect to the database
         
         #region Course
         public async Task<List<Course>> GetCourses()
@@ -171,7 +168,7 @@ namespace EffizyMusicSystem.Services
         }
 
         #endregion
-        //Add your methods here that directly connects to the dtabase
+
         #region Lesson
         
         public async Task<List<Lesson>> GetModuleLessons(int moduleId)
