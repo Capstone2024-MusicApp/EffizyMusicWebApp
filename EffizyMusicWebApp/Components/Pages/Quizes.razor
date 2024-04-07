@@ -48,6 +48,9 @@ else
                         <a href='/questions/@quiz.Id' class="btn btn-dark" role="button">
                             Questions
                         </a>
+                        <a href='/takeQuiz/@quiz.Id/0' class="btn btn-dark" role="button">
+                            Take Quiz
+                        </a>
                     </td>
                 </tr>
             }
@@ -55,14 +58,13 @@ else
     </table>
 }
 @code {
+    
+    [Parameter]
+    public int moduleId { get; set; }
+
     protected List<Quiz> moduleQuizList = new();
     protected override async Task OnInitializedAsync()
     {
         moduleQuizList = EffizyService.GetQuizes(moduleId);
     }
-}
-@code {
-    [Parameter]
-    public int moduleId { get; set; }
-
 }
