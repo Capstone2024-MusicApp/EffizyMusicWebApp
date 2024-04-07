@@ -1,0 +1,114 @@
+﻿@page "/quizResults/{quizId:int}"
+@using EffizyMusicSystem.Models
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+
+<h3>Quiz Results</h3>
+
+@if (results == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (results != null && results.Count > 0)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="alert alert-info" role="alert">
+                    <b>Total Questions:</b> @totalQuestions
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <b>Correct Answers: </b> @correctAnswers
+                </div>
+                <div class="alert alert-primary" role="alert">
+                    <b>Obtained Percentage:</b> @percentage%
+                </div>
+                <span></span>
+                <span></span>
+                <span> </span>
+            </div>
+        </div>
+    }
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                @* <th>ID</th> *@
+                <th>Question Text</th>
+                <th>Answer Choosed</th>
+                <th>Correct Choice</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (results == null || results.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">No record found.</td>
+                </tr>
+            }
+
+            @foreach (var quiz in results)
+            {
+                <tr>
+                    <td>@quiz.QuestionText</td>
+                    <td>@quiz.AnswerChoosed</td>
+                    <td>@quiz.CorrectChoice</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+
+    [Parameter]
+    public int quizId { get; set; }
+
+    protected List<ResultsViewModel> results = new();
+    public int totalQuestions = 0;
+    public int correctAnswers = 0;
+    public decimal percentage = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bool isLogin = await IsUserLogin();
+        if (isLogin == false)
+        {
+            NavigationManager.NavigateTo("/loginForm", true);
+            return;
+        }
+
+        var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
+        int userId = Convert.ToInt32(UserID.Value);
+
+        results = EffizyService.GetQuizResults(quizId, userId);
+        totalQuestions = results.Count;
+
+        for(int count = 0; count < results.Count; count++)
+        {
+            if (results[count].AnswerChoosed == results[count].CorrectChoice)
+            {
+                correctAnswers = correctAnswers + 1;
+            }
+        }
+
+        if(totalQuestions > 0)
+        {
+            percentage = Convert.ToDecimal(correctAnswers) / Convert.ToDecimal(totalQuestions) * 100;
+        }
+    }
+
+    protected async Task<bool> IsUserLogin()
+    {
+        var email = await ProtectedSessionStore.GetAsync<String>("Email");
+        if (email.Value != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
