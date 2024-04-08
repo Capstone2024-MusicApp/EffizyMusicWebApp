@@ -1,20 +1,15 @@
 ﻿using EffizyMusicSystem.Models;
 using EffizyMusicSystem.Models.DTO;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.DAL
 {
     public class EffizyMusicContext : DbContext
     {
-
         public EffizyMusicContext(DbContextOptions<EffizyMusicContext> options) : base(options)
         {
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<UserType> UserTypes { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
@@ -25,28 +20,24 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<InstructorRating> InstructorRatings { get; set; }
         public DbSet<Payment> Payments { get; set; }
-
-        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<SubscriptionPlan> Subscriptions { get; set; }
         public DbSet<Student> Students { get; set; }
-
         public DbSet<ViewLesson> ViewLessons { get; set; }
-
         public DbSet<Quiz> Quizes { get; set; }
-
-
-
+        public DbSet<QuizProgress> QuizesProgress { get; set; }
+        public DbSet<LessonProgress> LessonsProgress { get; set; }
         public DbSet<Question> Questions { get; set; }
-
         public DbSet<QuestionChoice> QuestionChoices { get; set; }
-
         public DbSet<Answer> Answers { get; set; }
-
         public DbSet<Enrollment> Enrollments { get; set; }
-        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; } 
+        public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; }
+
+        public virtual DbSet<QuizResult> QuizResults { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Quiz>(entity =>
             {
                 entity.ToTable("Quizes");
@@ -93,8 +84,75 @@ namespace EffizyMusicSystem.DAL
                     .HasConstraintName("FK_Answer_Question");
             });
 
+            modelBuilder.Entity<SubscriptionPlan>(entity =>
+            {
+                entity.ToTable("Subscriptions");
+                entity.Property(e => e.SubscriptionID)
+                    .HasColumnName("SubscriptionID")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Description)
+                    .IsRequired();
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.CourseID)
+                    .IsRequired();
+
+                entity.HasKey(e => e.SubscriptionID);
+
+                // Set up foreign key relationship
+                entity.HasOne(e => e.Course)
+                    .WithMany(c => c.Subscriptions)
+                    .HasForeignKey(e => e.CourseID)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Subscriptions_Courses");
+            });
 
             modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);
+
+            // Configure Enrollment table
+            modelBuilder.Entity<Enrollment>(entity =>
+            {
+                entity.ToTable("Enrollments");
+                entity.Property(e => e.EnrollmentID)
+                    .HasColumnName("EnrollmentID")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.StudentID)
+                    .HasColumnName("StudentID")
+                    .IsRequired();
+
+                entity.Property(e => e.CourseID)
+                    .HasColumnName("CourseID")
+                    .IsRequired();
+
+                entity.Property(e => e.EnrollmentDate)
+                    .HasColumnName("EnrollmentDate")
+                    .IsRequired();
+
+                entity.Property(e => e.ProgressStatus)
+                    .HasColumnName("ProgressStatus")
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                // Set up foreign key relationships
+                entity.HasOne(d => d.Student)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.StudentID)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Enrollments_Students");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.CourseID)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Enrollments_Courses");
+            });
         }
     }
 }

@@ -1,0 +1,74 @@
+﻿@page "/Subscription/SubscriptionForm"
+
+
+<EditForm Model="@subscription" OnValidSubmit="SaveSubscription">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Description">Description:</label>
+        <InputText id="Description" @bind-Value="@subscription.Description" class="form-control" />
+        <ValidationMessage For="@(() => subscription.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Amount">Amount:</label>
+        <InputNumber id="Amount" @bind-Value="@subscription.Amount" class="form-control" />
+        <ValidationMessage For="@(() => subscription.Amount)" />
+    </div>
+
+    <div class="form-group">
+        <label for="CourseID">Course ID:</label>
+        <InputNumber id="CourseID" @bind-Value="@subscription.CourseID" class="form-control" />
+        <ValidationMessage For="@(() => subscription.CourseID)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">@(IsEditing ? "Update" : "Create")</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? SubscriptionId { get; set; }
+
+    private SubscriptionPlan subscription = new SubscriptionPlan();
+    private bool IsEditing => SubscriptionId.HasValue && SubscriptionId.Value != 0;
+
+    [Inject]
+    private SubscriptionService SubscriptionService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEditing)
+        {
+            subscription = await SubscriptionService.GetSubscriptionByIdAsync(SubscriptionId.Value);
+        }
+    }
+
+    private async Task SaveSubscription()
+    {
+        if (IsEditing)
+        {
+            await SubscriptionService.UpdateSubscriptionAsync(subscription);
+        }
+        else
+        {
+            await SubscriptionService.AddSubscriptionAsync(subscription);
+        }
+
+        NavigateToList();
+    }
+
+    private void Cancel()
+    {
+        NavigateToList();
+    }
+
+    private void NavigateToList()
+    {
+        NavigationManager.NavigateTo("/subscription-list");
+    }
+}

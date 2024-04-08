@@ -1,5 +1,6 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
+using Microsoft.AspNetCore.Mvc;
 using EffizyMusicSystem.Models.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -171,6 +172,23 @@ namespace EffizyMusicSystem.Services
 
         #endregion
         //Add your methods here that directly connects to the dtabase
+        #region Lesson
+        
+        public async Task<List<Lesson>> GetModuleLessons(int moduleId)
+        {
+            try
+            {
+                //var less1 = await _context.Lessons.ToListAsync();
+                //var lessons1 = await _context.Lessons.Include(m => m.Module).ToListAsync();
+                var lessons = await _context.Lessons.Where(m => m.Module.ModuleID == moduleId).ToListAsync();
+                return lessons;
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            
+        }
 
         public void AddCourse(Course entity)
         {
@@ -183,6 +201,7 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+        #endregion
         #region Modules
         /// <summary>
         /// Get all modules
@@ -222,6 +241,48 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
+        
+        public async Task<Course> GetCourseByID(int id)
+        {
+            return await _context.Courses.Where(x => x.CourseID == id).FirstOrDefaultAsync();
+        }
+        public async Task<bool> AddModules(Module module)
+        {
+            try
+            {
+                if (module != null)
+                {
+                    _context.Modules.Add(module);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding module.", ex);
+            }
+        }
+
+
+        public void UpdateModule(Module entity)
+        {
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         public bool DeleteModule(int id)
         {
@@ -267,7 +328,6 @@ namespace EffizyMusicSystem.Services
                 {
                     _context.Lessons.Remove(lsn);
                     _context.SaveChanges();
-
                 }
 
                 //remove module.
@@ -285,35 +345,65 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
-        public async Task<Course> GetCourseByID(int id)
-        {
-            return await _context.Courses.Where(x => x.CourseID == id).FirstOrDefaultAsync();
-        }
-        public async Task<bool> AddModules(Module module)
+
+        #endregion
+
+        #region QuizResult
+
+        public List<QuizResult> GetQuizeResult()
         {
             try
             {
-                if (module != null)
-                {
-                    _context.Modules.Add(module);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-
+                return _context.QuizResults.ToList();
             }
-            catch (Exception ex)
+            catch
             {
-                throw new Exception("Error adding module.", ex);
+                throw;
             }
         }
 
-        
+        public void AddQuizResult(QuizResult entity)
+        {
+            try
+            {
+                _context.QuizResults.Add(entity);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        //To Update the records of a particluar QuizResult
+        public void UpdateQuizResult(QuizResult entity)
+        {
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
-       
+        public List<ResultsViewModel> GetQuizResults(int quizId, int userId)
+        {
+            var qry = from q in _context.Quizes
+                      join qr in _context.QuizResults on q.Id equals qr.QuizId
+                      join question in _context.Questions on qr.QuestionId equals question.Id
+                      join a in _context.Answers on question.Id equals a.QuestionId
+                      where q.Id == quizId && qr.UserId == userId
+                      select new ResultsViewModel
+                      {
+                          QuestionText = question.QuestionText,
+                          AnswerChoosed = qr.SelectedChoice,
+                          CorrectChoice = a.AnswerText
+                      };
+            return qry.Distinct().ToList();
+        }
+
         #endregion
 
         #region Quizes
@@ -487,7 +577,8 @@ namespace EffizyMusicSystem.Services
         {
             try
             {
-                return _context.Questions.Include(q => q.Quiz).Where(q => q.QuizId == quizId).ToList();
+                //return _context.Questions.Include(q => q.Quiz).Where(q => q.QuizId == quizId).ToList();
+                return _context.Questions.Include(q => q.QuestionChoices).Where(q => q.QuizId == quizId).ToList();
             }
             catch
             {
@@ -707,23 +798,32 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        #region Student Courses
-        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int studentID)
+        public List<QuestionnaireDTO> GetQuestionnaire(int quizID)
         {
-            return await _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where StudentID = {studentID};").ToListAsync();
+            List<QuestionnaireDTO> questionnaire =  _context.Database.SqlQuery<QuestionnaireDTO>($"EXECUTE sp_getQuestionnaire {quizID}").ToList();
+            
+            for(int i = 0; i < questionnaire.Count; i++)
+            {
+                questionnaire[i].questionChoices =  _context.QuestionChoices.Where(q => q.QuestionId == questionnaire[i].questionID).ToList();
+                questionnaire[i].answers =  _context.Answers.Where(a => a.QuestionId == questionnaire[i].questionID).ToList();
+            }
+            return questionnaire;
+        }
+        #region Student Courses
+        public async Task<List<StudentCourseDTO>> GetEnrolledCourses(int userID)
+        {
+            return await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getEnrolledCourses {userID}").ToListAsync();
         }
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
             StudentCourseDTO studentCourse;
 
-            //var enrollment = var question = _context.Questions.Include(m => m.Quiz).Where(m => m.Id == id).FirstOrDefault();
             studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
 
             studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
             return studentCourse;
-            // return _context.StudentCourseDTOs.FromSql($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseMode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID};").SingleOrDefault();
-
+            
         }
         #endregion
 

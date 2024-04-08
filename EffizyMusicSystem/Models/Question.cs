@@ -19,6 +19,9 @@ namespace EffizyMusicSystem.Models
         [JsonIgnore]
         public virtual Quiz? Quiz { get; set; } = null!;
 
+        [NotMapped]
+        public string AnswerValue { get; set; } = string.Empty;
+
         public virtual ICollection<QuestionChoice>? QuestionChoices { get; set; }
 
         public virtual ICollection<Answer>? Answers { get; set; }

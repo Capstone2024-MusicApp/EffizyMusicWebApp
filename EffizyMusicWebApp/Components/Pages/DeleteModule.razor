@@ -5,23 +5,23 @@
 <h3>Delete Module</h3>
 <hr />
 <EditForm Model="@model" OnValidSubmit="RemoveModule" FormName="delmodule">
-    <div class="form-group">
-        <h5 style="color:red">Are you sure you want to delete this module? It will delete related Lessons, Quizzes (Questions, choices, and answer) and all other related records!</h5>
-        <hr />
-        <table class="table">
-            <tbody>
-                <tr>
-                    <td><b>Module Title:</b> @model.Title</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Delete" class="btn btn-danger" />
+<div class="form-group">
+        <h5 style="color:red">Do you want to delete this moduleId? It will delete related Quizes (Questions, choices and answer) and all other related records!</h5>
+    <hr />
+    <table class="table">
+        <tbody>
+            <tr>
+                <td><b>Module Title:</b> @model.Title</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Delete" class="btn btn-danger" />
         <a class="btn btn-light" href="/modules/">
             Cancel
         </a>
-    </div>
+</div>
 </EditForm>
 @code {
     [Parameter]
@@ -33,7 +33,7 @@
     {
         //string apiUrl = "https://localhost:7164/api/Modules/GetModule/" + moduleId;
         //await Http.GetFromJsonAsync<Module>(apiUrl);
-        model = EffizyService.GetModule(moduleId);
+        model = EffizyService.GetModule(moduleId); 
     }
 
     protected async Task RemoveModule()

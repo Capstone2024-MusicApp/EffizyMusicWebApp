@@ -1,0 +1,71 @@
+﻿@page "/Subscription/ViewSubscriptions"
+@using Microsoft.AspNetCore.Components
+
+@inject SubscriptionService subscriptionService
+@inject NavigationManager NavigationManager
+
+
+<h3>Subscriptions</h3>
+
+@if (subscriptions == null)
+{
+    <p>Loading subscriptions...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subscription ID</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Course</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subscription in subscriptions)
+            {
+                <tr>
+                    <td>@subscription.SubscriptionID</td>
+                    <td>@subscription.Description</td>
+                    <td>@subscription.Amount.ToString("0.00")</td>
+                    <td>@subscription.Course.Title</td>
+                    <td>
+                        <a href="@($"subscription/editSubscription/{subscription.SubscriptionID}")" class="btn btn-primary btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => ConfirmDelete(subscription.SubscriptionID)">Delete</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+<a href="/Subscription/addSubscription" class="btn btn-success">Add New Subscription</a>
+
+@code {
+    List<SubscriptionPlan> subscriptions;
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        subscriptions = await subscriptionService.GetSubscriptionsAsync();
+    }
+
+    private async Task ConfirmDelete(int subscriptionID)
+    {
+        string message = "Are you sure you want to delete this subscription?";
+        object[] args = { message };
+        if (await JSRuntime.InvokeAsync<bool>("confirm", args))
+        {
+            await subscriptionService.DeleteSubscriptionAsync(subscriptionID);
+
+            subscriptions = await subscriptionService.GetSubscriptionsAsync();
+        }
+    }
+
+}

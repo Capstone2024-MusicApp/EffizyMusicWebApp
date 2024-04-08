@@ -34,5 +34,9 @@ namespace EffizyMusicSystem.Models
         public Instructor Instructor { get; set; }
 
         public virtual ICollection<Module> Modules { get; set; }
+
+        public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<SubscriptionPlan> Subscriptions { get; set; }
+
     }
 }

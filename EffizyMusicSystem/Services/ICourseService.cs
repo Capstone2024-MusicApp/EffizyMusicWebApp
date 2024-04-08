@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EffizyMusicSystem.Services
 {
@@ -17,5 +18,9 @@ namespace EffizyMusicSystem.Services
 
             Task<List<Instrument>> GetInstrumentsAsync();
             Task<List<Instructor>> GetInstructorsAsync();
+            Task<List<string>> GetDistinctSkillLevels();
+
+            Task<List<Course>> GetCourses(int instrumentID, string skillLevel);      
+            Task<List<Course>> GetCoursesByInstrumentAndSkillLevel(int instrumentId, string skillLevel);
     }
 }

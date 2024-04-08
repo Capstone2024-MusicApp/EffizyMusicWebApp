@@ -1,0 +1,268 @@
+﻿@page "/enrollmentConfirmation"
+@using EffizyMusicSystem.DAL;
+@using EffizyMusicSystem.Models
+@using Newtonsoft.Json
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h3>Enrollment Confirmation</h3>
+
+@if (paymentStatus == "success")
+{
+    <p class="text-success">Payment Successful!</p>
+    <p>Thank you for your enrollment.</p>
+}
+else if (paymentStatus == "cancel")
+{
+    <p class="text-warning">Payment Cancelled!</p>
+    <p>Your enrollment process was cancelled.</p>
+}
+else
+{
+    <p class="text-danger">Error occurred during payment processing.</p>
+    <p>Please try again later or contact support.</p>
+}
+
+@code {
+    [Parameter]
+    public string paymentStatus { get; set; }
+
+    [Inject]
+    private EffizyMusicContext _context { get; set; }
+
+    private string ErrorMessage = "";
+
+    [Parameter]
+    public string CourseID { get; set; }
+
+    [Parameter]
+    public string StudentID { get; set; }
+
+    [Parameter]
+    public string PaymentID { get; set; }
+
+    [Parameter]
+    public int UserID { get; set; }
+
+    private Enrollment newEnrollment;
+    private Payment payment;
+    private string payerID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            LogQueryParameters(uri); // Log the query parameters
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            paymentStatus = queryParameters.TryGetValue("paymentStatus", out var statusValues) ? statusValues.FirstOrDefault() : "";
+
+            if (paymentStatus == "success")
+            {
+                StudentID = queryParameters.TryGetValue("StudentID", out var studentIdValues) ? studentIdValues.FirstOrDefault() : "";
+                CourseID = queryParameters.TryGetValue("CourseID", out var courseIdValues) ? courseIdValues.FirstOrDefault() : "";
+                PaymentID = queryParameters.TryGetValue("PaymentID", out var paymentIdValues) ? paymentIdValues.FirstOrDefault() : "";
+                UserID = queryParameters.TryGetValue("UserID", out var userIdValues) ? int.Parse(userIdValues.FirstOrDefault()) : 0;
+
+                // Check if required parameters are not null
+                if (string.IsNullOrEmpty(StudentID) || string.IsNullOrEmpty(CourseID) || string.IsNullOrEmpty(PaymentID) || UserID == 0)
+                {
+                    ErrorMessage = "One or more required parameters are missing.";
+                    NavigationManager.NavigateTo("/error");
+                    return;
+                }
+
+                // Create a new Enrollment with the provided details
+                newEnrollment = new Enrollment
+                    {
+                        CourseID = int.Parse(CourseID),
+                        StudentID = int.Parse(StudentID),
+                        PaymentID = int.Parse(PaymentID),
+                        UserID = UserID,
+                        EnrollmentDate = DateTime.Now,
+                        ProgressStatus = "Not Started",
+                        EnrollmentStatus = "Enrolled"
+                    };
+
+                _context.Enrollments.Add(newEnrollment);
+                await _context.SaveChangesAsync();
+
+                ErrorMessage = "Enrollment status updated to Completed.";
+
+                payment = await _context.Payments.FirstOrDefaultAsync(p => p.PaymentID == int.Parse(PaymentID));
+
+                if (payment != null)
+                {
+                    // Update Payment Status to "Paid" and Address details
+                    payment.PaymentStatus = "Paid";
+                    payment.BillingAddress = ExtractBillAddressFromPayPalResponse(uri.ToString());
+                    payment.City = ExtractCityFromPayPalResponse(uri.ToString());
+                    payment.Province = ExtractProvinceFromPayPalResponse(uri.ToString());
+                    payment.PostalCode = ExtractPostalCodeFromPayPalResponse(uri.ToString());
+                    payment.Country = ExtractCountryFromPayPalResponse(uri.ToString());
+                    payment.PayerID = ExtractPayerIdFromPayPalResponse(uri.ToString()); // Update PayerID
+
+                    _context.Payments.Update(payment);
+                    await _context.SaveChangesAsync();
+
+                    ErrorMessage = "Payment status updated to Paid.";
+                }
+                else
+                {
+                    ErrorMessage = "Payment not found for PaymentID: " + PaymentID;
+                }
+            }
+            else
+            {
+                ErrorMessage = "PaymentStatus is not 'success'. Skipping enrollment creation.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error handling PayPal response: " + ex.Message;
+        }
+    }
+
+    private void LogQueryParameters(Uri uri)
+    {
+        var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+        foreach (var queryParameter in queryParameters)
+        {
+            Console.WriteLine($"Key: {queryParameter.Key}, Value: {queryParameter.Value}");
+        }
+    }
+
+    private string ExtractPayerIdFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            var payerId = queryParameters.TryGetValue("PayerID", out var payerIdValues) ? payerIdValues.FirstOrDefault() : "";
+            return payerId;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting PayerID from PayPal response: " + ex.Message;
+            return string.Empty;
+        }
+    }
+
+    private string ExtractBillAddressFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+            var billAddress = queryParameters.TryGetValue("address_line1", out var billAddressValues) ? billAddressValues.FirstOrDefault() : "";
+            // Check if address_line1 exists and is not empty
+            //if (queryParameters.ContainsKey("address_line1") && !string.IsNullOrWhiteSpace(queryParameters["address_line1"]))
+           // {
+                return billAddress;
+           // }
+
+            ErrorMessage = "Shipping address not found in PayPal response.";
+            return "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting shipping address from PayPal response: " + ex.Message;
+            return "";
+        }
+    }
+
+
+    private string ExtractCityFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParameters.ContainsKey("address_city") && !string.IsNullOrWhiteSpace(queryParameters["address_city"]))
+            {
+                return queryParameters["address_city"];
+            }
+
+            ErrorMessage = "City not found in PayPal response.";
+            return "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting city from PayPal response: " + ex.Message;
+            return "";
+        }
+
+        // Similar changes for other extraction methods
+    }
+
+    private string ExtractProvinceFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParameters.ContainsKey("address_state") && !string.IsNullOrWhiteSpace(queryParameters["address_state"]))
+            {
+                return queryParameters["address_state"];
+            }
+
+            ErrorMessage = "Province not found in PayPal response.";
+            return "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting province from PayPal response: " + ex.Message;
+            return "";
+        }
+    }
+
+    private string ExtractPostalCodeFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParameters.ContainsKey("address_zip") && !string.IsNullOrWhiteSpace(queryParameters["address_zip"]))
+            {
+                return queryParameters["address_zip"];
+            }
+
+            ErrorMessage = "Postal code not found in PayPal response.";
+            return "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting postal code from PayPal response: " + ex.Message;
+            return "";
+        }
+    }
+
+    private string ExtractCountryFromPayPalResponse(string payPalResponse)
+    {
+        try
+        {
+            var uri = new Uri(payPalResponse);
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParameters.ContainsKey("address_country") && !string.IsNullOrWhiteSpace(queryParameters["address_country"]))
+            {
+                return queryParameters["address_country"];
+            }
+
+            ErrorMessage = "Country not found in PayPal response.";
+            return "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error extracting country from PayPal response: " + ex.Message;
+            return "";
+        }
+    }
+
+}
