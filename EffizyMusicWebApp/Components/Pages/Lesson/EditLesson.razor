@@ -6,6 +6,9 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 <h3>Edit Lesson</h3>
 <hr />
 
@@ -74,9 +77,9 @@
         {           
             User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
             // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
-            if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+            if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
             {
-                NavService.NavigateTo("/NotAuthorize/");
+                NavigationManager.NavigateTo("/NotAuthorize/");
             }
             LessonData = await EffizyService.GetLessonById(LessonNumber);
             ModuleList = await EffizyService.GetModules();     

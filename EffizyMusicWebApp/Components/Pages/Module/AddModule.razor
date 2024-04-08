@@ -4,6 +4,10 @@
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 <h3>Add Module</h3>
 <hr />
 <EditForm Model="@ModuleData" OnValidSubmit="SaveModuleInfo" class="form mt-4" FormName="Add-Module">
@@ -52,12 +56,12 @@
     [SupplyParameterFromForm]
     protected Module ModuleData { get; set; } = new();
     public List<Course> CourseList = new();
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
-        if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
         {
-            NavService.NavigateTo("/NotAuthorize/");
+            NavigationManager.NavigateTo("/NotAuthorize/");
         }
         CourseList = EffizyService.GetCourseList();
     }

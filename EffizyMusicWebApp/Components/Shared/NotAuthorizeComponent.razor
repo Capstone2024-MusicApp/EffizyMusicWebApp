@@ -1,13 +1,14 @@
-﻿@Page "/NotAuthorizeComponent/"
-@inject NavigationManager NavManager
+﻿@page "/NotAuthorize/"
 <div class="text-center">
     <h3 class="display-3">Not Authorize</h3>
     <hr />
     <p class="text-danger">You are not authorize to view this area</p>
-    <button @onclick="GoToHome()">Go To Home Page</button>
+    <button @onclick="() => GoToHome()" class="btn btn-primary">Go To Home Page</button>
 </div>
 
 @code {
+    [Inject]
+    NavigationManager NavManager { get; set; }
     public void GoToHome()
     {
         NavManager.NavigateTo("/"); //Home Page

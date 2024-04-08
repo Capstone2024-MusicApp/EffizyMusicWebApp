@@ -5,8 +5,9 @@
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
 @rendermode InteractiveServer
-
-
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 
 <h3 class="text-center">Lessons List</h3>
 <hr />
@@ -82,7 +83,7 @@ else
         // Populate items with your data asynchronously
         User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
         // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
-        if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
         {
             NavService.NavigateTo("/NotAuthorize/");
         }
