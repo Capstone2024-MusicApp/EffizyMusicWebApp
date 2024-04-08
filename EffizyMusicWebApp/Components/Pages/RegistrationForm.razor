@@ -15,6 +15,8 @@
 @inject UserTypeService userTypeService
 @inject InstrumentService instrumentService
 @inject NavigationManager navigationManager
+@inject SubscriptionService subscriptionService
+@inject EffizyMusicContext _context
 @inject PayPalService PayPalService
 
 @rendermode InteractiveServer
@@ -346,12 +348,12 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     private User user = new User();
     private Student student = new Student();
     private Course course = new Course();
-    private Subscription subscription = new Subscription();
+    private SubscriptionPlan subscription = new SubscriptionPlan();
     private Instrument instrument = new Instrument();
     private List<Instrument> instruments;
     private List<Course> courses;
     private List<string> skillLevels;
-    private List<Subscription> subscriptions;
+    private List<SubscriptionPlan> subscriptions;
     private string ErrorMessage { get; set; } = "";
     private List<UserType> userTypes;
     private List<string> distinctSkillLevels = new List<string>();
@@ -360,13 +362,11 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     private int selectedSubscriptionID;
     private int selectedCourseID = 0;
     private string selectedUserType { get; set; } = "0";
-    private Subscription selectedSubscription;
+    private SubscriptionPlan selectedSubscription;
     private Course selectedCourse = new Course();
-    [Inject] private EffizyMusicContext _context { get; set; }
     [Inject] private IUserService userService { get; set; }
     [Inject] private CourseService courseService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private SubscriptionService subscriptionService { get; set; }
     private Instructor instructor = new Instructor();
     decimal amount = 0.00M;
     decimal paymentAmount = 0;
