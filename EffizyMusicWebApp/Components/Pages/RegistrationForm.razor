@@ -18,7 +18,6 @@
 @inject PayPalService PayPalService
 
 @rendermode InteractiveServer
-
 @if (CurrentStep == 1)
 {
     <div class="container justify-content-center mt-4 mb-4">
@@ -47,14 +46,14 @@
                 {
                     <div class="mb-4">
                         <label for="UserType" class="form-label">User Type:</label>
-                        <InputSelect id="UserTypeID" @bind-Value="user.UserTypeID" class="form-select">
+                        <InputSelect id="Description" @bind-Value="selectedUserType" class="form-select" @onchange="async (e) => await UserSelected(e.Value.ToString())">
                             <option value="0" disabled selected>select role</option>
                             @foreach (var userType in userTypes)
                             {
-                                <option value="@userType.UserTypeID">@userType.Description</option>
+                                <option value="@userType.Description">@userType.Description</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => user.UserTypeID)" />
+                        <ValidationMessage For="@(() => selectedUserType)" />
                     </div>
                 }
 
@@ -71,8 +70,7 @@
         }
     </div>
 }
-
-@if (user.UserTypeID == 12 && CurrentStep == 2) // Student
+@if (selectedUserType == "Student" && CurrentStep == 2)
 {
     <div class="containerd-flex justify-content-center  mt-4 mb-4">
         <h3 class="text-center">Student Registration</h3>
@@ -170,7 +168,7 @@
         }
     </div>
 }
-else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
+else if (selectedUserType == "Instructor" && CurrentStep == 2)
 {
     <div class="container justify-content-center mt-4 mb-4">
         <h3 class="text-center">Instructor Registration</h3>
@@ -218,7 +216,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
                             <option value="@inst.InstrumentID">@inst.InstrumentType</option>
                         }
                     </InputSelect>
-                    <ValidationMessage For="@(() => student.InstrumentID)" />
+                    <ValidationMessage For="@(() => instructor.InstrumentID)" />
                 </div>
 
                 <div class="mb-4">
@@ -268,7 +266,8 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         }
     </div>
 }
-@if (user.UserTypeID == 13 && CurrentStep == 3) // Instructor
+
+@if (selectedUserType == "Instructor" && CurrentStep == 3)
 {
     <div class="mt-4 mb-4">
         <h3>Instructor Registration</h3>
@@ -276,7 +275,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     </div>
 }
 
-@if (user.UserTypeID == 12 && CurrentStep == 3) // Student
+@if (selectedUserType == "Student" && CurrentStep == 3)
 {
     <EditForm Model="@student" OnValidSubmit="@RegisterStudentAndCreatePaymentAsync" FormName="StudentPaymentForm">
         <div class="mb-4">
@@ -337,8 +336,8 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     <div class="row">
         <div class="col text-center">
             <!-- Add music images here -->
-            <img src="your-music-image-1.jpg" alt="Music Image 1" class="img-fluid" />
-            <img src="your-music-image-2.jpg" alt="Music Image 2" class="img-fluid" />
+            @* <img src="your-music-image-1.jpg" alt="Music Image 1" class="img-fluid" />
+            <img src="your-music-image-2.jpg" alt="Music Image 2" class="img-fluid" /> *@
         </div>
     </div>
 </div>
@@ -356,20 +355,21 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
     private string ErrorMessage { get; set; } = "";
     private List<UserType> userTypes;
     private List<string> distinctSkillLevels = new List<string>();
-    private bool paymentSuccessful = false; // Flag to track payment status
+    private bool paymentSuccessful = false;
     private int selectedInstrumentID;
     private int selectedSubscriptionID;
     private int selectedCourseID = 0;
+    private string selectedUserType { get; set; } = "0";
     private Subscription selectedSubscription;
     private Course selectedCourse = new Course();
-    [Inject] private EffizyMusicContext _context { get; set; } // Inject EffizyMusicContext
+    [Inject] private EffizyMusicContext _context { get; set; }
     [Inject] private IUserService userService { get; set; }
     [Inject] private CourseService courseService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private SubscriptionService subscriptionService { get; set; }
     private Instructor instructor = new Instructor();
     decimal amount = 0.00M;
-    decimal paymentAmount = 0; // Initialize paymentAmount
+    decimal paymentAmount = 0;
     int userId = 0;
     private int CourseID { get; set; }
     private int PaymentID { get; set; }
@@ -382,7 +382,7 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         {
             ErrorMessage = "";
             userTypes = await userTypeService.GetUserTypes();
-            user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0; // Set default UserTypeID
+            user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0;
             instruments = await instrumentService.GetInstruments();
             selectedInstrumentID = instruments?.FirstOrDefault()?.InstrumentID ?? 0;
             distinctSkillLevels = await courseService.GetDistinctSkillLevels();
@@ -398,6 +398,11 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
         {
             ErrorMessage = "An error occurred while initializing: " + ex.Message;
         }
+    }
+    async Task UserSelected(string userType)
+    {
+        selectedUserType = userType;
+        await Task.CompletedTask;
     }
 
     async Task InstrumentChanged(ChangeEventArgs e)
@@ -523,19 +528,35 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
             ErrorMessage = "An error occurred while loading subscriptions: " + ex.Message;
         }
     }
-
     void NextStep()
     {
         try
         {
-            if (user.UserTypeID == 12 || user.UserTypeID == 13)
+            if (selectedUserType == "Student")
             {
-                student.InstrumentID = selectedInstrumentID;
-                CurrentStep++;
-                if (course.CourseID != 0)
+
+                if (CurrentStep == 1)
                 {
-                    LoadSubscriptionDetails(course.CourseID);
+                    student.InstrumentID = selectedInstrumentID;
+                    CurrentStep++;
+
+                    if (course.CourseID != 0)
+                    {
+                        LoadSubscriptionDetails(course.CourseID);
+                    }
                 }
+                else if (CurrentStep == 2)
+                {
+                    CurrentStep++;
+                }
+            }
+            else if (selectedUserType == "Instructor")
+            {
+                if (CurrentStep == 1)
+                {
+                    CurrentStep++;
+                }
+
             }
         }
         catch (Exception ex)
@@ -630,8 +651,15 @@ else if (user.UserTypeID == 13 && CurrentStep == 2) // Instructor
                         PaymentMethod = "PayPal",
                         Amount = (double)amount,
                         PaymentStatus = "Pending",
-                        UserID = user.UserID
+                        UserID = user.UserID,
+                        PayerID = "Waiting on Payment",
+                        BillingAddress = "Default Address",
+                        City = "Default City",
+                        Province = "Default Province",
+                        PostalCode = "Default Postal Code",
+                        Country = "Default Country"
                     };
+
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
                 await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
