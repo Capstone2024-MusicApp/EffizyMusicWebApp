@@ -96,9 +96,9 @@ h1:focus {
     display: block;
     text-align: left;
     border-radius: 10px;
-    width:contain;
+    width: contain;
     vertical-align: top;
-    overflow-y:scroll;
+    /*overflow-y:scroll; */
     margin: auto;
     max-height: 800px;
 }

@@ -814,32 +814,66 @@ namespace EffizyMusicSystem.Services
             return await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getEnrolledCourses {userID}").ToListAsync();
         }
 
-        public async Task<StudentCourseDTO?> GetStudentCourse(int enrollmentID)
+        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
-            List<StudentCourseDTO> studentCourseList= await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToListAsync();
-            StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
+            StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
+            //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
-            studentCourse.Modules = await _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToListAsync();
+            studentCourse.Modules =  _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
 
             studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+            studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
 
             return studentCourse;
             
         }
 
-        public async Task SetMissingLessonProgress(int enrollmentID)
+        public void SetMissingLessonProgress(int enrollmentID)
         {
             List<LessonProgress>? missingLessonProgress;
 
-            missingLessonProgress = await _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToListAsync();
+            missingLessonProgress = _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToList();
 
             foreach(LessonProgress lessonProgress in missingLessonProgress)
             {
 
-                await _context.LessonsProgress.AddAsync(lessonProgress);
-                await _context.SaveChangesAsync();
+                _context.LessonsProgress.Add(lessonProgress);
+                _context.SaveChanges();
             }    
             
+
+        }
+
+        public void setQuizProgress(int enrollmentID, int quizID, float grade, bool ignoreWhenFound)
+        {
+            QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
+            if(quizProgress == null)
+            {
+                quizProgress.EnrollmentID = enrollmentID;
+                quizProgress.QuizID = quizID;
+                quizProgress.Grade = 0;
+                _context.QuizesProgress.Add(quizProgress);
+                _context.SaveChanges();
+            }
+            else
+            {
+                if (!ignoreWhenFound)
+                {
+                    quizProgress.Grade = grade;
+
+                    _context.QuizesProgress.Update(quizProgress);
+                    _context.SaveChanges();
+                }
+            }
+
+        }
+
+
+        public void UpdateLessonProgress(LessonProgress lessonProgress)
+        {
+            _context.LessonsProgress.Update(lessonProgress);
+            _context.SaveChanges();
+
 
         }
         #endregion
