@@ -10,6 +10,12 @@ AS
 			  ,CourseCode
 			  ,e.StudentID
 			  ,ProgressStatus 
+			  ,(select count(*) from LessonsProgress lp
+				where lp.EnrollmentId = e.EnrollmentID
+				and ProgressStatus = 'COMPLETE') CompletedLessons
+			  ,(select count(*) from Modules m
+			    inner join Lessons l on m.ModuleID = l.ModuleID
+				and m.CourseID = c.CourseID) TotalLessons
 		from enrollments  e
 		inner join courses c on e.CourseID = c.CourseID
 		inner join students s on e.StudentID = s.StudentID
@@ -19,6 +25,37 @@ AS
 		IF @@ERROR <> 0 
 		BEGIN
 			RAISERROR('sp_getEnrolledCourses - Error getting enrolled courses.',16,1)
+		END
+	END
+GO
+
+CREATE OR ALTER PROCEDURE sp_getStudentCourse
+	@in_enrollmentID INT
+AS
+	DECLARE @ProcedureName VARCHAR(30) = 'sp_getStudentCourse';
+
+	BEGIN
+		select e.EnrollmentID
+			  ,c.CourseID
+			  , Title 
+			  , CourseDescription
+			  , CourseCode
+			  , StudentID
+			  , ProgressStatus 
+			  ,(select count(*) from LessonsProgress lp
+				where lp.EnrollmentId = e.EnrollmentID
+				and ProgressStatus = 'COMPLETE') CompletedLessons
+			  ,(select count(*) from Modules m
+				inner join Lessons l on m.ModuleID = l.ModuleID
+				and m.CourseID = c.CourseID) TotalLessons
+		from courses c 
+		inner join enrollments e on c.CourseId = e.CourseID 
+		where EnrollmentID = @in_enrollmentID;
+
+
+		IF @@ERROR <> 0 
+		BEGIN
+			RAISERROR('sp_getStudentCourse - Error getting student course.',16,1)
 		END
 	END
 GO
@@ -40,6 +77,28 @@ AS
 		IF @@ERROR <> 0 
 		BEGIN
 			RAISERROR('sp_getQuestionnaire - Error getting questionnaire.',16,1)
+		END
+	END
+GO
+
+CREATE OR ALTER PROCEDURE sp_getMissingLessonProgress
+	@in_enrollmentID INT
+AS
+	DECLARE @ProcedureName VARCHAR(30) = 'sp_getMissingLessonProgress';
+
+	BEGIN
+		select l.*
+		from Lessons l
+		inner join Modules m on l.ModuleID = m.ModuleID
+		inner join Courses c on m.CourseID = c.CourseID
+		inner join Enrollments e on e.EnrollmentID = c.CourseID
+		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID)
+		and e.EnrollmentID = @in_enrollmentID;
+
+
+		IF @@ERROR <> 0 
+		BEGIN
+			RAISERROR('sp_getMissingLessonProgress - Error getting missing lesson progress.',16,1)
 		END
 	END
 GO

@@ -74,34 +74,32 @@ h1:focus {
     
 }
 
-.access-course-main{
+.access-course-main {
     display: block;
-    width: 100%;
+    width: fit-content;
     min-height: max-content;
+    border-radius: 10px;
+    background: #efefef;
+    margin: auto;
+    padding:0px 30px 20px 30px;
 }
 .course-title {
     text-align: center;
-    display: block;
-    font-weight: bold;
-    font-size: 50px;
-    color: #1f1e8b;
 }
 
 .lesson-frame {
-    width: 900px;
-    display: inline-block;
-    margin-left: 20px;
+    display: block;
+    margin: auto;
 }
 
 .module-list {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: 0px;
+    display: block;
     text-align: left;
     border-radius: 10px;
-    width: 500px;
+    width:contain;
     vertical-align: top;
-    overflow:scroll;
+    overflow-y:scroll;
+    margin: auto;
     max-height: 800px;
 }
 
@@ -112,11 +110,12 @@ h1:focus {
     font-weight: 600;
 }
 
-.video-lesson-title{
-    font-weight: 600;
-    font-size: 30px;
-
+.video-lesson-title {
+    font-weight: 250;
+    font-size: 25px;
+    padding-bottom: 10px;
 }
+
 
 .feedback-container {
     display: block;
@@ -178,4 +177,9 @@ h1:focus {
     padding-top: 30px;
     color: darkslategray
 
+}
+
+.lesson-list-for-module{
+    width: 100%;
+    text-align: left;
 }

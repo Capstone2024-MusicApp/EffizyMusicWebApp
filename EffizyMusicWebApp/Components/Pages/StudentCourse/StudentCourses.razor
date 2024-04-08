@@ -9,7 +9,7 @@
 
 @inject ILogger<StudentCourses> Logger
 
-
+<div class="container">
 <h2>Courses</h2>
 <br />
 @if (availablecourses == null)
@@ -27,12 +27,12 @@ else
         }
         else
         {
-            <table class="student-course-list">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Course Mode</th>
+                        <th>Course Code</th>
                         <th>Progress</th>
                         <th>Access</th>
                     </tr>
@@ -44,7 +44,7 @@ else
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
                             <td>@course.CourseCode</td>
-                            <td>@course.ProgressStatus</td>
+                            <td>@course.CompletedLessons of @course.TotalLessons</td>
                             <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
                         }
@@ -57,7 +57,7 @@ else
         <br />
         <h3>Available Courses</h3>
         <br />
-        <table class="student-course-list">
+        <table class="table">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -81,6 +81,7 @@ else
     </div>
 }
 
+</div>
 @code {
     private List<Course>? availablecourses;
     private List<StudentCourseDTO>? enrolledCourses;

@@ -2,6 +2,7 @@
 using EffizyMusicSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using EffizyMusicSystem.Models.DTO;
+using EffizyMusicSystem.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Metadata;
 
 namespace EffizyMusicSystem.Services
 {
@@ -812,15 +814,33 @@ namespace EffizyMusicSystem.Services
             return await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getEnrolledCourses {userID}").ToListAsync();
         }
 
-        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
+        public async Task<StudentCourseDTO?> GetStudentCourse(int enrollmentID)
         {
-            StudentCourseDTO studentCourse;
+            List<StudentCourseDTO> studentCourseList= await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToListAsync();
+            StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
-            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+            studentCourse.Modules = await _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToListAsync();
 
-            studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+
             return studentCourse;
             
+        }
+
+        public async Task SetMissingLessonProgress(int enrollmentID)
+        {
+            List<LessonProgress>? missingLessonProgress;
+
+            missingLessonProgress = await _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToListAsync();
+
+            foreach(LessonProgress lessonProgress in missingLessonProgress)
+            {
+
+                await _context.LessonsProgress.AddAsync(lessonProgress);
+                await _context.SaveChangesAsync();
+            }    
+            
+
         }
         #endregion
 
