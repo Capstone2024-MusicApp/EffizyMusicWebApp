@@ -1,4 +1,5 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using EffizyMusicSystem.Utils
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">EffizyMusicWebApp</a>
     </div>
@@ -9,10 +10,17 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </NavLink>           
+        @if (User.UserTypeID == Constants.UserType_Student)
+        {
+                <NavLink class="nav-link" href="/StudentCourse/StudentCourses">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Courses
+                </NavLink>
+        }
         </div>
+        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="courses">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Courses
@@ -23,9 +31,6 @@
 
             </NavLink>
 
-            <NavLink class="nav-link" href="/StudentCourse/StudentCourses">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Courses
-            </NavLink>
             <NavLink class="nav-link" href="modules">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Modules
             </NavLink>
@@ -82,8 +87,14 @@
 @code{
     private bool collapseMenu = true;
     private bool expandSubMenu;
+    public User User = new();
 
     private string NavMenuCssClass => collapseMenu ? "collapse" : null;
+
+    private async Task OnInitializedAsync()
+    {
+       User = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+    }
 
     private void ToggleNavMenu()
     {

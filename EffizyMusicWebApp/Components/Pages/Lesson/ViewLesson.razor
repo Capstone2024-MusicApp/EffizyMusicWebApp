@@ -1,5 +1,6 @@
 ﻿@page "/ViewLesson"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @using EffizyMusicWebApp.Components.Shared
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
@@ -35,16 +36,16 @@ else
                     <td>
                         @if (lesson.LessonContent != null)
                         {
-                           @*  var base64 = Convert.ToBase64String(lesson.LessonContent);
-                            var src = $"data:video/mp4;base64,{base64}";
-                            @*  <video controls>
+                            @*  var base64 = Convert.ToBase64String(lesson.LessonContent);
+                var src = $"data:video/mp4;base64,{base64}";
+                @*  <video controls>
                 <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
                 Your browser does not support the video tag.
-                </video> 
-                            <video controls width="400px" height="300px">
-                                <source src="@src" type="video/mp4" />
-                                Your browser does not support the video tag.
-                            </video> *@
+                </video>
+                <video controls width="400px" height="300px">
+                <source src="@src" type="video/mp4" />
+                Your browser does not support the video tag.
+                </video> *@
                             @* FileName *@
                             @lesson.LessonFileName
                         }
