@@ -17,7 +17,7 @@ namespace EffizyMusicSystem.Services
             _context = context;
         }
 
-        public async Task<List<Subscription>> GetAllSubscriptions()
+        public async Task<List<SubscriptionPlan>> GetAllSubscriptions()
         {
             try
             {
@@ -30,14 +30,44 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        public async Task<List<Subscription>> GetSubscriptionsByCourseID(int courseID)
+        public async Task<List<SubscriptionPlan>> GetSubscriptionsByCourseID(int courseID)
         {
-            // Query the database to get subscriptions by courseID
             var subscriptions = await _context.Subscriptions
                                             .Where(s => s.CourseID == courseID)
                                             .ToListAsync();
 
-            return subscriptions ?? new List<Subscription>();
+            return subscriptions ?? new List<SubscriptionPlan>();
+        }
+        public async Task<List<SubscriptionPlan>> GetSubscriptionsAsync()
+        {
+            return await _context.Subscriptions.Include(s => s.Course).ToListAsync();
+        }
+
+        public async Task<SubscriptionPlan> GetSubscriptionByIdAsync(int id)
+        {
+            return await _context.Subscriptions.Include(s => s.Course).FirstOrDefaultAsync(s => s.SubscriptionID == id);
+        }
+
+        public async Task AddSubscriptionAsync(SubscriptionPlan subscription)
+        {
+            _context.Subscriptions.Add(subscription);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateSubscriptionAsync(SubscriptionPlan subscription)
+        {
+            _context.Entry(subscription).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteSubscriptionAsync(int id)
+        {
+            var subscription = await _context.Subscriptions.FindAsync(id);
+            if (subscription != null)
+            {
+                _context.Subscriptions.Remove(subscription);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
