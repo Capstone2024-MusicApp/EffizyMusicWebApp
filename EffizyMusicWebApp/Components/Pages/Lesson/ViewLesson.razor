@@ -35,21 +35,22 @@ else
                     <td>
                         @if (lesson.LessonContent != null)
                         {
-                            var base64 = Convert.ToBase64String(lesson.LessonContent);
+                           @*  var base64 = Convert.ToBase64String(lesson.LessonContent);
                             var src = $"data:video/mp4;base64,{base64}";
                             @*  <video controls>
                 <source src="data:video/mp4;base64,@(Convert.ToBase64String(lesson.LessonContent))" type="video/mp4" />
                 Your browser does not support the video tag.
-                </video> *@
+                </video> 
                             <video controls width="400px" height="300px">
                                 <source src="@src" type="video/mp4" />
                                 Your browser does not support the video tag.
-                            </video>
+                            </video> *@
                             @* FileName *@
+                            @lesson.LessonFileName
                         }
                         else
                         {
-                            <p>No video available.</p>
+                            <p>No video attached.</p>
                         }
                     </td>
                     <td>
@@ -78,6 +79,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         // Populate items with your data asynchronously
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
+        if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavService.NavigateTo("/NotAuthorize/");
+        }
         LessonList = await EffizyService.GetLessons();
     }
 

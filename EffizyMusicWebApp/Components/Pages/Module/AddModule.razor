@@ -53,6 +53,11 @@
     public List<Course> CourseList = new();
     protected override void OnInitialized()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavService.NavigateTo("/NotAuthorize/");
+        }
         CourseList = EffizyService.GetCourseList();
     }
     public async Task SaveModuleInfo()

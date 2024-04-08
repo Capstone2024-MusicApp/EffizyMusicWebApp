@@ -3,6 +3,7 @@
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavService
 @rendermode InteractiveServer
+@inject ProtectedSessionStorage ProtectedSessionStore
 <h2 class="display-3 text-center">Add Lesson</h2>
 
 <hr />
@@ -59,7 +60,7 @@
     // private byte[] videoBytes;
 
     public int ModuleId { get; set; }
-    private long maxFileSize = 10 * 1024 * 1024;
+    private long maxFileSize = 20 * 1024 * 1024;
 
     public List<Module> ModuleList = new();
 
@@ -68,6 +69,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
+        if (user.UserID == null || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavService.NavigateTo("/NotAuthorize/");
+        }
         ModuleList = await EffizyService.GetModules();
     }
     public async void SaveLessonInfo()
@@ -102,10 +109,8 @@
                 // Assign the byte array to the LessonContent property
                 LessonData.LessonContent = videoBytes;
             }
-            // var buffer = new byte[file.Size];
-            // await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
-            // LessonData.LessonContent = buffer;
 
+            LessonData.LessonFileName = e.File.Name;
         }
     }
 
