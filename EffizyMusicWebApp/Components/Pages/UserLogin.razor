@@ -44,7 +44,7 @@
 
     [SupplyParameterFromForm]
     protected User user { get; set; }
-    
+
     /* rotected Student student { get; set; } */
 
     protected override void OnInitialized() => user ??= new();
@@ -67,8 +67,8 @@
                 await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
                 // await ProtectedSessionStore.SetAsync("FirstName", student.FirstName);
                 // await ProtectedSessionStore.SetAsync("LastName", user.LastName);
-                await ProtectedSessionStore.SetAsync("User", user);
-                var model = await ProtectedSessionStore.GetAsync<User>("User");
+                // await ProtectedSessionStore.SetAsync("User", user);
+                // var model = await ProtectedSessionStore.GetAsync<User>("User");
 
                 //You can get values from session from any other page, e.g
                 var email = await ProtectedSessionStore.GetAsync<String>("Email");
@@ -76,13 +76,15 @@
                 var UserTypeID = await ProtectedSessionStore.GetAsync<int>("UserTypeID");
                 // var FirstName = await ProtectedSessionStore.GetAsync<String>("FirstName");
                 // var LastName = await ProtectedSessionStore.GetAsync<String>("LastName");
+
                 //Redirect to specific page.
                 NavigationManager.NavigateTo("/", true);
-                
+
             }
             else
             {
-                ErrorMessage = "Login failed.";
+                ErrorMessage = "Email and/or Password is incorrect.";
+                user = new User();
             }
         }
         catch (Exception ex)
