@@ -13,6 +13,8 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ModuleID { get; set; }
         public string Title { get; set; }
+
+        public int ModuleOrder { get; set; } = 0;
         public virtual Course Course { get; set; }
         public virtual ICollection<Lesson> Lessons { get; set; }
 
