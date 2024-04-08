@@ -1,7 +1,7 @@
 ﻿@using EffizyMusicSystem.Utils
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">EffizyMusicWebApp</a>
+        <a class="navbar-brand" href="">Effizy Music Application</a>
     </div>
 </div>
 
@@ -18,44 +18,42 @@
                 <NavLink class="nav-link" href="/StudentCourse/StudentCourses">
                     <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Courses
                 </NavLink>
+                <NavLink class="nav-link" href="RateInstructor">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Rate An Instructor
+                </NavLink>
         }
         </div>
+        <NavLink class="nav-link" href="profile">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Profile
+        </NavLink>
+        <NavLink class="nav-link" href="courses">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Courses
+        </NavLink>
+        <NavLink class="nav-link" href="modules">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Modules
+        </NavLink>
         
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="courses">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Courses
-            </NavLink>
+          
+        <NavLink class="nav-link" href="ViewLesson">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> View Lesson
+        </NavLink>
 
             <NavLink class="nav-link" href="paymenthistory">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Payment History
-
             </NavLink>
 
-            <NavLink class="nav-link" href="modules">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Modules
-            </NavLink>
-            <NavLink class="nav-link" href="registrationForm">
+            
+            @* <NavLink class="nav-link" href="registrationForm">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Register
-            </NavLink>
-            <NavLink class="nav-link" href="profile">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Profile
-            </NavLink>
-            <NavLink class="nav-link" href="RateInstructor">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Rate An Instructor
-            </NavLink>
+            </NavLink> *@
+            
+           
             <NavLink class="nav-link" href="/feedback">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Feedback
             </NavLink>
             <NavLink class="nav-link" href="/AddLesson">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Add Lesson
             </NavLink>
-        </div>
-        <div class="nav-item px-3">
-
-            <NavLink class="nav-link" href="ViewLesson">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> View Lesson
-            </NavLink>
-        </div>
        @*  <div class="nav-item px-3">           
             <NavLink class="nav-item" href="" @onclick="()=>expandSubMenu = !expandSubMenu">Module</NavLink>
 
