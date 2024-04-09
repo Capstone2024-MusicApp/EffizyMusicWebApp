@@ -12,9 +12,11 @@ namespace EffizyMusicSystem.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ModuleID { get; set; }
+        [Required(ErrorMessage = "Title is required"), MaxLength(255)]
         public string Title { get; set; }
 
         public int ModuleOrder { get; set; } = 0;
+        [Required(ErrorMessage = "Course Selection is Required")]
         public virtual Course Course { get; set; }
         public virtual ICollection<Lesson> Lessons { get; set; }
 
