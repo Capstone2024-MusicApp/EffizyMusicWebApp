@@ -1,41 +1,49 @@
 ﻿@page "/StudentCourse/AccessCourse/{EnrollmentID:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
+@using EffizyMusicSystem.Utils
 
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
 
 
+<script>
+    function loadVideo() {
+        document.getElementById("videoTagId").load();
+    }
+</script>
+
 <br />
-<br />
+
 <div class="access-course-main">
-    <label class="course-title">@studentCourse.Title</label>
-    <br /> 
-    <br />
+    <h1 class="course-title">@studentCourse.Title</h1>
+    <label style="text-align: center; margin: auto; display: block;"> @studentCourse.CourseDescription</label>
     <br />
     <br />
     <div class="lesson-frame">
         @if (DisplayLesson)
         {
+
+
+            <label class="video-lesson-title">@selectedModule.Title - @selectedLesson.Title </label>
+            <br />
             @if (selectedLesson.LessonContent != null)
             {
                 var base64 = Convert.ToBase64String(selectedLesson.LessonContent);
                 var src = $"data:video/mp4;base64,{base64}";
 
-                <video controls="controls" width="800px" height="600px">
+                <video controls="controls" height="600px" id="videoTagId">
                     <source src="@src" type="video/mp4" />
                 </video>
             }
             else
             {
-                <p>No video available.</p>
+                <video controls="controls" height="600px" id="videoTagId">
+                </video>
             }
             <br />
             <br />
-
-            <label class="video-lesson-title">@selectedLesson.Title</label>
-            <br />
-            <label><b>Course Description: </b>@studentCourse.CourseDescription</label>
         }
         else
         {
@@ -43,13 +51,13 @@
             <br />
             <br />
             int questionNumber = 1;
-            @foreach(var question in quesionnaire)
+            @foreach (var question in quesionnaire)
             {
-                
+
                 <label>@questionNumber. @question.questionText</label>
                 <br />
                 <InputRadioGroup Name="selectedQuiz" @bind-Value="@testString">
-                    @foreach(var choice in question.questionChoices)
+                    @foreach (var choice in question.questionChoices)
                     {
                         <InputRadio @bind-Value="choice.ChoiceText" />  <label> - @choice.ChoiceText</label>
                         <br />
@@ -65,43 +73,93 @@
 
 
     <div class="module-list">
-        <Accordion AlwaysOpen="false" >
+        <Accordion AlwaysOpen="false">
             @foreach (var module in studentCourse.Modules)
             {
-                <AccordionItem>
-                    <TitleTemplate>
-                        <Icon Name="IconName.MusicNote" Class="me-1" />
-                        @module.Title
-                    </TitleTemplate>
-                    <Content>
-                        <table>
-                            @foreach(var lesson in module.Lessons)
+                @if (module.ModuleID == selectedModule.ModuleID)
+                {
+                    <AccordionItem IsActive="true">
+                        <TitleTemplate>
+                            <Icon Name="IconName.MusicNote" Class="me-1" />
+                            <b>@module.Title</b>
+                        </TitleTemplate>
+                        <Content>
+                            @foreach (var lesson in module.Lessons)
                             {
-                                <tr>
-                                    <td class="lesson-title">
-                                        @if(selectedLesson.LessonNumber == lesson.LessonNumber)
-                                        {
+                                string progressStatus;
+                                LessonProgress lessonProgress = new LessonProgress();
+                                lessonProgress = studentCourse.LessonProgress.Where(x => x.LessonID == lesson.LessonNumber).FirstOrDefault() ?? new LessonProgress();
+                                progressStatus = lessonProgress.ProgressStatus ?? Constants.ProgressStatus_NotStarted;
 
-                                            <Button Class="accordion-item "  Style="background-color: yellowgreen;" @onclick="() => UpdateLesson(lesson)">Lesson - @lesson.Title </Button>
-                                        }
-                                        else
-                                        {
-                                        <Button Class="accordion-item" @onclick="() => UpdateLesson(lesson)">Lesson - @lesson.Title </Button>
-                                        }
-                                    </td>
-                                 </tr>
+                                <div style="margin-bottom: 8px;">
+                                    @if (selectedLesson.LessonNumber == lesson.LessonNumber)
+                                    {
+
+                                        <Button class="accordion-item  lesson-list-for-module" Style="background-color: #eeeeee;" @onclick="() => UpdateLesson(lesson)">
+                                            @lesson.Title - <i>@progressStatus</i>
+                                        </Button>
+                                    }
+                                    else
+                                    {
+                                        <Button Class="accordion-item lesson-list-for-module" @onclick="() => UpdateLesson(lesson)">@lesson.Title - <i>@progressStatus</i> </Button>
+                                    }
+                                </div>
                             }
                             @foreach (var quiz in module.Quizzes)
                             {
-                                <tr>
-                                    <td class="lesson-title"><Button Class="accordion-item btn-info" @onclick="() => selectQuiz(quiz)"><i>Quiz</i> - @quiz.QuizTitle</Button></td>
-                                 </tr>
+                                <div style="margin-bottom: 5px;">
+                                    <Button Class="accordion-item lesson-list-for-module" @onclick="() => selectQuiz(quiz)"><i>Quiz</i> - @quiz.QuizTitle</Button>
+
+                                    </div>
                             }
-                        </table>
-                    </Content>
-                </AccordionItem>
+                        </Content>
+                    </AccordionItem>
+                }
+                else
+                {
+                    <AccordionItem>
+                        <TitleTemplate>
+                            <Icon Name="IconName.MusicNote" Class="me-1" />
+                            <b>@module.Title</b>
+                        </TitleTemplate>
+                        <Content>
+                            @foreach (var lesson in module.Lessons)
+                            {
+
+                                string progressStatus;
+                                LessonProgress lessonProgress = new LessonProgress();
+                                lessonProgress = studentCourse.LessonProgress.Where(x => x.LessonID == lesson.LessonNumber).FirstOrDefault() ?? new LessonProgress();
+                                progressStatus = lessonProgress.ProgressStatus ?? Constants.ProgressStatus_NotStarted;
+                                
+                                <div style="margin-bottom: 8px;">
+                                    @if (selectedLesson.LessonNumber == lesson.LessonNumber)
+                                    {
+
+                                        <Button class="accordion-item  lesson-list-for-module" Style="background-color: #eeeeee;" @onclick="() => UpdateLesson(lesson)">
+                                            @lesson.Title - <i>progressStatus</i>
+                                        </Button>
+                                    }
+                                    else
+                                    {
+                                        <Button Class="accordion-item lesson-list-for-module" @onclick="() => UpdateLesson(lesson)">@lesson.Title - <i>@progressStatus</i> </Button>
+                                    }
+                                </div>
+
+                            }
+                            @foreach (var quiz in module.Quizzes)
+                            {
+                                <div style="margin-bottom: 5px;">
+                                    <Button Class="accordion-item lesson-list-for-module" @onclick="() => selectQuiz(quiz)"><i>Quiz</i> - @quiz.QuizTitle</Button>
+
+                                    </div>
+                            }
+                        </Content>
+                    </AccordionItem>
+                }
+
+
             }
-            
+
         </Accordion>
 
     </div>
@@ -114,6 +172,7 @@
 
     public StudentCourseDTO? studentCourse;
     public Lesson selectedLesson = new Lesson();
+    public Module selectedModule = new Module();
     public List<QuestionnaireDTO>? quesionnaire;
     public Quiz selectedQuiz = new Quiz();
 
@@ -121,18 +180,46 @@
     public String? testString;
     public Boolean DisplayLesson { get; set; } = true;
 
+    private void setSelectedModule(int LessonNumber)
+    {
+        Boolean moduleFound = false;
+        foreach (Module module in studentCourse.Modules)
+        {
+            foreach (Lesson lesson in module.Lessons)
+            {
+                if (lesson.LessonNumber == LessonNumber)
+                {
+                    selectedModule = module;
+                    moduleFound = true;
+                    break;
+                }
+            }
+
+            if (moduleFound)
+            {
+                break;
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
+        await EffizyService.SetMissingLessonProgress(EnrollmentID);
+        studentCourse = await EffizyService.GetStudentCourse(EnrollmentID);
         selectedLesson = studentCourse.Modules.First().Lessons.First();
+        setSelectedModule(selectedLesson.LessonNumber);
         lessonTitle = studentCourse.Modules.First().Lessons.First().Title;
     }
 
-    public void UpdateLesson(Lesson lesson)
+
+
+    public async Task UpdateLesson(Lesson lesson)
     {
         selectedLesson = lesson;
+        setSelectedModule(lesson.LessonNumber);
         DisplayLesson = true;
+
+        await JsRuntime.InvokeVoidAsync("loadVideo");
     }
 
     public void selectQuiz(Quiz quiz)

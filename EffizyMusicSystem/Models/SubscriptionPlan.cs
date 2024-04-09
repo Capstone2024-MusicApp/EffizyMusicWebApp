@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.Models
 {
-    public class Subscription
+    [Table("Subscriptions")]
+    public class SubscriptionPlan
     {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SubscriptionID { get; set; }
         [Required]
         public string Description { get; set; }

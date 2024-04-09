@@ -20,14 +20,12 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<InstructorRating> InstructorRatings { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<SubscriptionPlan> Subscriptions { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<ViewLesson> ViewLessons { get; set; }
         public DbSet<Quiz> Quizes { get; set; }
         public DbSet<QuizProgress> QuizesProgress { get; set; }
         public DbSet<LessonProgress> LessonsProgress { get; set; }
-
-
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionChoice> QuestionChoices { get; set; }
         public DbSet<Answer> Answers { get; set; }
@@ -86,10 +84,32 @@ namespace EffizyMusicSystem.DAL
                     .HasConstraintName("FK_Answer_Question");
             });
 
-            modelBuilder.Entity<Subscription>(entity =>
+            modelBuilder.Entity<SubscriptionPlan>(entity =>
             {
+                entity.ToTable("Subscriptions");
+                entity.Property(e => e.SubscriptionID)
+                    .HasColumnName("SubscriptionID")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Description)
+                    .IsRequired();
+
                 entity.Property(e => e.Amount)
-                    .HasColumnType("decimal(18,2)");
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.CourseID)
+                    .IsRequired();
+
+                entity.HasKey(e => e.SubscriptionID);
+
+                // Set up foreign key relationship
+                entity.HasOne(e => e.Course)
+                    .WithMany(c => c.Subscriptions)
+                    .HasForeignKey(e => e.CourseID)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Subscriptions_Courses");
             });
 
             modelBuilder.Entity<StudentCourseDTO>().HasNoKey().ToView(null);

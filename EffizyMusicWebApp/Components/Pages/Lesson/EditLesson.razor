@@ -27,12 +27,13 @@
             <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon>
             @if (LessonData.LessonContent != null)
         {
-            <p>File Name: @GetFileNameFromContent(LessonData.LessonContent)</p>           
+            <p>File Name: @LessonData.LessonFileName</p>           
         }
         else
         {
             <p>No file uploaded</p>
         }
+            <ValidationMessage For="@(() => LessonData.LessonContent)" />
     </div> 
     <div class="form-group">
         <label>Module</label>
@@ -42,6 +43,7 @@
                 <option value="@module">@module.Title</option>
             }
         </select>
+            <ValidationMessage For="@(() => LessonData.Module)" />
     </div>
 
     <div class="mt-4">
@@ -98,10 +100,6 @@
         SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
     }
 
-    private string GetFileNameFromContent(byte[] lessonContent)
-    {
-        return "example_filename.txt";
-    }
     public async Task RemoveLesson()
     {
         try

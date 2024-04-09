@@ -6,7 +6,9 @@
 
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
 @inject ILogger<StudentCourses> Logger
+
 
 <h2>Courses</h2>
 <br />
@@ -16,73 +18,66 @@
 }
 else
 {
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h3>Your Enrolled Courses</h3>
-                <br />
-                @if (enrolledCourses == null || enrolledCourses.Count == 0)
-                {
-                    <p><em>No enrolled courses.</em></p>
-                }
-                else
-                {
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Course Mode</th>
-                                <th>Progress</th>
-                                <th>Access</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var course in enrolledCourses)
-                            {
-                                <tr>
-                                    <td>@course.Title</td>
-                                    <td>@course.CourseDescription</td>
-                                    <td>@course.CourseCode</td>
-                                    <td>@course.ProgressStatus</td>
-                                    <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <br />
-                <br />
-                <br />
-                <h3>Available Courses</h3>
-                <br />
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Course Code</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var course in availablecourses)
+    <div class="main-student-course">
+        <h3>Your Enrolled Courses</h3>
+        <br />
+        @if(enrolledCourses == null)
+        {
+            <p><em>No enrolled courses.</em></p>
+        }
+        else
+        {
+            <table class="student-course-list">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Course Mode</th>
+                        <th>Progress</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        @foreach (var course in enrolledCourses)
                         {
-                            <tr>
-                                <td>@course.Title</td>
-                                <td>@course.CourseDescription</td>
-                                <td>@course.CourseCode</td>
-                                <td><a href="">View Course</a></td>
-                            </tr>
+                        <tr>
+                            <td>@course.Title</td>
+                            <td>@course.CourseDescription</td>
+                            <td>@course.CourseCode</td>
+                            <td>@course.ProgressStatus</td>
+                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                        </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                </tbody>
+            </table>
+        }
+
+        <br />
+        <br />
+        <br />
+        <h3>Available Courses</h3>
+        <br />
+        <table class="student-course-list">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Course Code</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                    @foreach (var course in availablecourses)
+                    {
+                    <tr>
+                        <td>@course.Title</td>
+                        <td>@course.CourseDescription</td>
+                        <td>@course.CourseCode</td>
+                        <td><a href="">View Course</a></td>
+                    </tr>
+                    }
+            </tbody>
+        </table>
     </div>
 }
 
@@ -90,7 +85,9 @@ else
     private List<Course>? availablecourses;
     private List<StudentCourseDTO>? enrolledCourses;
 
+
     private User user = new User();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,7 +95,7 @@ else
 
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
-        if (String.IsNullOrEmpty(user.UserID.ToString()))
+        if(String.IsNullOrEmpty(user.UserID.ToString()))
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
         }
@@ -107,4 +104,7 @@ else
             enrolledCourses = await EffizyService.GetEnrolledCourses(user.UserID);
         }
     }
+
+    
+
 }
