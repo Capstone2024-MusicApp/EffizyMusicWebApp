@@ -26,12 +26,13 @@
 </h5>
 <br />
 <div class="progress">
-    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 50%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: @percentage%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
 <div style="float: left">Not started</div>
 <div style="float: right">Completed</div>
 <div style="margin: 0 auto; width: 100px;">In Progress</div>
 <hr />
+
 <h3>Lessons List</h3>
 <table class="table table-striped align-middle table-bordered">
     <thead class="table-success">
@@ -73,10 +74,12 @@
     public List<EffizyMusicSystem.Models.Lesson> LessonList { get; set; } = new();
     public EffizyMusicSystem.Models.Module module = new EffizyMusicSystem.Models.Module();
 
+    int percentage = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        bool isLogin = await IsUserLogin();        if(!isLogin)
+        bool isLogin = await IsUserLogin();
+        if(!isLogin)
         {
             //Redirect to specific page.
             NavigationManager.NavigateTo("/loginForm", true);
@@ -86,6 +89,34 @@
         LessonList = await EffizyService.GetModuleLessons(moduleId);
 
         module = EffizyService.GetModule(moduleId);
+
+        //Below code is to show progess bar percentage.
+        var userId = await ProtectedSessionStore.GetAsync<int>("UserID");
+
+        int loginUserId = userId.Value;
+        //If user has record in ViewLesson table then it means he has started the lessons and percentage will be in progress, i.e 50%
+        var viewLessons = await EffizyService.GetUserLessons(loginUserId);
+        if (viewLessons != null && viewLessons.Count > 0)
+        {
+            percentage = 50;
+
+            //if user has done all quizzes, then progress will be completed.
+            var quizes = EffizyService.GetQuizes();
+            if (quizes != null && quizes.Count > 0)
+            {
+                percentage = 100;
+                foreach (var quiz in quizes)
+                {
+                    //if user has attempted the quiz, then QuizResult table should have record for it.
+                    var quizResult = EffizyService.GetQuizeResult(quiz.Id, loginUserId);
+                    if (quizResult == null || quizResult.Count == 0)
+                    {
+                        percentage = 50;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     protected async Task<bool> IsUserLogin()
