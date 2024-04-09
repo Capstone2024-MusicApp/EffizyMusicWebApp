@@ -19,5 +19,6 @@ namespace EffizyMusicSystem.Models
         public virtual ICollection<Lesson> Lessons { get; set; }
 
         public virtual ICollection<Quiz> Quizzes { get; set; }
+
     }
 }
