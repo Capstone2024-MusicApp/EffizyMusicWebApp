@@ -1,90 +1,122 @@
-﻿<div class="my-5">
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Your head content here -->
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Raleway', sans-serif !important;
+            overflow-x: hidden;
+        }
 
-    <footer class="text-white text-center text-lg-start bg-primary">
-        <!-- Grid container -->
-        <div class="container p-4">
-            <!--Grid row-->
-            <div class="row mt-4">
-                <!--Grid column-->
-                <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
-                    <h5 class="text-uppercase mb-4">About company</h5>
+        .my-5 {
+            margin-bottom: 0 !important;
+            flex: 1;
+        }
 
-                    <p>
-                        Efizzy Music Company
-                    </p>
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #dcdcdc; /* Changed to a slightly darker shade */
+            color: black; /* Text color for the footer */
+            padding:-bottom 20px; /* Added padding for better spacing */
+            border-top: 1px solid #f4f4f4; /* Added border-top */
+            font-size: 13px; /* Reduced font size */
+            text-align: center; /* Center align text */
+        }
 
-                    <div class="mt-4">
-                        
-                        <a>
-                            <Icon Name="IconName.Facebook" Size="IconSize.x2" Color="IconColor.White" />
-                           
-                        </a>
-                        <a>
-                            <Icon Name="IconName.Instagram" Size="IconSize.x2" Color="IconColor.White" />
-                        </a>
-                        <a>
-                            <Icon Name="IconName.Linkedin" Size="IconSize.x2" Color="IconColor.White" />
-                        </a>
-                        <a>
-                            <Icon Name="IconName.TwitterX" Size="IconSize.x2" Color="IconColor.White" />
-                        </a>
+        .col-lg-4 {
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 0 15px;
+            width: 25% !important;
+            background-color: #dcdcdc !important;
+        }
+
+        .custom-table {
+            background-color: #dcdcdc; /* Set table background color */
+        }
+
+        /* Other styles remain the same */
+    </style>
+</head>
+<body>
+    <div class="my-5">
+        <footer class="text-dark text-center text-lg-start">
+            <div class="container p-4">
+                <div class="row mt-4">
+                    <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
+                        <h5 class="text-uppercase mb-4">About company</h5>
+                        <p>
+                            Efizzy Music Company
+                        </p>
+                        <div class="mt-4">
+                            <a>
+                                <Icon Name="IconName.Facebook" Size="IconSize.x2" Color="IconColor.Dark" />
+                            </a>
+                            <a>
+                                <Icon Name="IconName.Instagram" Size="IconSize.x2" Color="IconColor.Dark" />
+                            </a>
+                            <a>
+                                <Icon Name="IconName.Linkedin" Size="IconSize.x2" Color="IconColor.Dark" />
+                            </a>
+                            <a>
+                                <Icon Name="IconName.TwitterX" Size="IconSize.x2" Color="IconColor.Dark" />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                        <ul class="fa-ul" style="margin-left: 1.65em;">
+                            <li class="mb-3 p-2">
+                                <span class="fa-li">
+                                    <Icon Name="IconName.Building" Size="IconSize.x2" Color="IconColor.Dark" />
+                                </span><span class="ms-2">Edmonton, AB</span>
+                            </li>
+                            <li class="mb-3 p-2">
+                                <span class="fa-li">
+                                    <Icon Name="IconName.FilePerson" Size="IconSize.x2" Color="IconColor.Dark" />
+                                </span><span class="ms-2">info@EfizzyMusic.com</span>
+                            </li>
+                            <li class="mb-3 p-2">
+                                <span class="fa-li">
+                                    <Icon Name="IconName.Phone" Size="IconSize.x2" Color="IconColor.Dark" />
+                                </span><span class="ms-2">+ 01 234 567 88</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase mb-4">Opening hours</h5>
+                        <table class="table text-center custom-table">
+                            <tbody class="font-weight-normal">
+                                <tr>
+                                    <td>Mon - Thu:</td>
+                                    <td>8am - 9pm</td>
+                                </tr>
+                                <tr>
+                                    <td>Fri - Sat:</td>
+                                    <td>8am - 1am</td>
+                                </tr>
+                                <tr>
+                                    <td>Sunday:</td>
+                                    <td>9am - 10pm</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <!--Grid column-->
-                <!--Grid column-->
-                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">                    
-
-                    <ul class="fa-ul" style="margin-left: 1.65em;">
-                        <li class="mb-3 p-2">
-                            <span class="fa-li">
-                                <Icon Name="IconName.Building" Size="IconSize.x2" Color="IconColor.White" />
-                            </span><span class="ms-2">Edmonton, AB</span>
-                        </li>
-                        <li class="mb-3 p-2">
-                            <span class="fa-li">
-                                <Icon Name="IconName.FilePerson" Size="IconSize.x2" Color="IconColor.White" />
-                                </span><span class="ms-2">info@EfizzyMusic.com</span>
-                        </li>
-                        <li class="mb-3 p-2">
-                            <span class="fa-li">
-                                <Icon Name="IconName.Phone" Size="IconSize.x2" Color="IconColor.White" />
-                            </span><span class="ms-2">+ 01 234 567 88</span>
-                        </li>
-                    </ul>
-                </div>
-                <!--Grid column-->
-                <!--Grid column-->
-                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-uppercase mb-4">Opening hours</h5>
-
-                    <table class="table text-center text-white">
-                        <tbody class="font-weight-normal">
-                            <tr>
-                                <td>Mon - Thu:</td>
-                                <td>8am - 9pm</td>
-                            </tr>
-                            <tr>
-                                <td>Fri - Sat:</td>
-                                <td>8am - 1am</td>
-                            </tr>
-                            <tr>
-                                <td>Sunday:</td>
-                                <td>9am - 10pm</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--Grid column-->
             </div>
-            <!--Grid row-->
-        </div>
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">            
-            <p class="text-center">&copy; <span id="currentYear"></span> Efizzy Music Application. All Rights Reserved.</p>
-        </div>
-    </footer>
-
+            <div class="text-center p-3">
+                <p class="text-center m-0">&copy; <span id="currentYear"></span> Efizzy Music Application. All Rights Reserved.</p>
+            </div>
+        </footer>
     </div>
-<script>
-    // JavaScript to set the current year dynamically
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-</script>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
