@@ -16,6 +16,6 @@ namespace EffizyMusicSystem.Models
 
         public int LessonID { get; set; }
 
-        public required string ProgressStatus { get; set; }
+        public  string ProgressStatus { get; set; }
     }
 }

@@ -12,11 +12,13 @@
 
 <hr />
     <EditForm Model="@LessonData" OnValidSubmit="SaveLessonInfo" FormName="Add-Lesson">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="form-outline mt-2">
                 <label for="title" class="form-label">Lesson Title:</label>
                 <InputText @bind-Value="LessonData.Title" class="form-control"></InputText>
+                <ValidationMessage For="@(() => LessonData.Title)" />
             </div>
             <div class="form-outline mt-2">
                 <label for="lessonMode" class="form-label">Lesson Mode:</label>
@@ -26,7 +28,7 @@
                 <label for="content" class="form-label">Lesson Content:</label>
                 <Icon Name="IconName.Upload"></Icon> Upload your Lesson
                 <InputFile OnChange="@HandleFileSelected" />
-
+                <ValidationMessage For="@(() => LessonData.LessonContent)" />
             </div> 
             <div class="form-outline mt-2">
                 <label for="module" class="form-label">Choose Module:</label>
@@ -38,7 +40,7 @@
                     }
                 </select>
 
-                @* <ValidationMessage For="@(() => ModuleData.Course)" /> *@
+                 <ValidationMessage For="@(() => LessonData.Module)" /> 
                 @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
             </div>
             <button type="submit" class="btn btn-primary mt-4">Add Lesson</button>
