@@ -161,6 +161,15 @@ namespace EffizyMusicSystem.Services
         }
         public async Task DeleteCourse(int id)
         {
+            var modulesToDelete = _context.Modules.Where(x=>x.Course.CourseID == id).ToList();
+            if(modulesToDelete != null)
+            {
+                foreach (var data in modulesToDelete)
+                {
+                    DeleteModule(data.ModuleID);
+                }
+            }
+            
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
