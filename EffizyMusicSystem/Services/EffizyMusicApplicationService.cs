@@ -189,6 +189,20 @@ namespace EffizyMusicSystem.Services
             
         }
 
+        public async Task<List<ViewLesson>> GetUserLessons(int userId)
+        {
+            try
+            {
+                var lessons = await _context.ViewLessons.Where(m => m.UserID == userId).ToListAsync();
+                return lessons;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
         public void AddCourse(Course entity)
         {
             try
@@ -361,6 +375,17 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<QuizResult> GetQuizeResult(int quizId, int userId)
+        {
+            try
+            {
+                return _context.QuizResults.Where(q => q.QuizId == quizId && q.UserId == userId).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public void AddQuizResult(QuizResult entity)
         {
             try
