@@ -9,78 +9,79 @@
 
 @inject ILogger<StudentCourses> Logger
 
+<div class="container">
+    <h2>Courses</h2>
+    <br />
+    @if (availablecourses == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="main-student-course">
+            <h3>Your Enrolled Courses</h3>
+            <br />
+            @if (enrolledCourses == null)
+            {
+                <p><em>No enrolled courses.</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Course Code</th>
+                            <th>Progress</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in enrolledCourses)
+                        {
+                            <tr>
+                                <td>@course.Title</td>
+                                <td>@course.CourseDescription</td>
+                                <td>@course.CourseCode</td>
+                                <td>@course.CompletedLessons of @course.TotalLessons</td>
+                                <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
 
-<h2>Courses</h2>
-<br />
-@if (availablecourses == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="main-student-course">
-        <h3>Your Enrolled Courses</h3>
-        <br />
-        @if(enrolledCourses == null)
-        {
-            <p><em>No enrolled courses.</em></p>
-        }
-        else
-        {
-            <table class="student-course-list">
+            <br />
+            <br />
+            <br />
+            <h3>Available Courses</h3>
+            <br />
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Course Mode</th>
-                        <th>Progress</th>
-                        <th>Access</th>
+                        <th>Course Code</th>
+                        <th>View</th>
                     </tr>
                 </thead>
                 <tbody>
-                        @foreach (var course in enrolledCourses)
-                        {
+                    @foreach (var course in availablecourses)
+                    {
                         <tr>
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
                             <td>@course.CourseCode</td>
-                            <td>@course.ProgressStatus</td>
-                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                            <td><a href="">View Course</a></td>
                         </tr>
-                        }
+                    }
                 </tbody>
             </table>
-        }
+        </div>
+    }
 
-        <br />
-        <br />
-        <br />
-        <h3>Available Courses</h3>
-        <br />
-        <table class="student-course-list">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Course Code</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody>
-                    @foreach (var course in availablecourses)
-                    {
-                    <tr>
-                        <td>@course.Title</td>
-                        <td>@course.CourseDescription</td>
-                        <td>@course.CourseCode</td>
-                        <td><a href="">View Course</a></td>
-                    </tr>
-                    }
-            </tbody>
-        </table>
-    </div>
-}
-
+</div>
 @code {
     private List<Course>? availablecourses;
     private List<StudentCourseDTO>? enrolledCourses;
@@ -95,7 +96,7 @@ else
 
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
-        if(String.IsNullOrEmpty(user.UserID.ToString()))
+        if (String.IsNullOrEmpty(user.UserID.ToString()))
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
         }
@@ -105,6 +106,6 @@ else
         }
     }
 
-    
+
 
 }
