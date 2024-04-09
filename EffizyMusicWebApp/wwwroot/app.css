@@ -14,7 +14,7 @@ main{
 }
 
 .table {
-    --bs-table-bg: #dcdcdc !important;
+
     background-color: #dcdcdc !important; /* Set table background color */
 }
 
