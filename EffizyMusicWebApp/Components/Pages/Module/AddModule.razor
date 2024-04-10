@@ -23,6 +23,13 @@
     </div>
 
     <div class="form-outline mt-2 col-md-6">
+        <label class="form-label">Module Order:</label>
+
+        <InputNumber class="form-control" @bind-Value="ModuleData.ModuleOrder" />
+
+    </div>
+
+    <div class="form-outline mt-2 col-md-6">
         <label for="course" class="form-label">Choose Course:</label>
         <select class="form-control" @onchange="HandleSelectedValue" required>
             <option value="">[Please Choose the Course...]</option>

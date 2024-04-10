@@ -28,7 +28,9 @@ namespace EffizyMusicSystem.Models.DTO
 
         [NotMapped]
         public virtual ICollection<LessonProgress>? LessonProgress{ get; set; }
-       
+        [NotMapped]
+        public virtual ICollection<QuizProgress>? QuizProgress { get; set; }
+
 
 
     }

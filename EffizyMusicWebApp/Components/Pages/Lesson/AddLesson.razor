@@ -20,6 +20,7 @@
                 <InputText @bind-Value="LessonData.Title" class="form-control"></InputText>
                 <ValidationMessage For="@(() => LessonData.Title)" />
             </div>
+
             <div class="form-outline mt-2">
                 <label for="lessonMode" class="form-label">Lesson Mode:</label>
                 <InputText @bind-Value="LessonData.LessonMode" class="form-control"></InputText>
@@ -29,7 +30,12 @@
                 <Icon Name="IconName.Upload"></Icon> Upload your Lesson
                 <InputFile OnChange="@HandleFileSelected" />
                 <ValidationMessage For="@(() => LessonData.LessonContent)" />
-            </div> 
+            </div>
+
+            <div class="form-outline mt-2">
+                <label for="LessonOrder" class="form-label">Lesson Order:</label>
+                <InputNumber @bind-Value="LessonData.LessonOrder" class="form-control"></InputNumber>
+            </div>
             <div class="form-outline mt-2">
                 <label for="module" class="form-label">Choose Module:</label>
                 <select class="form-control" @onchange="HandleSelectedValue" required>
