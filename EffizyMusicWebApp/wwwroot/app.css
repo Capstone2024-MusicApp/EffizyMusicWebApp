@@ -5,6 +5,19 @@ html, body {
 a, .btn-link {
     color: #006bb7;
 }
+main{
+    height:auto!important;
+}
+.table:not(caption) > * > * {
+    text-align: left !important;
+    background-color: #f1f1f1 !important;
+}
+
+.table {
+
+    background-color: #dcdcdc !important; /* Set table background color */
+}
+
 
 .btn-primary {
     color: #fff;
@@ -179,7 +192,26 @@ h1:focus {
 
 }
 
+.navbar-logo {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+/* For medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .col-md-12 {
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0 15px;
+    }
+
+    .col-md-6 {
+        max-width: 50%;
+        box-sizing: border-box;
+        padding: 0 15px;
+    }
 .lesson-list-for-module{
     width: 100%;
     text-align: left;
+}
 }
