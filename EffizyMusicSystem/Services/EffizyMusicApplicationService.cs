@@ -170,10 +170,11 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+       
         #endregion
         //Add your methods here that directly connects to the dtabase
         #region Lesson
-        
+
         public async Task<List<Lesson>> GetModuleLessons(int moduleId)
         {
             try
