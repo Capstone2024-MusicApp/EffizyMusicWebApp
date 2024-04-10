@@ -849,6 +849,7 @@ namespace EffizyMusicSystem.Services
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
             if(quizProgress == null)
             {
+                quizProgress = new QuizProgress();
                 quizProgress.EnrollmentID = enrollmentID;
                 quizProgress.QuizID = quizID;
                 quizProgress.Grade = 0;
