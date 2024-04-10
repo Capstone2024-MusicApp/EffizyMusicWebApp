@@ -1,4 +1,4 @@
-﻿@page "/StudentCourse/StudentCourses"
+@page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Models.DTO
 @using Microsoft.AspNetCore.Components.Authorization
@@ -10,81 +10,81 @@
 @inject ILogger<StudentCourses> Logger
 
 <div class="container">
-    <h2>Courses</h2>
-    <br />
-    @if (availablecourses == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <div class="main-student-course">
-            <h3>Your Enrolled Courses</h3>
-            <br />
-            @if (enrolledCourses == null)
-            {
-                <p><em>No enrolled courses.</em></p>
-            }
-            else
-            {
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Course Code</th>
-                            <th>Progress</th>
-                            <th>Access</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var course in enrolledCourses)
-                        {
-                            <tr>
-                                <td>@course.Title</td>
-                                <td>@course.CourseDescription</td>
-                                <td>@course.CourseCode</td>
-                                <td>@course.CompletedLessons of @course.TotalLessons</td>
-                                <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            @*  <PaginationComponent CurrentPage="@cp"
-        TotalPages="@TotalPagesEnrolledCourse"
-        onPageChange="@HandlePageChange" /> *@
-            <br />
-            <br />
-            <br />
-            <h3>Available Courses</h3>
-            <br />
+<h2>Courses</h2>
+<br />
+@if (availablecourses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main-student-course">
+        <h3>Your Enrolled Courses</h3>
+        <br />
+        @if (enrolledCourses == null)
+        {
+            <p><em>No enrolled courses.</em></p>
+        }
+        else
+        {
             <table class="table">
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Course Code</th>
-                        <th>View</th>
+                        <th>Progress</th>
+                        <th>Access</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var course in availablecourses)
+                    @foreach (var course in enrolledCourses)
                     {
                         <tr>
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
                             <td>@course.CourseCode</td>
-                            <td><a href="">View Course</a></td>
+                            <td>@course.CompletedLessons of @course.TotalLessons</td>
+                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                         </tr>
                     }
                 </tbody>
             </table>
-        </div>
-    }
-    @* <PaginationComponent CurrentPage="@cp"
-    TotalPages="@TotalPagesCourse"
+        }
+        @*  <PaginationComponent CurrentPage="@cp"
+    TotalPages="@TotalPagesEnrolledCourse"
     onPageChange="@HandlePageChange" /> *@
+        <br />
+        <br />
+        <br />
+        <h3>Available Courses</h3>
+        <br />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Course Code</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var course in availablecourses)
+                {
+                    <tr>
+                        <td>@course.Title</td>
+                        <td>@course.CourseDescription</td>
+                        <td>@course.CourseCode</td>
+                        <td><a href="">View Course</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@* <PaginationComponent CurrentPage="@cp"
+                     TotalPages="@TotalPagesCourse"
+                     onPageChange="@HandlePageChange" /> *@
 
 </div>
 @code {
