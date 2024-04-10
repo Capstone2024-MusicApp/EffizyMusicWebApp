@@ -7,67 +7,77 @@
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
     <DataAnnotationsValidator />
-    <div class="mb-3">
-        <label class="form-label">Course Title</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.Title" />
-        </div>
-        <ValidationMessage For="@(() => model.Title)" />
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label">Course Code</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.CourseCode" />
-        </div>
-        <ValidationMessage For="@(() => model.CourseCode)" />
-    </div>
-    
-    <div class="mb-3">
-        <label class="form-label">Course Description:</label>
-        <div class="col-md-4">
-            <textarea class="form-control" @bind="model.CourseDescription"></textarea>
-        </div>
-        <ValidationMessage For="@(() => model.CourseDescription)" />
-    </div>
+    <div class="row"> 
+        <div class="col-md-6"> 
 
+            <div class="mb-3">
+                <label class="form-label">Course Title</label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.Title" />
+                </div>
+                <ValidationMessage For="@(() => model.Title)" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Select Instrument</label>
-        <div class="col-md-4">
-            <select class="form-select" name="model.InstrumentID">
-                @if (Instruments != null)
-                {
-                    foreach (var entity in Instruments)
-                    {
-                        <option value="@entity.InstrumentID">@entity.InstrumentType</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Course Code</label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.CourseCode" />
+                </div>
+                <ValidationMessage For="@(() => model.CourseCode)" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Select Instructor</label>
-        <div class="col-md-4">
-            <select class="form-select" name="model.InstructorID">
-                @if (Instructors != null)
-                {
-                    foreach (var entity in Instructors)
-                    {
-                        <option value="@entity.InstructorID">@entity.FirstName @entity.LastName</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Course Description:</label>
+                <div class="col-md-6">
+                    <textarea class="form-control" @bind="model.CourseDescription"></textarea>
+                </div>
+                <ValidationMessage For="@(() => model.CourseDescription)" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Estimated Time </label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.EstimatedTime" />
         </div>
-        <ValidationMessage For="@(() => model.EstimatedTime)" />
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Select Instrument</label>
+                <div class="col-md-4">
+                    <select class="form-select" name="model.InstrumentID">
+                        @if (Instruments != null)
+                           {
+                             foreach (var entity in Instruments)
+                               {
+                                 <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                               }
+                           }
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Instructor</label>
+                <div class="col-md-4">
+                    <select class="form-select" name="model.InstructorID">
+                       @if (Instructors != null)
+                         {
+                           foreach (var entity in Instructors)
+                             {
+                               <option value="@entity.InstructorID">@entity.FirstName @entity.LastName</option>
+                             }
+                         }
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Estimated Time </label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.EstimatedTime" />
+                </div>
+                <ValidationMessage For="@(() => model.EstimatedTime)" />
+            </div>
+
+        </div>
+
     </div>
 
 
