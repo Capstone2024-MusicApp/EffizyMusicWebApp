@@ -16,7 +16,7 @@
 
 <br />
 
-@if (studentCourse == null)
+@if (@studentCourse == null)
 {
     <p>Loading...</p>
 }
@@ -30,32 +30,7 @@ else
         <div class="lesson-frame">
             @if (DisplayLesson)
             {
-                var base64 = Convert.ToBase64String(selectedLesson.LessonContent);
-                var src = $"data:video/mp4;base64,{base64}";
-
-                <video controls="controls" height="600px" id="videoTagId">
-                    <source src="@src" type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
-            }
-            else
-            {
-                <video controls="controls" height="600px" id="videoTagId">
-                </video>
-            }
-            <br />
-            <br />
-        }
-        else
-        {
-            <label class="video-lesson-title">Quiz - @selectedQuiz.QuizTitle</label>
-            <br />
-            <br />
-            int questionNumber = 1;
-            @foreach (var question in quesionnaire)
-            {
-
-                <label>@questionNumber. @question.questionText</label>
+                <label class="video-lesson-title">@selectedModule.Title - @selectedLesson.Title </label>
                 <br />
                 @if (selectedLesson.LessonContent != null)
                 {
