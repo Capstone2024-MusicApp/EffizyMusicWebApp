@@ -67,8 +67,8 @@
                 await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
                 // await ProtectedSessionStore.SetAsync("FirstName", student.FirstName);
                 // await ProtectedSessionStore.SetAsync("LastName", user.LastName);
-                // await ProtectedSessionStore.SetAsync("User", user);
-                // var model = await ProtectedSessionStore.GetAsync<User>("User");
+                await ProtectedSessionStore.SetAsync("User", user);
+                var model = await ProtectedSessionStore.GetAsync<User>("User");
 
                 //You can get values from session from any other page, e.g
                 var email = await ProtectedSessionStore.GetAsync<String>("Email");
