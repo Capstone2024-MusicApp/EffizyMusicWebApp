@@ -1,7 +1,12 @@
 ﻿@page "/RateInstructor/"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavService
 <PageTitle>Rate Instructor</PageTitle>
 <h2 class="display-3 text-center">Rate Instructor</h2>
 
@@ -75,8 +80,14 @@
     public List<Instructor> InstructorList = new();
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        User user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
+        // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavService.NavigateTo("/NotAuthorize/");
+        }
         InstructorList = EffizyService.GetInstructors();
     }
 

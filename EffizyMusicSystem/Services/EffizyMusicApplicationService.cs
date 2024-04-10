@@ -161,6 +161,15 @@ namespace EffizyMusicSystem.Services
         }
         public async Task DeleteCourse(int id)
         {
+            var modulesToDelete = _context.Modules.Where(x=>x.Course.CourseID == id).ToList();
+            if(modulesToDelete != null)
+            {
+                foreach (var data in modulesToDelete)
+                {
+                    DeleteModule(data.ModuleID);
+                }
+            }
+            
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
@@ -187,6 +196,20 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
             
+        }
+
+        public async Task<List<ViewLesson>> GetUserLessons(int userId)
+        {
+            try
+            {
+                var lessons = await _context.ViewLessons.Where(m => m.UserID == userId).ToListAsync();
+                return lessons;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
 
         public void AddCourse(Course entity)
@@ -361,6 +384,17 @@ namespace EffizyMusicSystem.Services
             }
         }
 
+        public List<QuizResult> GetQuizeResult(int quizId, int userId)
+        {
+            try
+            {
+                return _context.QuizResults.Where(q => q.QuizId == quizId && q.UserId == userId).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public void AddQuizResult(QuizResult entity)
         {
             try

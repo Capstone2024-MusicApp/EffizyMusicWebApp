@@ -1,10 +1,14 @@
 ﻿@page "/EditLesson"
 @page "/EditLesson/{LessonNumber:int}"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 <h3>Edit Lesson</h3>
 <hr />
 
@@ -27,12 +31,13 @@
             <input type="file" onchange="HandleFileSelected"><Icon Name="IconName.Upload"></Icon>
             @if (LessonData.LessonContent != null)
         {
-            <p>File Name: @GetFileNameFromContent(LessonData.LessonContent)</p>           
+            <p>File Name: @LessonData.LessonFileName</p>           
         }
         else
         {
             <p>No file uploaded</p>
         }
+            <ValidationMessage For="@(() => LessonData.LessonContent)" />
     </div> 
     <div class="form-group">
         <label>Module</label>
@@ -42,6 +47,7 @@
                 <option value="@module">@module.Title</option>
             }
         </select>
+            <ValidationMessage For="@(() => LessonData.Module)" />
     </div>
 
     <div class="mt-4">
@@ -70,7 +76,13 @@
     protected override async Task OnInitializedAsync()
     {
         try
-        {            
+        {           
+            User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+            // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
+            if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+            {
+                NavigationManager.NavigateTo("/NotAuthorize/");
+            }
             LessonData = await EffizyService.GetLessonById(LessonNumber);
             ModuleList = await EffizyService.GetModules();     
         }
@@ -98,10 +110,6 @@
         SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
     }
 
-    private string GetFileNameFromContent(byte[] lessonContent)
-    {
-        return "example_filename.txt";
-    }
     public async Task RemoveLesson()
     {
         try

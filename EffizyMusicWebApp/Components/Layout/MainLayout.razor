@@ -8,7 +8,7 @@
         <NavMenu />
     </div>
 
-    <main>
+    <main class="">
         <div class="top-row px-2">
             @if (isLogin == false)
             {
@@ -38,7 +38,7 @@
 
     protected override async void OnInitialized()
     {
-        isLogin = await IsUserLogin();
+        // isLogin = await IsUserLogin();
     }
 
     protected async Task<bool> IsUserLogin()
@@ -59,8 +59,8 @@
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
-        await ProtectedSessionStore.DeleteAsync("FirstName");
-        await ProtectedSessionStore.DeleteAsync("LastName");
+        // await ProtectedSessionStore.DeleteAsync("FirstName");
+        // await ProtectedSessionStore.DeleteAsync("LastName");
 
         //Redirect to specific page.
         NavigationManager.NavigateTo("/loginForm", true);
