@@ -12,7 +12,7 @@ namespace EffizyMusicSystem.Models
     {
         [Key]
         public int CourseID { get; set; }
-
+        [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; }
 
         [StringLength(30)]

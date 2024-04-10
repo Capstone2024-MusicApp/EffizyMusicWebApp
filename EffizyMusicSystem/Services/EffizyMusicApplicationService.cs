@@ -203,16 +203,12 @@ namespace EffizyMusicSystem.Services
             }
 
         }
-        //public async Task AddCourseAsync(Course course)
-        //{
-        //    _context.Courses.Add(course);
-        //    await _context.SaveChangesAsync();
-        //}
-        public void AddCourse(Course model)
+        public void AddCourse(Course entity)
         {
             try
             {
-                _context.Courses.Add(model);
+                _context.Courses.Add(entity);
+                _context.SaveChanges();
             }
             catch
             {
