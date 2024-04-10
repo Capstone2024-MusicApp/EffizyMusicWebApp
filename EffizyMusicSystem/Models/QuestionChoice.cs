@@ -16,7 +16,6 @@ namespace EffizyMusicSystem.Models
         public int QuestionId { get; set; }
 
         public bool IsCorrectAnswer { get; set; }
-
         public virtual Question? Question { get; set; } = null!;
     }
 }

@@ -16,7 +16,6 @@ namespace EffizyMusicSystem.Models
         public string Title { get; set; }
 
         public int ModuleOrder { get; set; } = 0;
-
         public virtual Course Course { get; set; }
         public virtual ICollection<Lesson> Lessons { get; set; }
 
