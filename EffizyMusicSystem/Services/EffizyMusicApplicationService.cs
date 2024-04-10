@@ -853,8 +853,9 @@ namespace EffizyMusicSystem.Services
             StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
             //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
-            studentCourse.Modules =  _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            studentCourse.Modules =  _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).OrderBy(m => m.ModuleOrder).ToList();
 
+            
             studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
             studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
 
