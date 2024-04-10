@@ -21,7 +21,7 @@ namespace EffizyMusicSystem.Models
         [Required(ErrorMessage = "Lesson Content video is required")]
         public byte[] LessonContent { get; set; } = new byte[0];
         public string LessonFileName { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Module Selection is Required")]
+
         public virtual Module Module { get; set; }
     }
 }
