@@ -170,8 +170,7 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-       
-        #endregion
+       #endregion
         //Add your methods here that directly connects to the dtabase
         #region Lesson
 
