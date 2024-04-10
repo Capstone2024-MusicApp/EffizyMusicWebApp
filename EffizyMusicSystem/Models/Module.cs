@@ -16,7 +16,7 @@ namespace EffizyMusicSystem.Models
         public string Title { get; set; }
 
         public int ModuleOrder { get; set; } = 0;
-        [Required(ErrorMessage = "Course Selection is Required")]
+
         public virtual Course Course { get; set; }
         public virtual ICollection<Lesson> Lessons { get; set; }
 
