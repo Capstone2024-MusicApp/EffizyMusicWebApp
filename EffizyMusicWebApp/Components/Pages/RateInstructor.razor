@@ -84,7 +84,7 @@
     {
         User user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
         // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
-        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Instructor)
         {
             NavService.NavigateTo("/NotAuthorize/");
         }
