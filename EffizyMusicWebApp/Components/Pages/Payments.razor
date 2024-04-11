@@ -29,7 +29,7 @@ else
 
             @if (model != null)
             {
-                foreach (var entity in model)
+                foreach (var entity in GetItemsOnCurrentPage())
                 {
                     <tr>
                         <td>@entity.PaymentID</td>
@@ -60,12 +60,28 @@ else
         </tbody>
     </table>
 }
+<PaginationComponent CurrentPage="@cp"
+                     TotalPages="@TotalPages"
+                     onPageChange="@HandlePageChange" />
 @code {
     protected List<Payment> model = new();
+    private int pageSize = 4;
+    private int cp = 1;
+    private int TotalPages => (int)Math.Ceiling((double)model.Count / pageSize);
     protected override async Task OnInitializedAsync()
     {
         model = EffizyService.GetPayments();
         
+    }
+    private IEnumerable<Payment> GetItemsOnCurrentPage()
+    {
+        int startIndex = (cp - 1) * pageSize;
+        return model.Skip(startIndex).Take(pageSize);
+    }
+
+    private void HandlePageChange(int newPage)
+    {
+        cp = newPage;
     }
 }
 @code {

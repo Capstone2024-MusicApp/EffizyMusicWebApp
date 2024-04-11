@@ -5,6 +5,19 @@ html, body {
 a, .btn-link {
     color: #006bb7;
 }
+main{
+    height:auto!important;
+}
+.table:not(caption) > * > * {
+    text-align: left !important;
+    background-color: #f1f1f1 !important;
+}
+
+.table {
+
+    background-color: #dcdcdc !important; /* Set table background color */
+}
+
 
 .btn-primary {
     color: #fff;
@@ -74,33 +87,32 @@ h1:focus {
     
 }
 
-.access-course-main{
+.access-course-main {
     display: block;
-    width: 100%;
+    width: fit-content;
     min-height: max-content;
+    border-radius: 10px;
+    background: #efefef;
+    margin: auto;
+    padding:0px 30px 20px 30px;
 }
 .course-title {
     text-align: center;
-    display: block;
-    font-weight: bold;
-    font-size: 50px;
-    color: #1f1e8b;
 }
 
 .lesson-frame {
-    width: 900px;
-    display: inline-block;
-    margin-left: 20px;
+    display: block;
+    margin: auto;
 }
 
 .module-list {
-    display: inline-block;
-    margin-left: 100px;
+    display: block;
     text-align: left;
     border-radius: 10px;
-    width: 500px;
+    width: contain;
     vertical-align: top;
-    overflow:scroll;
+    /*overflow-y:scroll; */
+    margin: auto;
     max-height: 800px;
 }
 
@@ -111,11 +123,12 @@ h1:focus {
     font-weight: 600;
 }
 
-.video-lesson-title{
-    font-weight: 600;
-    font-size: 30px;
-
+.video-lesson-title {
+    font-weight: 250;
+    font-size: 25px;
+    padding-bottom: 10px;
 }
+
 
 .feedback-container {
     display: block;
@@ -177,4 +190,28 @@ h1:focus {
     padding-top: 30px;
     color: darkslategray
 
+}
+
+.navbar-logo {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+/* For medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .col-md-12 {
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0 15px;
+    }
+
+    .col-md-6 {
+        max-width: 50%;
+        box-sizing: border-box;
+        padding: 0 15px;
+    }
+.lesson-list-for-module{
+    width: 100%;
+    text-align: left;
+}
 }

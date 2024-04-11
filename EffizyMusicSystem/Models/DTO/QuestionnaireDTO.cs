@@ -16,6 +16,9 @@ namespace EffizyMusicSystem.Models.DTO
         public required string questionText { get; set; }
 
         [NotMapped]
+        public string selectedAnswer { get; set; }
+
+        [NotMapped]
         public List<QuestionChoice> questionChoices { get; set; }
 
         [NotMapped]

@@ -15,6 +15,7 @@ namespace EffizyMusicSystem.Models
         public string ChoiceText { get; set; } = string.Empty;
         public int QuestionId { get; set; }
 
+        public bool IsCorrectAnswer { get; set; }
         public virtual Question? Question { get; set; } = null!;
     }
 }

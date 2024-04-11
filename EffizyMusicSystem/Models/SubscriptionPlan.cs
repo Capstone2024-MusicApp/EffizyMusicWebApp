@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace EffizyMusicSystem.Models
 {
+    [Table("Subscriptions")]
     public class SubscriptionPlan
     {
         [Key]

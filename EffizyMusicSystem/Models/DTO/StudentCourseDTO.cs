@@ -20,8 +20,17 @@ namespace EffizyMusicSystem.Models.DTO
 
         public required string ProgressStatus { get; set; }
 
+        public int CompletedLessons { get; set; }
+        public int TotalLessons { get; set; }
         [NotMapped]
         public virtual ICollection<Module>? Modules { get; set; }
+
+
+        [NotMapped]
+        public virtual ICollection<LessonProgress>? LessonProgress{ get; set; }
+        [NotMapped]
+        public virtual ICollection<QuizProgress>? QuizProgress { get; set; }
+
 
 
     }

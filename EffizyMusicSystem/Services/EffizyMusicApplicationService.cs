@@ -2,6 +2,7 @@
 using EffizyMusicSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using EffizyMusicSystem.Models.DTO;
+using EffizyMusicSystem.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Metadata;
 
 namespace EffizyMusicSystem.Services
 {
@@ -46,10 +48,9 @@ namespace EffizyMusicSystem.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        //public List<Instructor> GetInstructors()
-        //{
-        //    return _context.Instructors.ToList();
-        //}
+
+        //Add your methods here that directly connects to the dtabase
+
         public List<Course> GetCourseList()
         {
             return _context.Courses.ToList();
@@ -148,8 +149,6 @@ namespace EffizyMusicSystem.Services
                 .Include(x => x.UserType)
                 .FirstOrDefaultAsync(x => x.UserTypeID == userTypeID);
         }
-
-        //Add other methods here that directly connect to the database
         
         #region Course
         public async Task<List<Course>> GetCourses()
@@ -162,6 +161,15 @@ namespace EffizyMusicSystem.Services
         }
         public async Task DeleteCourse(int id)
         {
+            var modulesToDelete = _context.Modules.Where(x=>x.Course.CourseID == id).ToList();
+            if(modulesToDelete != null)
+            {
+                foreach (var data in modulesToDelete)
+                {
+                    DeleteModule(data.ModuleID);
+                }
+            }
+            
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
@@ -842,13 +850,67 @@ namespace EffizyMusicSystem.Services
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
-            StudentCourseDTO studentCourse;
+            StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
+            //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
-            studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"select e.EnrollmentID, c.CourseID, Title , CourseDescription, CourseCode, StudentID, ProgressStatus from courses c inner join enrollments e on c.CourseId = e.CourseID where EnrollmentID = {enrollmentID}").SingleOrDefault();
+            studentCourse.Modules =  _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).OrderBy(m => m.ModuleOrder).ToList();
 
-            studentCourse.Modules = _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToList();
+            
+            studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+            studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+
             return studentCourse;
             
+        }
+
+        public void SetMissingLessonProgress(int enrollmentID)
+        {
+            List<LessonProgress>? missingLessonProgress;
+
+            missingLessonProgress = _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToList();
+
+            foreach(LessonProgress lessonProgress in missingLessonProgress)
+            {
+
+                _context.LessonsProgress.Add(lessonProgress);
+                _context.SaveChanges();
+            }    
+            
+
+        }
+
+        public void setQuizProgress(int enrollmentID, int quizID, float grade, bool ignoreWhenFound)
+        {
+            QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
+            if(quizProgress == null)
+            {
+                quizProgress = new QuizProgress();
+                quizProgress.EnrollmentID = enrollmentID;
+                quizProgress.QuizID = quizID;
+                quizProgress.Grade = 0;
+                _context.QuizesProgress.Add(quizProgress);
+                _context.SaveChanges();
+            }
+            else
+            {
+                if (!ignoreWhenFound)
+                {
+                    quizProgress.Grade = grade;
+
+                    _context.QuizesProgress.Update(quizProgress);
+                    _context.SaveChanges();
+                }
+            }
+
+        }
+
+
+        public void UpdateLessonProgress(LessonProgress lessonProgress)
+        {
+            _context.LessonsProgress.Update(lessonProgress);
+            _context.SaveChanges();
+
+
         }
         #endregion
 
