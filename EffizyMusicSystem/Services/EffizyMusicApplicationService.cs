@@ -33,6 +33,7 @@ namespace EffizyMusicSystem.Services
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
+        List<Payment> GetUserPayments(int UserId);
 
         public List<Feedback> GetFeedback();
         public List<FeedbackDTO> GetFeedbackDTOs();
@@ -610,6 +611,18 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
+        public List<Payment> GetUserPayments(int UserId)
+        {
+            try
+            {
+                return _context.Payments.Where(x=>x.UserID == UserId).ToList();
             }
             catch
             {

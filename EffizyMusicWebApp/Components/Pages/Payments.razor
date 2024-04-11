@@ -1,6 +1,10 @@
 ﻿@page "/paymenthistory/"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavService
 <h3>Payment History</h3>
 @if (model == null)
 {
@@ -70,8 +74,14 @@ else
     private int TotalPages => (int)Math.Ceiling((double)model.Count / pageSize);
     protected override async Task OnInitializedAsync()
     {
-        model = EffizyService.GetPayments();
-        
+        User user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Instructor)
+            NavService.NavigateTo("/NotAuthorize/");
+        else if (user.UserTypeID == Constants.UserType_Student)
+            model = EffizyService.GetUserPayments(user.UserID);
+        else
+            model = EffizyService.GetPayments();
+
     }
     private IEnumerable<Payment> GetItemsOnCurrentPage()
     {

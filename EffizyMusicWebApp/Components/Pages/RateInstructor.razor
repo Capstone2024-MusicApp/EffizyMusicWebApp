@@ -76,6 +76,7 @@
     int currentRating = 0;
     [SupplyParameterFromForm]
     public InstructorRating RatingData { get; set; } = new();
+    public User user { get; set; } = new();
 
     public List<Instructor> InstructorList = new();
 
@@ -100,7 +101,7 @@
     {
         try
         {
-            var tt = RatingData.InstructorID;
+            RatingData.UserID = user.UserID;
             IsRatingAdded = await EffizyService.AddRating(RatingData);
             if (IsRatingAdded)
             {
