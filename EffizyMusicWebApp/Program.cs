@@ -1,7 +1,9 @@
+using Blazored.SessionStorage;
 using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
 using Microsoft.EntityFrameworkCore;
+using Blazored.SessionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,7 @@ builder.Services.AddRazorComponents()
 // Add services to the container.
 var services = builder.Services;
 builder.Services.AddBlazorBootstrap();
+builder.Services.AddBlazoredSessionStorage();
 
 // Add your DbContext configuration
 builder.Services.AddDbContext<EffizyMusicContext>(options =>

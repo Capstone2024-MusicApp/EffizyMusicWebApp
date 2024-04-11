@@ -210,8 +210,17 @@ h1:focus {
         box-sizing: border-box;
         padding: 0 15px;
     }
-.lesson-list-for-module{
-    width: 100%;
+
+}
+.lesson-list-for-module {
+    width: 95%;
     text-align: left;
 }
+
+.btn:disabled {
+    border-color:#dcdcdc;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: inherit;
 }

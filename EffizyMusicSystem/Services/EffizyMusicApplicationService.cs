@@ -179,10 +179,10 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        #endregion
-
+       #endregion
+        //Add your methods here that directly connects to the dtabase
         #region Lesson
-        
+
         public async Task<List<Lesson>> GetModuleLessons(int moduleId)
         {
             try
@@ -212,14 +212,14 @@ namespace EffizyMusicSystem.Services
             }
 
         }
-
         public void AddCourse(Course entity)
         {
             try
             {
                 _context.Courses.Add(entity);
+                _context.SaveChanges();
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }
@@ -406,6 +406,21 @@ namespace EffizyMusicSystem.Services
             catch
             {
                 throw;
+            }
+        }
+
+        public void SaveQuizResult(QuizResult entity)
+        {
+            QuizResult qr = _context.QuizResults.Where(q => q.QuizId == entity.QuizId && q.UserId == entity.UserId && q.QuestionId == entity.QuestionId).FirstOrDefault();
+            if(qr == null)
+            {
+                AddQuizResult(entity);
+            }
+            else
+            {
+                qr.SelectedChoice = entity.SelectedChoice;
+                qr.CreatedDate = entity.CreatedDate;
+                UpdateQuizResult(qr);
             }
         }
         //To Update the records of a particluar QuizResult
@@ -863,14 +878,67 @@ namespace EffizyMusicSystem.Services
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
+
+            Boolean disableNextModule = true;
+            Boolean isFirstModule = true;
             StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
             //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
             studentCourse.Modules =  _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).OrderBy(m => m.ModuleOrder).ToList();
 
-            
             studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
             studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+
+            foreach (Module module in studentCourse.Modules)
+            {
+                module.EnableForStudent = true;
+
+                int quizPassed = 0;
+                foreach (Lesson lesson in module.Lessons)
+                {
+                    lesson.ProgressStatus = studentCourse.LessonProgress.Where(x => x.LessonID == lesson.LessonNumber).FirstOrDefault().ProgressStatus ?? Constants.ProgressStatus_NotStarted;
+                }
+
+                foreach (Quiz quiz in module.Quizzes)
+                {
+                    QuizProgress qp = studentCourse.QuizProgress.Where(x => x.QuizID == quiz.Id).FirstOrDefault() ?? new QuizProgress();
+                    quiz.Grade = qp.Grade;
+                    if(quiz.Grade >= 80)
+                    {
+                        quizPassed++;
+                    }
+                }
+
+                if(disableNextModule && !isFirstModule)
+                {
+                    module.EnableForStudent = false;
+                }
+                else 
+                {
+                    if(!disableNextModule)
+                    {
+                        module.EnableForStudent = true;
+                    }
+                    
+                    if (quizPassed == module.Quizzes.Count)
+                    {
+                        disableNextModule = false;
+                        module.EnableForStudent = true;
+                    }
+                    else
+                    {
+                        if (!isFirstModule) { 
+                        disableNextModule = true;
+                        }
+                    }
+                }
+
+
+
+                isFirstModule = false;
+            }
+
+
 
             return studentCourse;
             
@@ -892,7 +960,7 @@ namespace EffizyMusicSystem.Services
 
         }
 
-        public void setQuizProgress(int enrollmentID, int quizID, float grade, bool ignoreWhenFound)
+        public void setQuizProgress(int enrollmentID, int quizID, float grade)
         {
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
             if(quizProgress == null)
@@ -906,13 +974,13 @@ namespace EffizyMusicSystem.Services
             }
             else
             {
-                if (!ignoreWhenFound)
-                {
-                    quizProgress.Grade = grade;
+                    if (quizProgress.Grade < grade)
+                    {
+                        quizProgress.Grade = grade;
 
-                    _context.QuizesProgress.Update(quizProgress);
-                    _context.SaveChanges();
-                }
+                        _context.QuizesProgress.Update(quizProgress);
+                        _context.SaveChanges();
+                    }
             }
 
         }
@@ -958,7 +1026,7 @@ namespace EffizyMusicSystem.Services
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
                 string hashPassword = PasswordHasher.HashPassword(password);
-                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
+                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
             }
             else
                 return null;
