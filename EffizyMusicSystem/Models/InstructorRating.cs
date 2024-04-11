@@ -13,10 +13,15 @@ namespace EffizyMusicSystem.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RatingID { get; set; }
 
+
+        [Required(ErrorMessage = "Rating is Required")]
         public double Rating { get; set; }
 
+        [Required(ErrorMessage = "Feedback is Required")]
         public string Feedback { get; set; } = string.Empty;
 
+
+        [Required(ErrorMessage = "Please select the Instructor")]
         public int InstructorID {  get; set; }
         public int UserID {  get; set; }
     }
