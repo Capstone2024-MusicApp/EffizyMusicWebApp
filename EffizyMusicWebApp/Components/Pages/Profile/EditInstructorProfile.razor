@@ -1,7 +1,11 @@
-﻿@page "/admin/edit-instructor-profile/{InstructorID}"
+﻿@page "/editInstructorProfile/{InstructorID}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject IUserProfileService UserProfileService
 @inject NavigationManager NavigationManager
 
@@ -103,6 +107,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         await LoadInstructorProfile();
     }
 

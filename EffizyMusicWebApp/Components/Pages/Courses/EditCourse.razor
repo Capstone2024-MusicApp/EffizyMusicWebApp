@@ -3,6 +3,11 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components.Forms
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject ICourseService CourseService
 @inject NavigationManager NavigationManager
 
@@ -107,6 +112,12 @@ else
     {
         try
         {
+            User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+            if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+            {
+                NavigationManager.NavigateTo("/NotAuthorize/");
+            }
+            
             course = await CourseService.GetCourseByIdAsync(CourseID);
             Instruments = await CourseService.GetInstrumentsAsync();
             Instructors = await CourseService.GetInstructorsAsync();
