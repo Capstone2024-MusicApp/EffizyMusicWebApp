@@ -95,8 +95,9 @@ AS
 		inner join Modules m on l.ModuleID = m.ModuleID
 		inner join Courses c on m.CourseID = c.CourseID
 		inner join Enrollments e on e.CourseID = c.CourseID
-		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID)
-		and e.EnrollmentID = @in_enrollmentID;
+		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID and lp.LessonID = l.LessonNumber)
+		and e.EnrollmentID = @in_enrollmentID
+		order by m.ModuleOrder, l.LessonOrder;
 
 
 		IF @@ERROR <> 0 

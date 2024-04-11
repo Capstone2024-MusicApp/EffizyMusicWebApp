@@ -23,5 +23,8 @@ namespace EffizyMusicSystem.Models
         public byte[] LessonContent { get; set; } = new byte[0];
         public string LessonFileName { get; set; } = string.Empty;
         public virtual Module Module { get; set; }
+
+        [NotMapped]
+        public string ProgressStatus { get; set; } = string.Empty;
     }
 }
