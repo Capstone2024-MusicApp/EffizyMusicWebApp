@@ -1026,7 +1026,7 @@ namespace EffizyMusicSystem.Services
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
                 string hashPassword = PasswordHasher.HashPassword(password);
-                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
+                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
             }
             else
                 return null;
