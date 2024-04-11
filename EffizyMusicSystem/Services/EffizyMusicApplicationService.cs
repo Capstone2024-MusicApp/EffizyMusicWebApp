@@ -178,10 +178,10 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        #endregion
-
+       #endregion
+        //Add your methods here that directly connects to the dtabase
         #region Lesson
-        
+
         public async Task<List<Lesson>> GetModuleLessons(int moduleId)
         {
             try
@@ -211,14 +211,14 @@ namespace EffizyMusicSystem.Services
             }
 
         }
-
         public void AddCourse(Course entity)
         {
             try
             {
                 _context.Courses.Add(entity);
+                _context.SaveChanges();
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }
