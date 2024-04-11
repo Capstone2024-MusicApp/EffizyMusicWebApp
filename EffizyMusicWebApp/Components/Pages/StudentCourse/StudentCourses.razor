@@ -9,9 +9,9 @@
 
 @inject ILogger<StudentCourses> Logger
 
-<div class="container">
+<div class="container"> 
 
-    <h2>Courses</h2>
+     <h2>Courses</h2>
     <br />
     @if (availablecourses == null)
     {
@@ -49,57 +49,57 @@
                                 <td>@course.CompletedLessons of @course.TotalLessons</td>
                                 <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                                 <td>
-                                    @if (course.CompletedLessons >= @course.TotalLessons)
-                                    {
+                                    @if(course.CompletedLessons >= @course.TotalLessons)
                                         {
-                                            <Icon Name="IconName.CheckCircleFill" Style="padding-left: 5px;" Color="IconColor.Success" Size="IconSize.x5" />
+                                            {
+                                                <Icon Name="IconName.CheckCircleFill" Style="padding-left: 5px;" Color="IconColor.Success" Size="IconSize.x5" />
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        <Icon Name="IconName.CircleHalf" Style="padding-left: 5px;" Color="IconColor.Info" Size="IconSize.x5" />
-                                    }
-                                </td>
+                                        else
+                                        {
+                                            <Icon Name="IconName.CircleHalf" Style="padding-left: 5px;" Color="IconColor.Info" Size="IconSize.x5" />
+                                        }
+                                    </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            }
+             }
         </div>
-        @*  <PaginationComponent CurrentPage="@cp"
-    TotalPages="@TotalPagesEnrolledCourse"
-    onPageChange="@HandlePageChange" /> *@
-        <br />
-        <br />
-        <br />
+            @*  <PaginationComponent CurrentPage="@cp"
+        TotalPages="@TotalPagesEnrolledCourse"
+        onPageChange="@HandlePageChange" /> *@
+            <br />
+            <br />
+            <br />
         <h3>Available Courses</h3>
-        <br />
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Course Code</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var course in availablecourses)
-                {
+            <br />
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@course.Title</td>
-                        <td>@course.CourseDescription</td>
-                        <td>@course.CourseCode</td>
-                        <td><a href="">View Course</a></td>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Course Code</th>
+                        <th>View</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-
-
-        @* <PaginationComponent CurrentPage="@cp"
-    TotalPages="@TotalPagesCourse"
-    onPageChange="@HandlePageChange" /> *@
+                </thead>
+                <tbody>
+                    @foreach (var course in availablecourses)
+                    {
+                        <tr>
+                            <td>@course.Title</td>
+                            <td>@course.CourseDescription</td>
+                            <td>@course.CourseCode</td>
+                            <td><a href="">View Course</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        
+                
+                @* <PaginationComponent CurrentPage="@cp"
+                         TotalPages="@TotalPagesCourse"
+                         onPageChange="@HandlePageChange" /> *@
     }
 
 </div>
@@ -149,4 +149,3 @@
 
 }
 
-}
