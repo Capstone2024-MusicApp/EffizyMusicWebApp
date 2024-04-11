@@ -39,6 +39,10 @@
         }
             <ValidationMessage For="@(() => LessonData.LessonContent)" />
     </div> 
+        <div class="form-outline mt-2">
+            <label for="lessonOrder" class="form-label">Lesson Order:</label>
+            <InputNumber @bind-Value="LessonData.LessonOrder" class="form-control" />
+        </div>
     <div class="form-group">
         <label>Module</label>
         <select class="form-control" @onchange="HandleSelectedModule">

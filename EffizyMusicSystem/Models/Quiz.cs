@@ -21,5 +21,8 @@ namespace EffizyMusicSystem.Models
         public virtual Module? Module { get; set; } = null!;
 
         public virtual ICollection<Question>? Questions { get; set; }
+
+        [NotMapped]
+        public float Grade { get; set; } = 0;
     }
 }

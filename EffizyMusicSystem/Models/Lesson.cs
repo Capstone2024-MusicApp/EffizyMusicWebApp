@@ -17,11 +17,14 @@ namespace EffizyMusicSystem.Models
         public string Title { get; set; } = string.Empty;
 
         public string LessonMode { get; set; } = string.Empty;
+
         public int LessonOrder { get; set; } = 0;
         [Required(ErrorMessage = "Lesson Content video is required")]
         public byte[] LessonContent { get; set; } = new byte[0];
         public string LessonFileName { get; set; } = string.Empty;
-
         public virtual Module Module { get; set; }
+
+        [NotMapped]
+        public string ProgressStatus { get; set; } = string.Empty;
     }
 }

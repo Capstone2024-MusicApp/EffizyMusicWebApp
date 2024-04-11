@@ -87,13 +87,17 @@ AS
 	DECLARE @ProcedureName VARCHAR(30) = 'sp_getMissingLessonProgress';
 
 	BEGIN
-		select l.*
+		select 0 LessonProgressID
+			  ,@in_enrollmentID EnrollmentID
+			  ,l.LessonNumber LessonID
+			  ,'NOT STARTED' ProgressStatus
 		from Lessons l
 		inner join Modules m on l.ModuleID = m.ModuleID
 		inner join Courses c on m.CourseID = c.CourseID
-		inner join Enrollments e on e.EnrollmentID = c.CourseID
-		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID)
-		and e.EnrollmentID = @in_enrollmentID;
+		inner join Enrollments e on e.CourseID = c.CourseID
+		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID and lp.LessonID = l.LessonNumber)
+		and e.EnrollmentID = @in_enrollmentID
+		order by m.ModuleOrder, l.LessonOrder;
 
 
 		IF @@ERROR <> 0 

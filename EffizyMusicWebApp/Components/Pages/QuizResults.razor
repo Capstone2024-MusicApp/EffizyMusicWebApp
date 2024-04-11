@@ -1,4 +1,4 @@
-﻿@page "/quizResults/{quizId:int}"
+﻿@page "/quizResults/{quizId:int}/{enrollmentID:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
@@ -59,11 +59,15 @@ else
             }
         </tbody>
     </table>
+    <Button Class="btn btn-primary" @onclick="BackToCourse"> Back to Course</Button>
 }
 @code {
 
     [Parameter]
     public int quizId { get; set; }
+
+    [Parameter]
+    public int enrollmentId { get; set; }
 
     protected List<ResultsViewModel> results = new();
     public int totalQuestions = 0;
@@ -96,6 +100,7 @@ else
         if(totalQuestions > 0)
         {
             percentage = Convert.ToDecimal(correctAnswers) / Convert.ToDecimal(totalQuestions) * 100;
+            EffizyService.setQuizProgress(enrollmentId, quizId, (float)percentage);
         }
     }
 
@@ -110,5 +115,11 @@ else
         {
             return false;
         }
+    }
+
+    public void BackToCourse()
+    {
+
+        NavigationManager.NavigateTo("/StudentCourse/AccessCourse/" + enrollmentId, true);
     }
 }

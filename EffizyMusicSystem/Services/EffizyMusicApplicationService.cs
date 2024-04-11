@@ -407,6 +407,21 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
+        public void SaveQuizResult(QuizResult entity)
+        {
+            QuizResult qr = _context.QuizResults.Where(q => q.QuizId == entity.QuizId && q.UserId == entity.UserId && q.QuestionId == entity.QuestionId).FirstOrDefault();
+            if(qr == null)
+            {
+                AddQuizResult(entity);
+            }
+            else
+            {
+                qr.SelectedChoice = entity.SelectedChoice;
+                qr.CreatedDate = entity.CreatedDate;
+                UpdateQuizResult(qr);
+            }
+        }
         //To Update the records of a particluar QuizResult
         public void UpdateQuizResult(QuizResult entity)
         {
@@ -848,32 +863,121 @@ namespace EffizyMusicSystem.Services
             return await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getEnrolledCourses {userID}").ToListAsync();
         }
 
-        public async Task<StudentCourseDTO?> GetStudentCourse(int enrollmentID)
+        public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
-            List<StudentCourseDTO> studentCourseList= await _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToListAsync();
-            StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
-            studentCourse.Modules = await _context.Modules.Include(l => l.Lessons).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).ToListAsync();
+            Boolean disableNextModule = true;
+            Boolean isFirstModule = true;
+            StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
+            //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
+
+            studentCourse.Modules =  _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).OrderBy(m => m.ModuleOrder).ToList();
 
             studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+            studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+
+            foreach (Module module in studentCourse.Modules)
+            {
+                module.EnableForStudent = true;
+
+                int quizPassed = 0;
+                foreach (Lesson lesson in module.Lessons)
+                {
+                    lesson.ProgressStatus = studentCourse.LessonProgress.Where(x => x.LessonID == lesson.LessonNumber).FirstOrDefault().ProgressStatus ?? Constants.ProgressStatus_NotStarted;
+                }
+
+                foreach (Quiz quiz in module.Quizzes)
+                {
+                    QuizProgress qp = studentCourse.QuizProgress.Where(x => x.QuizID == quiz.Id).FirstOrDefault() ?? new QuizProgress();
+                    quiz.Grade = qp.Grade;
+                    if(quiz.Grade >= 80)
+                    {
+                        quizPassed++;
+                    }
+                }
+
+                if(disableNextModule && !isFirstModule)
+                {
+                    module.EnableForStudent = false;
+                }
+                else 
+                {
+                    if(!disableNextModule)
+                    {
+                        module.EnableForStudent = true;
+                    }
+                    
+                    if (quizPassed == module.Quizzes.Count)
+                    {
+                        disableNextModule = false;
+                        module.EnableForStudent = true;
+                    }
+                    else
+                    {
+                        if (!isFirstModule) { 
+                        disableNextModule = true;
+                        }
+                    }
+                }
+
+
+
+                isFirstModule = false;
+            }
+
+
 
             return studentCourse;
             
         }
 
-        public async Task SetMissingLessonProgress(int enrollmentID)
+        public void SetMissingLessonProgress(int enrollmentID)
         {
             List<LessonProgress>? missingLessonProgress;
 
-            missingLessonProgress = await _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToListAsync();
+            missingLessonProgress = _context.Database.SqlQuery<LessonProgress>($"EXECUTE sp_getMissingLessonProgress {enrollmentID}").ToList();
 
             foreach(LessonProgress lessonProgress in missingLessonProgress)
             {
 
-                await _context.LessonsProgress.AddAsync(lessonProgress);
-                await _context.SaveChangesAsync();
+                _context.LessonsProgress.Add(lessonProgress);
+                _context.SaveChanges();
             }    
             
+
+        }
+
+        public void setQuizProgress(int enrollmentID, int quizID, float grade)
+        {
+            QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
+            if(quizProgress == null)
+            {
+                quizProgress = new QuizProgress();
+                quizProgress.EnrollmentID = enrollmentID;
+                quizProgress.QuizID = quizID;
+                quizProgress.Grade = 0;
+                _context.QuizesProgress.Add(quizProgress);
+                _context.SaveChanges();
+            }
+            else
+            {
+                    if (quizProgress.Grade < grade)
+                    {
+                        quizProgress.Grade = grade;
+
+                        _context.QuizesProgress.Update(quizProgress);
+                        _context.SaveChanges();
+                    }
+            }
+
+        }
+
+
+        public void UpdateLessonProgress(LessonProgress lessonProgress)
+        {
+            _context.LessonsProgress.Update(lessonProgress);
+            _context.SaveChanges();
+
 
         }
         #endregion
