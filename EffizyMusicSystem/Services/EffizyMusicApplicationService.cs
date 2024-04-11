@@ -210,7 +210,7 @@ namespace EffizyMusicSystem.Services
                 _context.Courses.Add(entity);
                 _context.SaveChanges();
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }
