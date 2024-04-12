@@ -118,7 +118,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (model == null) // && string.IsNullOrEmpty(model.Title)
+        if (model == null) 
         {
             model = new Course();
 
@@ -133,12 +133,12 @@
         if (!string.IsNullOrEmpty(model.Title))
         {
             EffizyService.AddCourse(model);
-            Cancel();
+            NavigationManager.NavigateTo("/courses/");
         }
     }
 
-    public void Cancel()
-    {
-        NavigationManager.NavigateTo("/courses/");
-    }
+    // public void Cancel()
+    // {
+    //     NavigationManager.NavigateTo("/courses/");
+    // }
 }

@@ -10,14 +10,24 @@
 
     <main class="">
         <div class="top-row px-2">
-            @if (isLogin == false)
+            @if (isLogin)
+            {
+                <button @onclick="@Logout" class="btn btn-md btn-primary">Logout</button>
+            }
+            else
+            {
+                <a href="/loginForm" class="btn btn-md btn-primary">Login</a>
+            }
+
+          
+            @* @if (isLogin == false)
             {
                 <a href="/loginForm">Login</a>
             }
             else
             {
                 <button @onclick="@Logout" class="btn-link">Logout</button>
-            }
+            } *@
         </div>
 
         <article class="content px-4">
@@ -38,7 +48,7 @@
 
     protected override async void OnInitialized()
     {
-        // isLogin = await IsUserLogin();
+        isLogin = await IsUserLogin();
     }
 
     protected async Task<bool> IsUserLogin()
@@ -47,6 +57,7 @@
         if (email.Value != null)
         {
             return true;
+            
         }
         else
         {
@@ -59,10 +70,22 @@
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
-        // await ProtectedSessionStore.DeleteAsync("FirstName");
-        // await ProtectedSessionStore.DeleteAsync("LastName");
+        await ProtectedSessionStore.DeleteAsync("User");
+        
 
         //Redirect to specific page.
         NavigationManager.NavigateTo("/loginForm", true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check if the user is logged in
+            isLogin = await IsUserLogin();
+
+            // Update the button text
+            StateHasChanged();
+        }
     }
 }

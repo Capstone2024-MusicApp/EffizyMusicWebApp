@@ -220,7 +220,7 @@ namespace EffizyMusicSystem.Services
             }
             catch(Exception ex)
             {
-                throw;
+                throw new Exception("Error adding module. Please try again", ex);
             }
         }
         #endregion
