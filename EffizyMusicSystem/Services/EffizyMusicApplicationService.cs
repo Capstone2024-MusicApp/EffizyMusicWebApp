@@ -211,18 +211,34 @@ namespace EffizyMusicSystem.Services
             }
 
         }
-        public void AddCourse(Course entity)
+        //public void AddCourse(Course entity)
+        //{
+        //    try
+        //    {
+        //        _context.Courses.Add(entity);
+        //        _context.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error adding module. Please try again", ex);
+        //    }
+        //}
+
+        public async Task<bool> AddCourse(Course entity)
         {
             try
             {
                 _context.Courses.Add(entity);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+                return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("Error adding module. Please try again", ex);
+                return false;
             }
         }
+
         #endregion
         #region Modules
         /// <summary>
