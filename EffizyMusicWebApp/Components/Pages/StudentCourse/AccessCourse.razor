@@ -115,7 +115,7 @@ else
                                 qp = studentCourse.QuizProgress.Where(x => x.QuizID == quiz.Id).FirstOrDefault() ?? new QuizProgress();
                                 quizPercentage = qp.Grade.ToString();
                                 <div style="margin-bottom: 5px;">
-                                    <Button Class="accordion-item lesson-list-for-module" @onclick="() => selectQuiz(quiz)" Disabled="@disableLesson"> @quiz.QuizTitle - @quizPercentage% Passed</Button>
+                                    <Button Class="accordion-item lesson-list-for-module" @onclick="() => selectQuiz(quiz)" Disabled="@disableLesson"> @quiz.QuizTitle - Highest Grade: @quizPercentage% </Button>
                                         @if (module.EnableForStudent)
                                     {
                                         @if (qp.Grade >= 80)
