@@ -7,55 +7,95 @@
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
     <DataAnnotationsValidator />
-    <div class="mb-3">
-        <label class="form-label">Course Title:</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.Title" />
-        </div>
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label">Course Mode:</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.CourseCode" />
-        </div>
-        <ValidationMessage For="@(() => model.CourseCode)" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Description:</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="model.CourseDescription" />
-        </div>
-        <ValidationMessage For="@(() => model.CourseDescription)" />
-    </div>
+    <div class="row"> 
+        <div class="col-md-6"> 
 
-    <div class="mb-3">
-        <label class="form-label">Select Instrument:</label>
-        <div class="col-md-4">
-            <select class="form-select" name="model.InstrumentID">
-                @if (Instruments != null)
-                {
-                    foreach (var entity in Instruments)
-                    {
-                        <option value="@entity.InstrumentID">@entity.InstrumentType</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Course Title</label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.Title" />
+                </div>
+                <ValidationMessage For="@(() => model.Title)" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Select Instructor:</label>
-        <div class="col-md-4">
-            <select class="form-select" name="model.InstructorID">
-                @if (Instructors != null)
-                {
-                    foreach (var entity in Instructors)
-                    {
-                        <option value="@entity.InstructorID">@entity.Location</option>
-                    }
-                }
-            </select>
+            <div class="mb-3">
+                <label class="form-label">Course Code</label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.CourseCode" />
+                </div>
+                <ValidationMessage For="@(() => model.CourseCode)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Course Description:</label>
+                <div class="col-md-6">
+                    <textarea class="form-control" @bind="model.CourseDescription"></textarea>
+                </div>
+                <ValidationMessage For="@(() => model.CourseDescription)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Skill Level </label>
+                <div class="col-md-6">
+                    <InputSelect @bind-Value="model.SkillLevel" class="form-select" name="model.SkillLevel">
+                        <option value="">--Select an option--</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => model.SkillLevel)" />
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Select Instrument</label>
+                <div class="col-md-6">
+                    @* <select class="form-select" name="model.InstrumentID"> *@
+                        <InputSelect @bind-Value="model.InstrumentID" class="form-select" name="model.InstrumentID">
+                        <option value="0">--Select an option--</option>
+                        @if (Instruments != null)
+                        {
+                            
+                            foreach (var entity in Instruments)
+                            {
+                                <option value="@entity.InstrumentID">@entity.InstrumentType</option>
+                            }
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => model.InstrumentID)" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Instructor</label>
+                <div class="col-md-6">
+                    @* <select class="form-select" name="model.InstructorID"> *@
+                    <InputSelect @bind-Value="model.InstructorID" class="form-select" name="model.InstructorID">
+                        <option value="0">--Select an option--</option>
+                        @if (Instructors != null)
+                        {
+                            foreach (var entity in Instructors)
+                            {
+                                <option value="@entity.InstructorID">@entity.FirstName @entity.LastName</option>
+                            }
+                        }
+                    </InputSelect>
+                    @* </select> *@
+                    <ValidationMessage For="@(() => model.InstructorID)" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Estimated Time </label>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="model.EstimatedTime" />
+                </div>
+                <ValidationMessage For="@(() => model.EstimatedTime)" />
+            </div>
         </div>
     </div>
 
@@ -75,9 +115,10 @@
 
     protected List<Instructor> Instructors { get; set; }
 
+
     protected override async Task OnInitializedAsync()
     {
-        if (model == null) // && string.IsNullOrEmpty(model.Title) 
+        if (model == null) // && string.IsNullOrEmpty(model.Title)
         {
             model = new Course();
 

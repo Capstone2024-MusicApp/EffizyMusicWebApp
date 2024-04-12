@@ -33,6 +33,7 @@ namespace EffizyMusicSystem.Services
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
+        List<Payment> GetUserPayments(int UserId);
 
         public List<Feedback> GetFeedback();
         public List<FeedbackDTO> GetFeedbackDTOs();
@@ -178,10 +179,10 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        #endregion
-
+       #endregion
+        //Add your methods here that directly connects to the dtabase
         #region Lesson
-        
+
         public async Task<List<Lesson>> GetModuleLessons(int moduleId)
         {
             try
@@ -211,14 +212,14 @@ namespace EffizyMusicSystem.Services
             }
 
         }
-
         public void AddCourse(Course entity)
         {
             try
             {
                 _context.Courses.Add(entity);
+                _context.SaveChanges();
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }
@@ -610,6 +611,18 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
+        public List<Payment> GetUserPayments(int UserId)
+        {
+            try
+            {
+                return _context.Payments.Where(x=>x.UserID == UserId).ToList();
             }
             catch
             {
@@ -1013,7 +1026,7 @@ namespace EffizyMusicSystem.Services
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
                 string hashPassword = PasswordHasher.HashPassword(password);
-                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
+                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
             }
             else
                 return null;
