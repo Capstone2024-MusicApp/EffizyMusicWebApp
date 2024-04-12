@@ -16,6 +16,12 @@
 } 
 
 <EditForm FormName="Submit-Rating" method="post" Model="@RatingData" OnValidSubmit="SaveRating" class="form mt-4">    
+    <div class="mt-2 alert alert-danger">
+        @if (IsRatingAdded || IsError)
+        {
+            <p class="text-primary h4">@Message</p>
+        }
+    </div>
     <div class="row justify-content-center">
         <div class="col-md-6">
     <div class="form-outline mt-2">
@@ -54,12 +60,7 @@
     <button type="submit" class="btn btn-primary mt-4">Submit Feedback</button>
 
     @* <input type="submit" class="btn btn-primary m-2" id="submit" value="Submit FeedBack"> *@
-    <div class="mt-2">
-        @if (IsRatingAdded || IsError)
-        {
-            <p class="text-primary h4">@Message</p> //TO DO: Confirm
-        }
-    </div>
+   
     </div>
     </div>
 </EditForm>
