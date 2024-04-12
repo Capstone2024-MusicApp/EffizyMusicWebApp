@@ -2,6 +2,7 @@
 @using EffizyMusicSystem.DAL
 @using EffizyMusicSystem.Services
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore
 @using Newtonsoft.Json
@@ -635,6 +636,22 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
             user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            if (selectedUserType == "Student")
+            {
+                user.UserTypeID = Constants.UserType_Student;
+            }
+            else if (selectedUserType == "Instructor")
+            {
+                user.UserTypeID = Constants.UserType_Instructor;
+            }
+            else if (selectedUserType == "Administator")
+            {
+                user.UserTypeID = Constants.UserType_Administrator;
+            }
+            else
+            {
+                user.UserTypeID = 0;
+            }
             bool userCreated = await userService.CreateUserAsync(user);
             if (!userCreated)
             {

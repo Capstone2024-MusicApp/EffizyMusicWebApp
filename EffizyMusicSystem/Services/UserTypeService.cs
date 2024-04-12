@@ -1,5 +1,6 @@
 ﻿using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Models;
+using EffizyMusicSystem.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace EffizyMusicSystem.Services
 
         public async Task<List<UserType>> GetUserTypes()
         {
-            return await _context.UserTypes.ToListAsync();
+            return await _context.UserTypes.Where(x => x.UserTypeID != Constants.UserType_Administrator).ToListAsync();
         }
 
 
