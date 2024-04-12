@@ -1,4 +1,4 @@
-﻿@page "/takeQuiz/{quizId:int}/{count:int}"
+﻿@page "/takeQuiz/{quizId:int}/{count:int}/{enrollmentID:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
@@ -72,6 +72,8 @@
 
     [Parameter]
     public int count { get; set; }
+    [Parameter]
+    public int enrollmentId { get; set; }
     //int count = 0;
 
     Question model = new Question();
@@ -125,13 +127,13 @@
                 };
 
             count++;
-            EffizyService.AddQuizResult(quizResult);
+            EffizyService.SaveQuizResult(quizResult);
             if (count == totalCount)
             {
-                NavigationManager.NavigateTo("/quizResults/" + quizId, true);
+                NavigationManager.NavigateTo("/quizResults/" + quizId + "/" + enrollmentId, true);
             }
             else
-                NavigationManager.NavigateTo("/takeQuiz/" + quizId + "/" + count, true);
+                NavigationManager.NavigateTo("/takeQuiz/" + quizId + "/" + count + "/" + enrollmentId, true);
         }
     }
 

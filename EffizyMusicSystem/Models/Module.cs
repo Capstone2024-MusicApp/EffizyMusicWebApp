@@ -21,5 +21,8 @@ namespace EffizyMusicSystem.Models
 
         public virtual ICollection<Quiz> Quizzes { get; set; }
 
+        [NotMapped]
+        public Boolean EnableForStudent { get; set; } = false;
+
     }
 }
