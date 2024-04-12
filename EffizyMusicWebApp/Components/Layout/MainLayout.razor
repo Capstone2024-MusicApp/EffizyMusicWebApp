@@ -77,15 +77,15 @@
         NavigationManager.NavigateTo("/loginForm", true);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Check if the user is logged in
-            isLogin = await IsUserLogin();
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Check if the user is logged in
+    //         isLogin = await IsUserLogin();
 
-            // Update the button text
-            StateHasChanged();
-        }
-    }
+    //         // Update the button text
+    //         StateHasChanged();
+    //     }
+    // }
 }
