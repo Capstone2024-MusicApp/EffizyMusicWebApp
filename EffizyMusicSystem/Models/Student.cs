@@ -27,7 +27,7 @@ namespace EffizyMusicSystem.Models
         public string Phone { get; set; }
 
         //public string SkillLevel { get; set; }
-        public double Grades { get; set; }
+        //public double Grades { get; set; }
         public string PaymentPlan { get; set; } = "N/A";
         public bool TermsAndConditions { get; set; }
         public int UserID { get; set; }
