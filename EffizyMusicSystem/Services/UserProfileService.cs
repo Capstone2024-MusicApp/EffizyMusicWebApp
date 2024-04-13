@@ -26,20 +26,6 @@ namespace EffizyMusicSystem.Services
                 .FirstOrDefaultAsync(u => u.UserID == userId);
         }
 
-        // public async Task<Student> GetStudentProfileAsync(int studentID)
-        // {
-        //     try
-        //     {
-        //         var student = await _context.Students.FindAsync(studentID);
-        //         return student;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Console.WriteLine($"Error getting student profile: {ex.Message}");
-        //         throw new Exception($"Error updating student profile: {ex.Message}");
-        //     }
-        // }
-
         public async Task<int?> GetStudentIDByUserIDAsync(int userId)
         {
             var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == userId);
@@ -52,18 +38,6 @@ namespace EffizyMusicSystem.Services
             return instructor?.InstructorID;
         }
 
-        // public async Task<Instructor> GetInstructorProfileAsync(int instructorID)
-        // {
-        //     try
-        //     {
-        //         var instructor =  await _context.Instructors.FindAsync(instructorID);
-        //         return instructor;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Console.WriteLine($"Error getting student profile: {ex.Message}");
-        //         throw;
-        //     }
         public async Task<Student> GetStudentProfileAsync(int userId)
         {
             return await _context.Students
