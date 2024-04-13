@@ -1,0 +1,89 @@
+﻿@page "/StudentCourse/ViewCourse/{CourseID:int}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+@using EffizyMusicSystem.Utils
+@using System.Web
+@using System.Text.RegularExpressions;
+
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+
+
+<div class="container">
+
+    <h2>View Course</h2>
+    <br /> 
+    <br />
+    <div class="main-student-course">
+        <h3>@courseDetails.Title</h3>
+        <label class="vc-instructed-by">by @courseDetails.Instructor</label>
+        <br />
+        <br />
+
+        <table class="table">
+        <!-- <thead>
+                <tr>
+                    <th>Instrument Type</th>
+                    <th>Skill Level</th>
+                    <th>Estimated Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td> @courseDetails.Instrument</td>
+                    <td>@courseDetails.SkillLevel</td>
+                    <td> @courseDetails.EstimatedTime</td>
+                </tr>
+                </tbody>-->
+            <tr>
+                <td style="text-align: center; padding-left: 10px;">Instrument Type:    @courseDetails.Instrument </td>
+                <td style="text-align: center; margin: auto;">Skill Level:    @courseDetails.SkillLevel</td>
+                <td style="text-align: center; margin: auto;">Estimated Time:    @courseDetails.EstimatedTime</td>
+            </tr>
+        </table>
+        <br />
+        <p>
+            @{
+                MarkupString desc = (MarkupString)@courseDetails.CourseDescription.Replace( "\r\n", "<br />" ).Replace( "\n", "<br />" );
+    
+            }
+            @desc</p>
+        
+        <br />
+
+        <h3>Modules</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Module Title</th>
+                    <th># of Lessons</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var module in courseDetails.Modules)
+                {
+                    <tr>
+                        <td> @module.Title</td>
+                        <td>@module.Lessons.Count</td>
+                    </tr>
+                }
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CourseID { get; set; }
+
+    public ViewCourseDTO courseDetails { get; set; } = new ViewCourseDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        courseDetails = EffizyService.GetCourseDetails(CourseID);
+    }
+}

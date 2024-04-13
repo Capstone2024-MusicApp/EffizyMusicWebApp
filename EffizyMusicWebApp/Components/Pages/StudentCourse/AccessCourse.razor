@@ -26,10 +26,11 @@ else
 {
     <div class="access-course-main">
         <h1 class="course-title">@studentCourse.Title</h1>
-        <label style="text-align: center; margin: auto; display: block;"> @studentCourse.CourseDescription</label>
+        <br />
+        <label style="text-align: center; margin: auto; display: block; max-width: 60%"> @studentCourse.CourseDescription</label>
         <br />
         <br />
-        <div class="lesson-frame">
+        <div class="lesson-frame" style="text-align: center;">
             <label class="video-lesson-title">@selectedModule.Title - @selectedLesson.Title </label>
             <br />
             @if (selectedLesson.LessonContent != null)

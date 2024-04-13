@@ -960,6 +960,16 @@ namespace EffizyMusicSystem.Services
 
         }
 
+        public ViewCourseDTO GetCourseDetails(int CourseID)
+        {
+            ViewCourseDTO viewCourseDTO;
+            viewCourseDTO =  _context.Database.SqlQuery<ViewCourseDTO>($"EXECUTE sp_getCourseDetials {CourseID}").ToList().FirstOrDefault() ?? new ViewCourseDTO();
+            viewCourseDTO.Modules = _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == viewCourseDTO.CourseId).OrderBy(m => m.ModuleOrder).ToList();
+
+            return viewCourseDTO;
+
+        }
+
         public void setQuizProgress(int enrollmentID, int quizID, float grade)
         {
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
