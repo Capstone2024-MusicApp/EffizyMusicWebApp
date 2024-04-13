@@ -12,16 +12,16 @@
 <div class="container">
     <h3>Edit Instructor Profile</h3>
 
-    @if (!string.IsNullOrEmpty(ErrorMessage))
+    @if (!string.IsNullOrEmpty(Message))
     {
         <div class="alert alert-danger" role="alert">
-            @ErrorMessage
+            @Message
         </div>
     }
 
     @if (InstructorProfile != null)
     {
-        <EditForm Model="@InstructorProfile" OnValidSubmit="@HandleValidSubmit">
+        <EditForm Model="@InstructorProfile" OnValidSubmit="@UpdateProfile">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -63,7 +63,7 @@
     [Parameter]
     public int InstructorID { get; set; }
     private Instructor InstructorProfile { get; set; }
-    private string ErrorMessage { get; set; }
+    private string Message { get; set; }
     private User user;
     private int userId;
 
@@ -80,21 +80,21 @@
                 InstructorProfile = await UserProfileService.GetInstructorProfileAsync(userId);
                 if (InstructorProfile == null)
                 {
-                    ErrorMessage = "Instructor profile not found.";
+                    Message = "Instructor profile not found.";
                 }
             }
             else
             {
-                ErrorMessage = "Unauthorized access: You are not an instructor.";
+                Message = "Unauthorized access: You are not an instructor.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Error retrieving instructor profile: {ex.Message}";
+            Message = $"Error retrieving instructor profile: {ex.Message}";
         }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task UpdateProfile()
     {
         try
         {
@@ -103,7 +103,7 @@
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Error updating the instructor profile: {ex.Message}";
+            Message = $"Error updating the instructor profile: {ex.Message}";
         }
     }
 }
