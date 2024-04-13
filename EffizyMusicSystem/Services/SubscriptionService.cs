@@ -69,5 +69,13 @@ namespace EffizyMusicSystem.Services
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<bool> CheckExistingSubscriptionAsync(string description, int courseID)
+        {
+            // Check if a subscription of the same type and course already exists
+            bool existingSubscription = await _context.Subscriptions
+                .AnyAsync(s => s.Description == description && s.CourseID == courseID);
+
+            return existingSubscription;
+        }
     }
 }

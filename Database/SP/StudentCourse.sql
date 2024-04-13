@@ -106,3 +106,31 @@ AS
 		END
 	END
 GO
+
+CREATE OR ALTER PROCEDURE sp_getCourseDetials
+	@in_courseID INT
+AS
+	DECLARE @ProcedureName VARCHAR(30) = 'sp_getCourseDetials';
+
+	BEGIN
+		select c.CourseId
+			  ,c.Title
+			  ,c.CourseDescription
+			  ,c.SkillLevel
+			  ,c.EstimatedTime
+			  ,im.InstrumentType Instrument
+			  ,id.FirstName + ' ' + id.LastName Instructor
+		from courses c
+		inner join instruments im on c.InstrumentID = im.InstrumentID
+		inner join instructors id on c.InstructorID = id.instructorId
+		where courseID = @in_courseID;
+
+
+
+		IF @@ERROR <> 0 
+		BEGIN
+			RAISERROR('sp_getCourseDetials - Error getting missing course details.',16,1)
+		END
+	END
+GO
+
