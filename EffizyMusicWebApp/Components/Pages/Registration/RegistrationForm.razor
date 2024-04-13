@@ -65,10 +65,10 @@
                 </div>
             </div>
         </EditForm>
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+        @if (!string.IsNullOrEmpty(Message))
         {
             <div class="alert alert-danger" role="alert">
-                @ErrorMessage
+                @Message
             </div>
         }
     </div>
@@ -163,10 +163,10 @@
                 </div>
             </div>
         </EditForm>
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+        @if (!string.IsNullOrEmpty(Message))
         {
             <div class="alert alert-danger" role="alert">
-                @ErrorMessage
+                @Message
             </div>
         }
     </div>
@@ -261,10 +261,10 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 <button type="submit" @onclick="RegisterInstructor" class="btn btn-primary">Register</button>
             </div>
         </EditForm>
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+        @if (!string.IsNullOrEmpty(Message))
         {
             <div class="alert alert-danger" role="alert">
-                @ErrorMessage
+                @Message
             </div>
         }
     </div>
@@ -325,10 +325,10 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         <button type="submit" class="btn btn-primary">Make Payment</button>
     </EditForm>
 
-    @if (!string.IsNullOrEmpty(ErrorMessage))
+    @if (!string.IsNullOrEmpty(Message))
     {
         <div class="alert alert-danger" role="alert">
-            @ErrorMessage
+            @Message
         </div>
     }
 }
@@ -355,7 +355,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     private List<Course> courses;
     private List<string> skillLevels;
     private List<SubscriptionPlan> subscriptions;
-    private string ErrorMessage { get; set; } = "";
+    private string Message { get; set; } = "";
     private List<UserType> userTypes;
     private List<string> distinctSkillLevels = new List<string>();
     private bool paymentSuccessful = false;
@@ -381,7 +381,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     {
         try
         {
-            ErrorMessage = "";
+            Message = "";
             userTypes = await userTypeService.GetUserTypes();
             user.UserTypeID = userTypes?.FirstOrDefault()?.UserTypeID ?? 0;
             instruments = await instrumentService.GetInstruments();
@@ -397,7 +397,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred while initializing: " + ex.Message;
+            Message = "An error occurred while initializing: " + ex.Message;
         }
     }
     async Task UserSelected(string userType)
@@ -419,7 +419,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during instrument change: " + ex.Message;
+            Message = "An error occurred during instrument change: " + ex.Message;
         }
     }
 
@@ -437,7 +437,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during skill level change: " + ex.Message;
+            Message = "An error occurred during skill level change: " + ex.Message;
         }
     }
 
@@ -448,11 +448,11 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             courses = await courseService.GetCourses(instrumentID, skillLevel);
             if (courses == null)
             {
-                ErrorMessage = "No courses found.";
+                Message = "No courses found.";
             }
             else
             {
-                ErrorMessage = "";
+                Message = "";
             }
             // Load subscriptions based on the new course selection
             if (courses != null && courses.Count > 0)
@@ -463,7 +463,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred while loading courses: " + ex.Message;
+            Message = "An error occurred while loading courses: " + ex.Message;
         }
     }
 
@@ -478,7 +478,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Error loading subscriptions: " + ex.Message;
+            Message = "Error loading subscriptions: " + ex.Message;
         }
     }
 
@@ -495,17 +495,17 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 }
                 else
                 {
-                    ErrorMessage = "Invalid Course ID";
+                    Message = "Invalid Course ID";
                 }
             }
             else
             {
-                ErrorMessage = "Invalid Course ID";
+                Message = "Invalid Course ID";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during course change: " + ex.Message;
+            Message = "An error occurred during course change: " + ex.Message;
         }
     }
 
@@ -520,22 +520,21 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             }
             else
             {
-                ErrorMessage = "No Subscriptions found for CourseID: " + courseID;
+                Message = "No Subscriptions found for CourseID: " + courseID;
             }
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred while loading subscriptions: " + ex.Message;
+            Message = "An error occurred while loading subscriptions: " + ex.Message;
         }
     }
-    void NextStep()
+    private async Task NextStep()
     {
         try
         {
             if (selectedUserType == "Student")
             {
-
                 if (CurrentStep == 1)
                 {
                     student.InstrumentID = selectedInstrumentID;
@@ -548,7 +547,15 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 }
                 else if (CurrentStep == 2)
                 {
+                    // Check if Terms and Conditions are accepted
+                    if (!student.TermsAndConditions)
+                    {
+                        Message = "You must agree to the Terms and Conditions to proceed.";
+                        return;
+                    }
+
                     CurrentStep++;
+                    Message = "";
                 }
             }
             else if (selectedUserType == "Instructor")
@@ -557,12 +564,11 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 {
                     CurrentStep++;
                 }
-
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during next step: " + ex.Message;
+            Message = "An error occurred during next step: " + ex.Message;
         }
     }
 
@@ -577,7 +583,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during going back: " + ex.Message;
+            Message = "An error occurred during going back: " + ex.Message;
         }
     }
 
@@ -590,7 +596,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             bool userCreated = await userService.CreateUserAsync(user);
             if (!userCreated)
             {
-                ErrorMessage = "Failed to create user.";
+                Message = "Failed to create user.";
                 return;
             }
             instructor.UserID = user.UserID;
@@ -602,12 +608,12 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             }
             else
             {
-                ErrorMessage = "Failed to create instructor.";
+                Message = "Failed to create instructor.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during instructor registration: " + ex.Message;
+            Message = "An error occurred during instructor registration: " + ex.Message;
         }
     }
 
@@ -619,14 +625,14 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             Course selectedCourse = selectedSubscription?.Course;
             if (selectedCourse == null || amount <= 0)
             {
-                ErrorMessage = "Please select a valid subscription to make a payment.";
+                Message = "Please select a valid subscription to make a payment.";
                 return;
             }
             await RegisterStudentAndPaymentAsync(amount, selectedCourse);
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
+            Message = "An error occurred during student registration and payment: " + ex.Message;
         }
     }
 
@@ -655,7 +661,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             bool userCreated = await userService.CreateUserAsync(user);
             if (!userCreated)
             {
-                ErrorMessage = "Failed to create user.";
+                Message = "Failed to create user.";
                 return;
             }
             student.UserID = user.UserID;
@@ -683,12 +689,12 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             }
             else
             {
-                ErrorMessage = "Failed to create student.";
+                Message = "Failed to create student.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during student registration and payment: " + ex.Message;
+            Message = "An error occurred during student registration and payment: " + ex.Message;
         }
     }
 
@@ -724,17 +730,17 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 }
                 else
                 {
-                    ErrorMessage = "Selected subscription does not have a valid amount.";
+                    Message = "Selected subscription does not have a valid amount.";
                 }
             }
             else
             {
-                ErrorMessage = "Please select a valid subscription to make a payment.";
+                Message = "Please select a valid subscription to make a payment.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during payment: " + ex.Message;
+            Message = "An error occurred during payment: " + ex.Message;
         }
     }
 
@@ -748,7 +754,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         }
         catch (Exception ex)
         {
-            ErrorMessage = "An error occurred during instructor creation: " + ex.Message;
+            Message = "An error occurred during instructor creation: " + ex.Message;
             return false;
         }
     }
