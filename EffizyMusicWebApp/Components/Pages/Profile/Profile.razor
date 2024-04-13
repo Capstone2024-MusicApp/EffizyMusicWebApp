@@ -2,14 +2,9 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components.Authorization
-
 @inject NavigationManager NavigationManager
-
-@rendermode InteractiveServer
-
 @inject IUserService UserService
 @inject IUserProfileService UserProfileService
-@inject IUserProfileService InstructorService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container">
@@ -27,9 +22,9 @@
             Profile
         </div>
         <div class="card-body">
-            @if (CurrentUserType == "Student")
+            @if (CurrentUser != null)
             {
-                @if (StudentProfile != null)
+                @if (CurrentUser.UserType.Description == "Student" && StudentProfile != null)
                 {
                     <div class="row">
                         <div class="col-md-4">
@@ -45,8 +40,6 @@
                                 <dd class="col-sm-9">@StudentProfile.Gender</dd>
                                 <dt class="col-sm-3">Phone:</dt>
                                 <dd class="col-sm-9">@StudentProfile.Phone</dd>
-                                @* <dt class="col-sm-3">Skill Level:</dt>
-                                <dd class="col-sm-9">@StudentProfile.SkillLevel</dd> *@
                                 <dt class="col-sm-3">Grades:</dt>
                                 <dd class="col-sm-9">@StudentProfile.Grades</dd>
                                 <dt class="col-sm-3">Payment Plan:</dt>
@@ -55,14 +48,7 @@
                         </div>
                     </div>
                 }
-                else
-                {
-                    <p>Student profile not found.</p>
-                }
-            }
-            else if (CurrentUserType == "Instructor")
-            {
-                @if (InstructorProfile != null)
+                else if (CurrentUser.UserType.Description == "Instructor" && InstructorProfile != null)
                 {
                     <div class="row">
                         <div class="col-md-4">
@@ -92,10 +78,10 @@
                         </div>
                     </div>
                 }
-                else
-                {
-                    <p>Instructor profile not found.</p>
-                }
+            }
+            else
+            {
+                <p>User is not authenticated.</p>
             }
             <div class="row mt-3">
                 <div class="col-md-6">
@@ -109,45 +95,59 @@
 @code {
     private Student StudentProfile { get; set; }
     private Instructor InstructorProfile { get; set; }
-    private string CurrentUserType { get; set; }
+    private User CurrentUser { get; set; }
     private string ErrorMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var userId = 59; // I need to change this back to the actual logged-in user ID 
-            //var userId = UserService.GetCurrentUserId()
-            var user = await UserProfileService.GetUserById(userId);
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
-            if (user != null)
+            if (user.Identity != null && user.Identity.IsAuthenticated)
             {
-                CurrentUserType = user.UserType.Description;
-
-                if (user.UserType.Description == "Student")
+                var userIdClaim = user.FindFirst("sub");
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
                 {
-                    var studentId = await UserProfileService.GetStudentIDByUserIDAsync(user.UserID);
-                    if (studentId.HasValue)
+                    var userProfile = await UserProfileService.GetUserById(userId);
+                    if (userProfile != null)
                     {
-                        StudentProfile = await UserProfileService.GetStudentProfileAsync(studentId.Value);
-                    }
-                    else
-                    {
-                        ErrorMessage = "Student profile not found.";
+                        CurrentUser = userProfile;
+                        if (userProfile.UserType.Description == "Student")
+                        {
+                            var studentId = await UserProfileService.GetStudentIDByUserIDAsync(userProfile.UserID);
+                            if (studentId.HasValue)
+                            {
+                                StudentProfile = await UserProfileService.GetStudentProfileAsync(studentId.Value);
+                            }
+                            else
+                            {
+                                ErrorMessage = "Student profile not found.";
+                            }
+                        }
+                        else if (userProfile.UserType.Description == "Instructor")
+                        {
+                            var instructorId = await UserProfileService.GetInstructorIDByUserIDAsync(userProfile.UserID);
+                            if (instructorId.HasValue)
+                            {
+                                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(instructorId.Value);
+                            }
+                            else
+                            {
+                                ErrorMessage = "Instructor profile not found.";
+                            }
+                        }
                     }
                 }
-                else if (user.UserType.Description == "Instructor")
+                else
                 {
-                    var instructorId = await UserProfileService.GetInstructorIDByUserIDAsync(user.UserID);
-                    if (instructorId.HasValue)
-                    {
-                        InstructorProfile = await UserProfileService.GetInstructorProfileAsync(instructorId.Value);
-                    }
-                    else
-                    {
-                        ErrorMessage = "Instructor profile not found.";
-                    }
+                    ErrorMessage = "User ID claim not found or invalid.";
                 }
+            }
+            else
+            {
+                ErrorMessage = "User is not authenticated.";
             }
         }
         catch (Exception ex)
@@ -160,13 +160,16 @@
     {
         try
         {
-            if (CurrentUserType == "Student" && StudentProfile != null)
+            if (CurrentUser != null)
             {
-                NavigationManager.NavigateTo("/admin/edit-student-profile/" + StudentProfile.StudentID);
-            }
-            else if (CurrentUserType == "Instructor" && InstructorProfile != null)
-            {
-                NavigationManager.NavigateTo("/admin/edit-instructor-profile/" + InstructorProfile.InstructorID);
+                if (CurrentUser.UserType.Description == "Student" && StudentProfile != null)
+                {
+                    NavigationManager.NavigateTo("/admin/edit-student-profile/" + StudentProfile.StudentID);
+                }
+                else if (CurrentUser.UserType.Description == "Instructor" && InstructorProfile != null)
+                {
+                    NavigationManager.NavigateTo("/admin/edit-instructor-profile/" + InstructorProfile.InstructorID);
+                }
             }
         }
         catch (Exception ex)
