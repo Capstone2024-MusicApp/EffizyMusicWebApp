@@ -18,5 +18,7 @@ namespace EffizyMusicSystem.Models.DTO
         public string Instructor { get; set; } = string.Empty;
         [NotMapped]
         public virtual ICollection<Module>? Modules { get; set; }
+        [NotMapped]
+        public ICollection<SubscriptionPlan> Subscriptions { get; set; }
     }
 }
