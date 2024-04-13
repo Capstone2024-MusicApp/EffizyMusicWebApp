@@ -1025,11 +1025,25 @@ namespace EffizyMusicSystem.Services
         {
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
-                string hashPassword = PasswordHasher.HashPassword(password);
-                return _context.Users.Where(u => u.Email == email && u.Password == hashPassword).FirstOrDefault();
+                string hashedPassword = PasswordHasher.HashPassword(password);
+
+                var user = _context.Users
+                    .FirstOrDefault(u => u.Email == email && u.Password == hashedPassword);
+
+                if (user != null)
+                {
+                    return new User
+                    {
+                        UserID = user.UserID,
+                        ConfirmPassword = user.ConfirmPassword, // Handle possible null
+                        Email = user.Email, // Handle possible null
+                        Password = user.Password, // Handle possible null
+                        UserTypeID = user.UserTypeID // Handle possible null
+                    };
+                }
             }
-            else
-                return null;
+
+            return null;
         }
     }
     #endregion
