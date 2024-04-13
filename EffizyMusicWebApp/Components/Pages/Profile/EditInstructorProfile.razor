@@ -1,162 +1,109 @@
-﻿@page "/editInstructorProfile/{InstructorID}"
+﻿@page "/editInstructorProfile/{InstructorID:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
-@using Microsoft.AspNetCore.Components
 @using EffizyMusicSystem.Utils
-@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject IUserProfileService UserProfileService
 @inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
 
-@rendermode InteractiveServer
+<div class="container">
+    <h3>Edit Instructor Profile</h3>
 
-<h3>Edit Instructor Profile</h3>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Message
+        </div>
+    }
 
-@if (InstructorProfile != null)
-{
-    <EditForm Model="@InstructorProfile" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator />
+    @if (InstructorProfile != null)
+    {
+        <EditForm Model="@InstructorProfile" OnValidSubmit="@UpdateProfile">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="form-group mb-3">
-                    <label for="firstName">First Name</label>
-                    <InputText id="firstName" class="form-control" @bind-Value="@InstructorProfile.FirstName" />
-                    <ValidationMessage For="@(() => InstructorProfile.FirstName)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="lastName">Last Name</label>
-                    <InputText id="lastName" class="form-control" @bind-Value="@InstructorProfile.LastName" />
-                    <ValidationMessage For="@(() => InstructorProfile.LastName)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="gender">Gender</label>
-                    <InputText id="gender" class="form-control" @bind-Value="@InstructorProfile.Gender" />
-                    <ValidationMessage For="@(() => InstructorProfile.Gender)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="phone">Phone</label>
-                    <InputText id="phone" class="form-control" @bind-Value="@InstructorProfile.Phone" />
-                    <ValidationMessage For="@(() => InstructorProfile.Phone)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="location">Location</label>
-                    <InputText id="location" class="form-control" @bind-Value="@InstructorProfile.Location" />
-                    <ValidationMessage For="@(() => InstructorProfile.Location)" />
-                </div>
+            <div class="mb-3">
+                <label for="FirstName" class="form-label">First Name</label>
+                <InputText id="FirstName" class="form-control" @bind-Value="InstructorProfile.FirstName" />
             </div>
 
-            <div class="col-md-4">
-
-
-                <div class="form-group mb-3">
-                    <label for="highestQualification">Highest Qualification</label>
-                    <InputText id="highestQualification" class="form-control" @bind-Value="@InstructorProfile.HighestMusicQualification" />
-                    <ValidationMessage For="@(() => InstructorProfile.HighestMusicQualification)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="yearsOfExperience">Years of Experience</label>
-                    <InputNumber id="yearsOfExperience" class="form-control" @bind-Value="@InstructorProfile.YearsOfExperience" />
-                    <ValidationMessage For="@(() => InstructorProfile.YearsOfExperience)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="referenceEmail">Reference Email</label>
-                    <InputText id="referenceEmail" class="form-control" @bind-Value="@InstructorProfile.ReferenceEmail" />
-                    <ValidationMessage For="@(() => InstructorProfile.ReferenceEmail)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="referencePhone">Reference Phone</label>
-                    <InputText id="referencePhone" class="form-control" @bind-Value="@InstructorProfile.ReferencePhone" />
-                    <ValidationMessage For="@(() => InstructorProfile.ReferencePhone)" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="status">Status</label>
-                    <InputText id="status" class="form-control" @bind-Value="@InstructorProfile.Status" readonly="readonly" />
-                    <ValidationMessage For="@(() => InstructorProfile.Status)" />
-                </div>
+            <div class="mb-3">
+                <label for="LastName" class="form-label">Last Name</label>
+                <InputText id="LastName" class="form-control" @bind-Value="InstructorProfile.LastName" />
             </div>
-        </div>
 
-        <div class="form-group text-center mt-3">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button class="btn btn-secondary ml-2" @onclick="Back">Back</button>
-        </div>
-    </EditForm>
-}
-else
-{
-    <p>Loading...</p>
-}
+            <div class="mb-3">
+                <label for="Phone" class="form-label">Phone</label>
+                <InputText id="Phone" class="form-control" @bind-Value="InstructorProfile.Phone" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Qualification" class="form-label">Highest Qualification</label>
+                <InputText id="Qualification" class="form-control" @bind-Value="InstructorProfile.HighestMusicQualification" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Experience" class="form-label">Years of Experience</label>
+                <InputNumber id="Experience" class="form-control" @bind-Value="InstructorProfile.YearsOfExperience" />
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Changes</button>
+        </EditForm>
+    }
+    else
+    {
+        <p>Instructor profile not found.</p>
+    }
+</div>
 
 @code {
     [Parameter]
-    public string InstructorID { get; set; }
-
+    public int InstructorID { get; set; }
     private Instructor InstructorProfile { get; set; }
-
-    private string ErrorMessage { get; set; }
+    private string Message { get; set; }
+    private User user;
+    private int userId;
 
     protected override async Task OnInitializedAsync()
     {
-        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
-        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        try
         {
-            NavigationManager.NavigateTo("/NotAuthorize/");
-        }
-        await LoadInstructorProfile();
-    }
+            var result = await ProtectedSessionStore.GetAsync<User>("User");
+            user = result.Value ?? new User();
+            userId = user.UserID;
 
-    private async Task LoadInstructorProfile()
-    {
-        if (!string.IsNullOrEmpty(InstructorID) && int.TryParse(InstructorID, out int instructorId))
-        {
-            try
+            if (user.UserTypeID == Constants.UserType_Instructor)
             {
-                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(instructorId);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading instructor profile: {ex.Message}");
-                ErrorMessage = $"Error loading instructor profile: {ex.Message}";
-            }
-        }
-    }
-
-    private async Task HandleSubmit()
-    {
-        if (InstructorProfile != null)
-        {
-            try
-            {
-                var success = await UserProfileService.UpdateInstructorProfileAsync(InstructorProfile);
-                if (success)
+                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(userId);
+                if (InstructorProfile == null)
                 {
-                    NavigationManager.NavigateTo($"/profile");
-                }
-                else
-                {
-                    ErrorMessage = "Failed to update instructor profile.";
+                    Message = "Instructor profile not found.";
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Error updating instructor profile: {ex.Message}");
-                ErrorMessage = $"Error updating instructor profile: {ex.Message}";
+                Message = "Unauthorized access: You are not an instructor.";
             }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error retrieving instructor profile: {ex.Message}";
         }
     }
 
-    private void Back()
+    private async Task UpdateProfile()
     {
-        NavigationManager.NavigateTo("/profile");
+        try
+        {
+            await UserProfileService.UpdateInstructorProfileAsync(InstructorProfile);
+            NavigationManager.NavigateTo("/profile");
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error updating the instructor profile: {ex.Message}";
+        }
     }
 }

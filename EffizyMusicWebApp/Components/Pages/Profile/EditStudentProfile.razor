@@ -2,12 +2,22 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components
+@using EffizyMusicSystem.Utils
 @using System.Threading.Tasks
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
 @inject IUserProfileService UserProfileService
 @inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
 @rendermode InteractiveServer
 
 <h3>Edit Student Profile</h3>
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-danger" role="alert">
+        @Message
+    </div>
+}
 
 @if (StudentProfile != null)
 {
@@ -77,59 +87,51 @@ else
 
     private Student StudentProfile { get; set; }
     private bool IsLoading { get; set; } = true;
-    private string ErrorMessage { get; set; }
+    private string Message { get; set; }
+
+    private User user;
+    private int userId;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadStudentProfile();
-    }
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<User>("User");
+            user = result.Value ?? new User();
+            userId = user.UserID;
 
-    private async Task LoadStudentProfile()
-    {
-        if (!string.IsNullOrEmpty(StudentID) && int.TryParse(StudentID, out int studentId))
-        {
-            try
+            if (user.UserTypeID == Constants.UserType_Student)
             {
-                ErrorMessage = $"Loading student profile for ID: {studentId}";
-                StudentProfile = await UserProfileService.GetStudentProfileAsync(studentId);
-                IsLoading = false;
-                if (StudentProfile != null)
+                StudentProfile = await UserProfileService.GetStudentProfileAsync(userId);
+                if (StudentProfile == null)
                 {
-                    ErrorMessage = $"Student profile loaded: {StudentProfile.FirstName} {StudentProfile.LastName}";
-                }
-                else
-                {
-                    ErrorMessage = $"Student profile is null for ID: {studentId}";
+                    Message = "Student profile not found.";
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ErrorMessage = $"Error loading student profile: {ex.Message}";
+                Message = "Unauthorized access: You are not a student.";
             }
         }
-        else
+
+
+        catch (Exception ex)
         {
-            ErrorMessage = "Invalid Student ID";
+            Message = $"Error retrieving instructor profile: {ex.Message}";
         }
+
     }
 
     private async Task UpdateProfile()
     {
         try
         {
-            var result = await UserProfileService.UpdateStudentProfileAsync(StudentProfile);
-            if (result)
-            {
-                NavigationManager.NavigateTo("/profile");
-            }
-            else
-            {
-                ErrorMessage = "Failed to update student profile.";
-            }
+            await UserProfileService.UpdateStudentProfileAsync(StudentProfile);
+            NavigationManager.NavigateTo("/profile");
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Error updating student profile: {ex.Message}";
+            Message = $"Error updating the student profile: {ex.Message}";
         }
     }
 
