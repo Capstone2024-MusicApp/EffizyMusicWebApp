@@ -38,7 +38,12 @@
                     </td>
                 </tr>
                 <tr >
-                    <td colspan="2">@feedback.Comments</td>
+                    <td colspan="2">
+                        @{
+                            MarkupString theComment = (MarkupString)@feedback.Comments.Replace( "\r\n", "<br />" ).Replace( "\n", "<br />" );
+    
+                        }
+                            @theComment</td>
                 </tr>
                 <tr>
                     
