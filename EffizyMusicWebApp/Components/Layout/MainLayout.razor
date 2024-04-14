@@ -17,7 +17,7 @@
             }
             else
             {
-                <a href="/loginForm">Login</a>
+                <a href="/loginForm" role="button">Login</a>
             }
         </div>
         <article class="content px-4">
@@ -85,6 +85,7 @@
 
     private async Task Logout()
     {
+        await ProtectedSessionStore.DeleteAsync("User");
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
