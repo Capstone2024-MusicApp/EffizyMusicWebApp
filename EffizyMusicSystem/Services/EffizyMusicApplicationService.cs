@@ -30,11 +30,12 @@ namespace EffizyMusicSystem.Services
 
         Task<List<Module>> GetModules();
         Task<Module> GetModuleByID(int id);
+        Task<List<Lesson>> GetModuleLessons(int moduleId);
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
         List<Payment> GetUserPayments(int UserId);
-
+        Task<List<Module>> GetModulesByCourseID(int courseId);
         public List<Feedback> GetFeedback();
         public List<FeedbackDTO> GetFeedbackDTOs();
         public void InsertFeedback(Feedback feedback);
@@ -235,6 +236,17 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<List<Module>> GetModulesByCourseID(int courseId)
+        {
+            try
+            {
+                return await _context.Modules.Where(x => x.Course.CourseID == courseId).ToListAsync();
             }
             catch
             {
@@ -960,6 +972,17 @@ namespace EffizyMusicSystem.Services
 
         }
 
+        public ViewCourseDTO GetCourseDetails(int CourseID)
+        {
+            ViewCourseDTO viewCourseDTO;
+            viewCourseDTO =  _context.Database.SqlQuery<ViewCourseDTO>($"EXECUTE sp_getCourseDetials {CourseID}").ToList().FirstOrDefault() ?? new ViewCourseDTO();
+            viewCourseDTO.Modules = _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == viewCourseDTO.CourseId).OrderBy(m => m.ModuleOrder).ToList();
+            viewCourseDTO.Subscriptions = _context.Subscriptions.Where(x => x.CourseID == CourseID).ToList();
+
+            return viewCourseDTO;
+
+        }
+
         public void setQuizProgress(int enrollmentID, int quizID, float grade)
         {
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
@@ -1045,6 +1068,20 @@ namespace EffizyMusicSystem.Services
 
             return null;
         }
+
+
+        public Student GetStudentFromUser(int userID)
+        {
+            return _context.Students.Where(x => x.UserID == userID).ToList().FirstOrDefault();
+        }
+
+        public void AddPayment(Payment payment)
+        {
+
+            _context.Payments.Add(payment);
+            _context.SaveChanges();
+        }
     }
+
     #endregion
 }

@@ -55,6 +55,11 @@ namespace EffizyMusicSystem.Services
         {
             return await _context.Instructors.ToListAsync();
         }
+        public async Task<List<Course>> GetCourseByInstructorAsync(int userId)
+        {
+            var instructorId = await _context.Instructors.Where(x=>x.UserID == userId).Select(x=>x.InstructorID).FirstOrDefaultAsync();
+            return await _context.Courses.Where(x => x.InstructorID == instructorId).ToListAsync();
+        }
 
         public async Task<List<string>> GetDistinctSkillLevels()
         {

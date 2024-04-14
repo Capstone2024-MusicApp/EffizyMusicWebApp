@@ -44,6 +44,9 @@
                     <td>
                         <a href="@($"editcourse/{course.CourseID}")" class="btn btn-primary btn-sm">
                             <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="@($"modules/{course.CourseID}")" class="btn btn-warning btn-md">  
+                            Modules
                         </a>&nbsp;&nbsp;
                     </td>
                 </tr>
@@ -67,6 +70,11 @@
         {
             NavigationManager.NavigateTo("/NotAuthorize/");
         }
+        if(user.UserTypeID == Constants.UserType_Instructor)
+        {
+            CourseList = await CourseService.GetCourseByInstructorAsync(user.UserID);
+        }
+        else
         CourseList = await CourseService.GetCoursesAsync();
     }
 
