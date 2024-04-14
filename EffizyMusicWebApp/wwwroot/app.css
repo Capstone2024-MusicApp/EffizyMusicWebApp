@@ -1,5 +1,17 @@
 html, body {
     font-family: 'Raleway', sans-serif !important;
+    opacity: 0;
+    animation: fadeInAnimation 3s ease-in forwards;
+}
+
+@keyframes fadeInAnimation {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 a, .btn-link {
