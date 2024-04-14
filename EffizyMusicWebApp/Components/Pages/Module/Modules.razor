@@ -1,4 +1,4 @@
-﻿@page "/modules"
+﻿@page "/modules/{CourseId:int}"
 
 @using EffizyMusicSystem.DAL
 @using EffizyMusicSystem.Models
@@ -42,7 +42,7 @@ else
                         <a href='/quizes/@module.ModuleID' class="btn btn-outline-dark" role="button">
                             Quizes
                         </a>
-                        <a href='/module/lessons/@module.ModuleID' class="btn btn-outline-dark" role="button">
+                        <a href='/lessons/@module.ModuleID' class="btn btn-outline-dark" role="button">
                             Lessons
                         </a>
                     </td>
@@ -55,16 +55,15 @@ else
                      TotalPages="@TotalPages"
                      onPageChange="@HandlePageChange" />
 @code {
+    public int CourseId { get; set; }
     protected List<EffizyMusicSystem.Models.Module> moduleList = new();
     private int pageSize = 4;
     private int cp = 1;
     private int TotalPages => (int)Math.Ceiling((double)moduleList.Count / pageSize);
-    //protected List<User> searchUserData = new();
-    //protected Module module = new();
-    //protected string SearchString { get; set; } = string.Empty;
+   
     protected override async Task OnInitializedAsync()
     {
-        moduleList = await EffizyService.GetModules();
+        moduleList = await EffizyService.GetModulesByCourseID(CourseId);
         //await GetModules();
     }
     private IEnumerable<EffizyMusicSystem.Models.Module> GetItemsOnCurrentPage()

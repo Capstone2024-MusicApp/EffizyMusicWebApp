@@ -1,4 +1,4 @@
-﻿@page "/ViewLesson"
+﻿@page "/lessons/{ModuleID:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Utils
 @using EffizyMusicWebApp.Components.Shared
@@ -77,6 +77,7 @@ else
                      onPageChange="@HandlePageChange" />
 
 @code {
+    private int ModuleID { get; set; }
     private List<Lesson> LessonList = new();
     private int pageSize = 4;
     private int cp = 1;
@@ -92,7 +93,7 @@ else
         {
             NavService.NavigateTo("/NotAuthorize/");
         }
-        LessonList = await EffizyService.GetLessons();
+        LessonList = await EffizyService.GetModuleLessons(ModuleID);
     }
 
     private IEnumerable<Lesson> GetItemsOnCurrentPage()

@@ -30,11 +30,12 @@ namespace EffizyMusicSystem.Services
 
         Task<List<Module>> GetModules();
         Task<Module> GetModuleByID(int id);
+        Task<List<Lesson>> GetModuleLessons(int moduleId);
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
         List<Payment> GetUserPayments(int UserId);
-
+        Task<List<Module>> GetModulesByCourseID(int courseId);
         public List<Feedback> GetFeedback();
         public List<FeedbackDTO> GetFeedbackDTOs();
         public void InsertFeedback(Feedback feedback);
@@ -235,6 +236,17 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<List<Module>> GetModulesByCourseID(int courseId)
+        {
+            try
+            {
+                return await _context.Modules.Where(x => x.Course.CourseID == courseId).ToListAsync();
             }
             catch
             {
