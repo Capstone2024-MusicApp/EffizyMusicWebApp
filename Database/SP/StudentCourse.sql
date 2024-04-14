@@ -12,10 +12,16 @@ AS
 			  ,ProgressStatus 
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
-				and ProgressStatus = 'COMPLETE') CompletedLessons
-			  ,(select count(*) from Modules m
+				and ProgressStatus = 'COMPLETE') +
+				(select count(*) from QuizesProgress qp
+				where qp.EnrollmentId = e.EnrollmentID
+				and qp.Grade >= 80) CompletedLessons
+			  ,((select count(*) from Modules m
 			    inner join Lessons l on m.ModuleID = l.ModuleID
-				and m.CourseID = c.CourseID) TotalLessons
+				and m.CourseID = c.CourseID) +
+				(select count(*) from Modules m
+				inner join Quizes q on m.ModuleID = q.ModuleID
+				and m.CourseID = c.CourseID)) TotalLessons
 		from enrollments  e
 		inner join courses c on e.CourseID = c.CourseID
 		inner join students s on e.StudentID = s.StudentID

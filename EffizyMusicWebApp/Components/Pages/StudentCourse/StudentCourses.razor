@@ -46,7 +46,20 @@
                                 <td>@course.Title</td>
                                 <td>@course.CourseDescription</td>
                                 <td>@course.CourseCode</td>
-                                <td>@course.CompletedLessons of @course.TotalLessons</td>
+                                <td>@{
+                                        double percentageComplete;
+                                        if (course.TotalLessons == 0)
+                                        { 
+                                            percentageComplete = 100; 
+                                        }
+                                        else
+                                        {
+                                            percentageComplete = Math.Round(((double)course.CompletedLessons / (double)course.TotalLessons) * 100, 2);
+                                        }
+                                    }
+                                        @percentageComplete%
+                                    
+                                </td>
                                 <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
                                 <td>
                                     @if(course.CompletedLessons >= @course.TotalLessons)
