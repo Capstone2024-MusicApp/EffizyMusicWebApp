@@ -10,17 +10,17 @@
     </div>
     <main>
         <div class="top-row px-2">
-            @if (isLogin)
+            @* @if (isLogin)
             {
                 <button @onclick="@Logout" class="btn btn-md btn-primary">Logout</button>
             }
             else
             {
                 <a href="/loginForm" class="btn btn-md btn-primary">Login</a>
-            }
+            } *@
 
           
-            @* @if (isLogin == false)
+            @if (isLogin == false)
             {
                 <span><strong>Welcome, <span class="text-danger">@fullName</span></strong></span>
                 <button @onclick="@Logout" class="btn-link">Logout</button>
@@ -28,7 +28,7 @@
             else
             {
                 <button @onclick="@Logout" class="btn-link">Logout</button>
-            } *@
+            }
         </div>
         <article class="content px-4">
             @Body
@@ -50,21 +50,23 @@
     protected override async Task OnInitializedAsync()
     {
         isLogin = await IsUserLoggedIn();
-        if (isLogin)
-        {
-            return true;
-            
-        }
-        else
-        {
-            return false;
-        }
+        
     }
 
     private async Task<bool> IsUserLoggedIn()
     {
         var userIdResult = await ProtectedSessionStore.GetAsync<int>("UserID");
         return userIdResult.Success && userIdResult.Value != 0;
+
+        if (isLogin)
+        {
+            return true;
+
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private async Task LoadUserDetails()

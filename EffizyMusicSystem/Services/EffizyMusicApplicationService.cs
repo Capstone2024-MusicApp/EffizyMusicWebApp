@@ -228,7 +228,7 @@ namespace EffizyMusicSystem.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding module. Please try again", ex);
+                throw;
             }
         }
 

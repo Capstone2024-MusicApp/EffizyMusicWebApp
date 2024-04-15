@@ -2,25 +2,16 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Enum
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
-<<<<<<< HEAD
 @inject NavigationManager NavigationManager
-@using EffizyMusicSystem.DAL
-=======
-@rendermode InteractiveServer
 
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
 <h3>Add Course</h3>
 <hr />
-<EditForm Model="@model" Submit="SaveCourse" FormName="addcourse">
+<EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
     <DataAnnotationsValidator />
 
     <div class="row">
         <div class="col-md-6">
-<<<<<<< HEAD
-
-=======
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
             <div class="mb-3">
                 <label class="form-label">Course Title</label>
                 <div class="col-md-6">
@@ -28,35 +19,21 @@
                 </div>
                 <ValidationMessage For="@(() => model.Title)" />
             </div>
-<<<<<<< HEAD
-
             <div class="mb-3">
                 <label class="form-label">Course Code</label>
-=======
-            <div class="mb-3">
-                <label class="form-label">Course Code:</label>
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
                 <div class="col-md-6">
                     <InputText class="form-control" @bind-Value="model.CourseCode" />
                 </div>
                 <ValidationMessage For="@(() => model.CourseCode)" />
             </div>
-<<<<<<< HEAD
 
             <div class="mb-3">
                 <label class="form-label">Course Description:</label>
-=======
-            <div class="mb-3">
-                <label class="form-label">Description:</label>
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
                 <div class="col-md-6">
                     <textarea class="form-control" @bind="model.CourseDescription"></textarea>
                 </div>
                 <ValidationMessage For="@(() => model.CourseDescription)" />
             </div>
-
-<<<<<<< HEAD
-=======
 
             <div class="mb-3">
                 <label class="form-label">Select Instrument:</label>
@@ -99,7 +76,6 @@
                 </div>
             </div>
 
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
             <div class="mb-3">
                 <label class="form-label">Skill Level </label>
                 <div class="col-md-6">
@@ -113,64 +89,17 @@
                 </div>
             </div>
 
-<<<<<<< HEAD
+                <div class="mb-3">
+                    <label class="form-label">Estimated Time </label>
+                    <div class="col-md-6">
+                        <InputText class="form-control" @bind-Value="model.EstimatedTime" />
+                    </div>
+                    <ValidationMessage For="@(() => model.EstimatedTime)" />
+                </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Select Instrument</label>
-                <div class="col-md-6">
-                    @* <select class="form-select" name="model.InstrumentID"> *@
-                    <InputSelect @bind-Value="model.InstrumentID" class="form-select" name="model.InstrumentID">
-                        <option value="0">--Select an option--</option>
-                        @if (Instruments != null)
-                        {
-
-                            foreach (var entity in Instruments)
-                            {
-                                <option value="@entity.InstrumentID">@entity.InstrumentType</option>
-                            }
-                        }
-                    </InputSelect>
-                    @* <ValidationMessage For="@(() => model.Instrument)" /> *@
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Select Instructor</label>
-                <div class="col-md-6">
-                    @* <select class="form-select" name="model.InstructorID"> *@
-                    <InputSelect @bind-Value="model.InstructorID" class="form-select" name="model.InstructorID">
-                        <option value="0">--Select an option--</option>
-                        @if (Instructors != null)
-                        {
-                            foreach (var entity in Instructors)
-                            {
-                                <option value="@entity.InstructorID">@entity.FirstName @entity.LastName</option>
-                            }
-                        }
-                    </InputSelect>
-                    @* </select> *@
-                    @* <ValidationMessage For="@(() => model.Instructor)" /> *@
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Estimated Time </label>
-                <div class="col-md-6">
-                    <InputText class="form-control" @bind-Value="model.EstimatedTime" />
-                </div>
-                <ValidationMessage For="@(() => model.EstimatedTime)" />
-            </div>
-        </div>
-<<<<<<< HEAD
     </div>
 
-=======
-        </div>
 
-    
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
         <a class="btn btn-light" href="/courses/">
@@ -178,26 +107,16 @@
         </a>
     </div>
 </EditForm>
-<<<<<<< HEAD
-=======
-
-@code {
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
 @code {
     [SupplyParameterFromForm]
     protected Course model { get; set; }
-    
 
     protected List<Instrument> Instruments { get; set; }
 
     protected List<Instructor> Instructors { get; set; }
     private string ErrorMessage { get; set; } = "";
 
-<<<<<<< HEAD
-    private string ErrorMessage { get; set; } = "";
-=======
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
     protected override async Task OnInitializedAsync()
     {
@@ -208,20 +127,10 @@
             Instruments = EffizyService.GetInstruments();
 
             Instructors = EffizyService.GetInstructors();
-<<<<<<< HEAD
         }
     }
-
 
     protected async Task SaveCourse()
-=======
-
-
-        }
-    }
-
-    private async Task SaveCourse()
->>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
     {
         if (!string.IsNullOrEmpty(model.Title))
         {
@@ -229,8 +138,7 @@
             Cancel();
         }
     }
-    
-    
+
     public void Cancel()
     {
         NavigationManager.NavigateTo("/courses/");
