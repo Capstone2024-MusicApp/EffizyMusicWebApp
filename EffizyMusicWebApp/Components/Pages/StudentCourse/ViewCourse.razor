@@ -80,14 +80,17 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(var module in courseDetails.Modules)
+                @if (courseDetails.Modules != null)
                 {
-                    <tr>
-                        <td> @module.Title</td>
-                        <td>@module.Lessons.Count</td>
-                    </tr>
+                    @foreach (var module in courseDetails.Modules)
+                    {
+                        <tr>
+                            <td> @module.Title</td>
+                            <td>@module.Lessons.Count</td>
+                        </tr>
+                    }
                 }
-                
+
             </tbody>
         </table>
         <br />
@@ -144,7 +147,7 @@
         try
         {
 
-            if (selectedSubscriptionID != 0 || courseDetails.Subscriptions.Count == 0)
+            if (selectedSubscriptionID != 0 || courseDetails.Subscriptions.Count != 0)
             {
                 ErrorMessage = String.Empty;
                 SubscriptionPlan selectedSubcription = new SubscriptionPlan();
