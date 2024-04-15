@@ -2,10 +2,13 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Enum
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+<<<<<<< HEAD
 @inject NavigationManager NavigationManager
 @using EffizyMusicSystem.DAL
+=======
 @rendermode InteractiveServer
 
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
 <h3>Add Course</h3>
 <hr />
@@ -14,6 +17,10 @@
 
     <div class="row">
         <div class="col-md-6">
+<<<<<<< HEAD
+
+=======
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
             <div class="mb-3">
                 <label class="form-label">Course Title</label>
                 <div class="col-md-6">
@@ -21,23 +28,35 @@
                 </div>
                 <ValidationMessage For="@(() => model.Title)" />
             </div>
+<<<<<<< HEAD
 
             <div class="mb-3">
                 <label class="form-label">Course Code</label>
+=======
+            <div class="mb-3">
+                <label class="form-label">Course Code:</label>
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
                 <div class="col-md-6">
                     <InputText class="form-control" @bind-Value="model.CourseCode" />
                 </div>
                 <ValidationMessage For="@(() => model.CourseCode)" />
             </div>
+<<<<<<< HEAD
 
             <div class="mb-3">
                 <label class="form-label">Course Description:</label>
+=======
+            <div class="mb-3">
+                <label class="form-label">Description:</label>
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
                 <div class="col-md-6">
                     <textarea class="form-control" @bind="model.CourseDescription"></textarea>
                 </div>
                 <ValidationMessage For="@(() => model.CourseDescription)" />
             </div>
 
+<<<<<<< HEAD
+=======
 
             <div class="mb-3">
                 <label class="form-label">Select Instrument:</label>
@@ -80,6 +99,7 @@
                 </div>
             </div>
 
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
             <div class="mb-3">
                 <label class="form-label">Skill Level </label>
                 <div class="col-md-6">
@@ -93,6 +113,7 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
         </div>
 
         <div class="col-md-6">
@@ -142,8 +163,14 @@
                 <ValidationMessage For="@(() => model.EstimatedTime)" />
             </div>
         </div>
+<<<<<<< HEAD
     </div>
 
+=======
+        </div>
+
+    
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
         <a class="btn btn-light" href="/courses/">
@@ -151,6 +178,11 @@
         </a>
     </div>
 </EditForm>
+<<<<<<< HEAD
+=======
+
+@code {
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
 @code {
     [SupplyParameterFromForm]
@@ -162,7 +194,10 @@
     protected List<Instructor> Instructors { get; set; }
     private string ErrorMessage { get; set; } = "";
 
+<<<<<<< HEAD
     private string ErrorMessage { get; set; } = "";
+=======
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
 
     protected override async Task OnInitializedAsync()
     {
@@ -173,11 +208,20 @@
             Instruments = EffizyService.GetInstruments();
 
             Instructors = EffizyService.GetInstructors();
+<<<<<<< HEAD
         }
     }
 
 
     protected async Task SaveCourse()
+=======
+
+
+        }
+    }
+
+    private async Task SaveCourse()
+>>>>>>> 672aa83c3964fd2e26fcf7550b4ce6c66973bc64
     {
         if (!string.IsNullOrEmpty(model.Title))
         {
