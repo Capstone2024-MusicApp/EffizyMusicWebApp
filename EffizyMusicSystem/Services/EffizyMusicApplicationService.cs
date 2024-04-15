@@ -39,6 +39,7 @@ namespace EffizyMusicSystem.Services
         public List<FeedbackDTO> GetFeedbackDTOs();
         public void InsertFeedback(Feedback feedback);
         public void DeleteFeedback(Feedback feedback);
+  
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -213,6 +214,10 @@ namespace EffizyMusicSystem.Services
 
         }
 
+
+
+
+
         public void AddCourse(Course entity)
         {
             try
@@ -222,7 +227,7 @@ namespace EffizyMusicSystem.Services
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("Error adding module. Please try again", ex);
             }
         }
 
