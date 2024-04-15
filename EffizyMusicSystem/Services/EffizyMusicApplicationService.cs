@@ -1069,6 +1069,22 @@ namespace EffizyMusicSystem.Services
             return null;
         }
 
+        public bool DoesEnrolmentMatchUer(int enrollmentID, int userID)
+        {
+            bool enrollmentMatch = false;
+            Enrollment enrollment = _context.Enrollments.Where(x => x.EnrollmentID == enrollmentID && x.UserID == userID).ToList().FirstOrDefault();
+
+            if(enrollment == null)
+            {
+                enrollmentMatch = false;
+            }
+            else 
+            {
+                enrollmentMatch = true;
+            }
+
+            return enrollmentMatch;
+        }
 
         public Student GetStudentFromUser(int userID)
         {

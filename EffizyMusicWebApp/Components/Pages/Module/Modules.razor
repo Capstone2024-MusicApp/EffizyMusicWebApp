@@ -3,16 +3,28 @@
 @using EffizyMusicSystem.DAL
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
 <h3>Modules</h3>
 
 <br />
-@if (moduleList == null)
+@if (UserTypeID == 3)
 {
-    <p><em>No Record Found</em></p>
+    <div class="alert alert-danger" role="alert">
+        You have no rights to see modules.
+    </div>
 }
 else
 {
-    <table class="table table-striped align-middle table-bordered">
+    @if (moduleList == null)
+    {
+        <p><em>No Record Found</em></p>
+    }
+    else
+    {
+     <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
                @*  <th>ID</th> *@
@@ -50,13 +62,15 @@ else
             }
         </tbody>
     </table>
-}
+    }
+ }
 <PaginationComponent CurrentPage="@cp"
                      TotalPages="@TotalPages"
                      onPageChange="@HandlePageChange" />
 @code {
     [Parameter]
     public int CourseId { get; set; }
+    public int UserTypeID = 0;
     protected List<EffizyMusicSystem.Models.Module> moduleList = new();
     private int pageSize = 4;
     private int cp = 1;
@@ -64,6 +78,15 @@ else
    
     protected override async Task OnInitializedAsync()
     {
+        bool isLogin = await IsUserLogin();
+        if (isLogin == false)
+        {
+            NavigationManager.NavigateTo("/loginForm", true);
+            return;
+        }
+        var UserType = await ProtectedSessionStore.GetAsync<int>("UserTypeID");
+        UserTypeID = UserType.Value;
+
         moduleList = await EffizyService.GetModulesByCourseID(CourseId);
         //await GetModules();
     }
@@ -77,6 +100,20 @@ else
     {
         cp = newPage;
     }
+
+    protected async Task<bool> IsUserLogin()
+    {
+        var email = await ProtectedSessionStore.GetAsync<String>("Email");
+        if (email.Value != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     // protected async Task GetModules()
     // {
     //     string apiUrl = "https://localhost:7164/api/Modules/";
