@@ -408,6 +408,7 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
         public void AddQuizResult(QuizResult entity)
         {
             try
@@ -658,6 +659,7 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
+
 
         public Question GetQuestion(int id)
         {
