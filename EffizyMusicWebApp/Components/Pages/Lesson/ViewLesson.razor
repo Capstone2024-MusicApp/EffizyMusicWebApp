@@ -1,4 +1,4 @@
-﻿@page "/ViewLesson"
+﻿@page "/lessons/{ModuleID:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Utils
 @using EffizyMusicWebApp.Components.Shared
@@ -58,6 +58,9 @@ else
                         }
                     </td>
                     <td>
+                        <a href='/AddLesson' class="btn btn-primary" role="button">
+                            <Icon Name="IconName.PersonAdd"></Icon>
+                        </a>
                         <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
                             <Icon Name="IconName.PencilSquare"></Icon>
                         </a>
@@ -74,10 +77,11 @@ else
                      onPageChange="@HandlePageChange" />
 
 @code {
+    [Parameter]
+    public int ModuleID { get; set; }
     private List<Lesson> LessonList = new();
     private int pageSize = 4;
     private int cp = 1;
-    private string videoUrl;
     private int TotalPages => (int)Math.Ceiling((double)LessonList.Count / pageSize);
 
     protected override async Task OnInitializedAsync()
@@ -89,7 +93,7 @@ else
         {
             NavService.NavigateTo("/NotAuthorize/");
         }
-        LessonList = await EffizyService.GetLessons();
+        LessonList = await EffizyService.GetModuleLessons(ModuleID);
     }
 
     private IEnumerable<Lesson> GetItemsOnCurrentPage()

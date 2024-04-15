@@ -2,6 +2,10 @@
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject IInstructorService InstructorService
 @inject NavigationManager NavigationManager
 
@@ -41,13 +45,17 @@ else
 @code {
     [Parameter]
     public string InstructorId { get; set; }
-     
     private Instructor Instructor { get; set; }
     private string ErrorMessage { get; set; }
     public Instrument Instrument { get; set; } // Navigation property
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         await LoadInstructor();
     }
 

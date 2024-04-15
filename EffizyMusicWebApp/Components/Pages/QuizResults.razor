@@ -16,6 +16,9 @@ else
     @if (results != null && results.Count > 0)
     {
         <div class="row">
+            <div class="alert alert-success" role="alert" style="color:darkred;font-size:20px">
+                <b>You need 80% marks to pass.</b>
+            </div>
             <div class="col-md-6">
                 <div class="alert alert-info" role="alert">
                     <b>Total Questions:</b> @totalQuestions
@@ -74,17 +77,20 @@ else
     public int correctAnswers = 0;
     public decimal percentage = 0;
 
+    private User user { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        bool isLogin = await IsUserLogin();
-        if (isLogin == false)
+
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+
+        bool isLogin; // = await IsUserLogin();
+        if (user == null || user.UserID == 0)
         {
             NavigationManager.NavigateTo("/loginForm", true);
             return;
         }
-
-        var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
-        int userId = Convert.ToInt32(UserID.Value);
+        int userId = Convert.ToInt32(user.UserID);
 
         results = EffizyService.GetQuizResults(quizId, userId);
         totalQuestions = results.Count;
@@ -97,10 +103,14 @@ else
             }
         }
 
-        if(totalQuestions > 0)
+        if(totalQuestions > 0 )
         {
             percentage = Convert.ToDecimal(correctAnswers) / Convert.ToDecimal(totalQuestions) * 100;
-            EffizyService.setQuizProgress(enrollmentId, quizId, (float)percentage);
+            if (enrollmentId != 0)
+            {
+
+                EffizyService.setQuizProgress(enrollmentId, quizId, (float)percentage);
+            }
         }
     }
 

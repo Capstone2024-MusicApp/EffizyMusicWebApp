@@ -1,14 +1,14 @@
-﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inherits LayoutComponentBase
+@inject UserProfileService UserProfileService
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavigationManager
-
+@inject IUserProfileService UserProfileService
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
-    <main class="">
+    <main>
         <div class="top-row px-2">
             @if (isLogin)
             {
@@ -22,14 +22,14 @@
           
             @* @if (isLogin == false)
             {
-                <a href="/loginForm">Login</a>
+                <span><strong>Welcome, <span class="text-danger">@fullName</span></strong></span>
+                <button @onclick="@Logout" class="btn-link">Logout</button>
             }
             else
             {
                 <button @onclick="@Logout" class="btn-link">Logout</button>
             } *@
         </div>
-
         <article class="content px-4">
             @Body
         </article>
@@ -42,19 +42,15 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
-@code
-{
-    bool isLogin { get; set; }
 
-    protected override async void OnInitialized()
-    {
-        isLogin = await IsUserLogin();
-    }
+@code {
+    private string fullName = "Not logged in";
+    private bool isLogin = false;
 
-    protected async Task<bool> IsUserLogin()
+    protected override async Task OnInitializedAsync()
     {
-        var email = await ProtectedSessionStore.GetAsync<String>("Email");
-        if (email.Value != null)
+        isLogin = await IsUserLoggedIn();
+        if (isLogin)
         {
             return true;
             
@@ -65,16 +61,54 @@
         }
     }
 
-    protected async Task Logout()
+    private async Task<bool> IsUserLoggedIn()
     {
+        var userIdResult = await ProtectedSessionStore.GetAsync<int>("UserID");
+        return userIdResult.Success && userIdResult.Value != 0;
+    }
+
+    private async Task LoadUserDetails()
+    {
+        var userIdResult = await ProtectedSessionStore.GetAsync<int>("UserID");
+        if (!userIdResult.Success || userIdResult.Value == 0)
+        {
+            fullName = "User ID not found";
+            return;
+        }
+
+        int userId = userIdResult.Value;
+
+        // Check for Student Profile first
+        var student = await UserProfileService.GetStudentProfileAsync(userId);
+        if (student != null)
+        {
+            fullName = $"{student.FirstName} {student.LastName}";
+            return;
+        }
+
+        // If not a student, check for Instructor Profile
+        var instructor = await UserProfileService.GetInstructorProfileAsync(userId);
+        if (instructor != null)
+        {
+            fullName = $"{instructor.FirstName} {instructor.LastName}";
+            return;
+        }
+
+        // If nothing found, set user as not found
+        fullName = "Profile not found";
+    }
+
+    private async Task Logout()
+    {
+        await ProtectedSessionStore.DeleteAsync("User");
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
         await ProtectedSessionStore.DeleteAsync("User");
         
 
-        //Redirect to specific page.
-        NavigationManager.NavigateTo("/loginForm", true);
+        // Redirect to login page
+        NavigationManager.NavigateTo("/loginForm", forceLoad: true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

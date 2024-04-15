@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
+
+@inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
 @inject IJSRuntime JsRuntime
 @inject ProtectedSessionStorage ProtectedSessionStore
@@ -36,7 +38,12 @@
                     </td>
                 </tr>
                 <tr >
-                    <td colspan="2">@feedback.Comments</td>
+                    <td colspan="2">
+                        @{
+                            MarkupString theComment = (MarkupString)@feedback.Comments.Replace( "\r\n", "<br />" ).Replace( "\n", "<br />" );
+    
+                        }
+                            @theComment</td>
                 </tr>
                 <tr>
                     
@@ -90,6 +97,8 @@
         EffizyService.InsertFeedback(feedbackpost);
         feedbacks = EffizyService.GetFeedbackDTOs();
         feedbackpost = new Feedback();
+        
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 
     private async Task DeleteFeedback(FeedbackDTO feedback)

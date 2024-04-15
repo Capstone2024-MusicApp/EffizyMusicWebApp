@@ -44,6 +44,9 @@
                     <td>
                         <a href="@($"editcourse/{course.CourseID}")" class="btn btn-primary btn-sm">
                             <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="@($"modules/{course.CourseID}")" class="btn btn-warning btn-md">  
+                            Modules
                         </a>&nbsp;&nbsp;
                     </td>
                 </tr>
@@ -62,6 +65,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
+        if(user.UserTypeID == Constants.UserType_Instructor)
+        {
+            CourseList = await CourseService.GetCourseByInstructorAsync(user.UserID);
+        }
+        else
         CourseList = await CourseService.GetCoursesAsync();
     }
 
