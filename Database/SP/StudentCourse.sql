@@ -9,6 +9,7 @@ AS
 			  ,CourseDescription
 			  ,CourseCode
 			  ,e.StudentID
+			  ,e.UserID
 			  ,ProgressStatus 
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
