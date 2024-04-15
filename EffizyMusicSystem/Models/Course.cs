@@ -11,7 +11,7 @@ namespace EffizyMusicSystem.Models
 {
     public class Course
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public int CourseID { get; set; }
         [Required(ErrorMessage = "Please enter a course title.")]
         public string Title { get; set; }
