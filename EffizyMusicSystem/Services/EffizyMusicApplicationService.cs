@@ -408,12 +408,12 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
-        public void AddQuizResult(QuizResult entity)
+        public async Task AddQuizResult(QuizResult entity)
         {
             try
             {
-                _context.QuizResults.Add(entity);
-                _context.SaveChanges();
+                _context.QuizResults.AddAsync(entity);
+                _context.SaveChangesAsync();
             }
             catch
             {
@@ -421,27 +421,27 @@ namespace EffizyMusicSystem.Services
             }
         }
 
-        public void SaveQuizResult(QuizResult entity)
+        public async Task SaveQuizResult(QuizResult entity)
         {
             QuizResult qr = _context.QuizResults.Where(q => q.QuizId == entity.QuizId && q.UserId == entity.UserId && q.QuestionId == entity.QuestionId).FirstOrDefault();
             if(qr == null)
             {
-                AddQuizResult(entity);
+                await AddQuizResult(entity);
             }
             else
             {
                 qr.SelectedChoice = entity.SelectedChoice;
                 qr.CreatedDate = entity.CreatedDate;
-                UpdateQuizResult(qr);
+                await UpdateQuizResult(qr);
             }
         }
         //To Update the records of a particluar QuizResult
-        public void UpdateQuizResult(QuizResult entity)
+        public async Task UpdateQuizResult(QuizResult entity)
         {
             try
             {
                 _context.Entry(entity).State = EntityState.Modified;
-                _context.SaveChanges();
+                _context.SaveChangesAsync();
             }
             catch
             {

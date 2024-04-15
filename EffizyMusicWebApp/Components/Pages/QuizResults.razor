@@ -100,10 +100,14 @@ else
             }
         }
 
-        if(totalQuestions > 0 && enrollmentId != 0)
+        if(totalQuestions > 0 )
         {
             percentage = Convert.ToDecimal(correctAnswers) / Convert.ToDecimal(totalQuestions) * 100;
-            EffizyService.setQuizProgress(enrollmentId, quizId, (float)percentage);
+            if (enrollmentId != 0)
+            {
+
+                EffizyService.setQuizProgress(enrollmentId, quizId, (float)percentage);
+            }
         }
     }
 
