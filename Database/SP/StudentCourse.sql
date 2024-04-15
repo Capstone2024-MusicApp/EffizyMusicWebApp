@@ -47,6 +47,7 @@ AS
 			  , CourseDescription
 			  , CourseCode
 			  , StudentID
+			  ,UserID
 			  , ProgressStatus 
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
@@ -140,3 +141,4 @@ AS
 	END
 GO
 
+select * From enrollments;
