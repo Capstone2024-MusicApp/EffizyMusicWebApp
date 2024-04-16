@@ -239,8 +239,17 @@ else
                 {
                     if (quiz.Grade < 80)
                     {
-                        selectedLesson = module.Lessons.First();
-                        selectedModule = module;
+                        if(module.Lessons.Count == 0)
+                        {
+                            selectedModule = module;
+                            selectedLesson = studentCourse.Modules.First().Lessons.First();
+
+                        }
+                        else
+                        {
+                            selectedLesson = module.Lessons.First();
+                            selectedModule = module;
+                        }
                         moduleFound = true;
                         break;
                     }
