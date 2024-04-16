@@ -17,13 +17,32 @@
 </style>
 <!-- RatingComponent.razor -->
 <div class="rating">
-    @for (int i = 0; i < 5; i++)
-    {
-        <span class="star @(i < SelectedRating ? "selected" : "")"
-              @onclick="()=>SetRating(i + 1)">
+
+        <span class="star @(1 <= SelectedRating  ? "selected" : "")"
+              @onclick="()=>SetRating(1)">
             &#9733;
         </span>
-    }
+
+    <span class="star @(2 <= SelectedRating  ? "selected" : "")"
+              @onclick="()=>SetRating(2)">
+            &#9733;
+        </span>
+
+        <span class="star @(3 <= SelectedRating ? "selected" : "")"
+              @onclick="()=>SetRating(3)">
+            &#9733;
+        </span>
+
+        <span class="star @(4 <= SelectedRating  ? "selected" : "")"
+              @onclick="()=>SetRating(4)">
+            &#9733;
+        </span>
+
+    <span class="star @(5 <= SelectedRating  ? "selected" : "")"
+          @onclick="()=>SetRating(5)">
+        &#9733;
+    </span>
+    
 </div>
 
 @code {
@@ -34,6 +53,7 @@
     public EventCallback<int> RatingChanged { get; set; }
 
     private int SelectedRating = 0;
+
 
     private async Task SetRating(int rating)
     {

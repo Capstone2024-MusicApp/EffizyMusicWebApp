@@ -1,8 +1,11 @@
 @page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @using EffizyMusicSystem.Models.DTO
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject NavigationManager NavigationManager
 
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
@@ -15,10 +18,16 @@
     <br />
     @if (availablecourses == null)
     {
-        <p><em>Loading...</em></p>
+        <div style="margin: auto; vertical-align:middle; width: 100% height: 100%">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
     }
     else
     {
+        @if(user == null || user.UserID != 0)
+        {
         <div class="main-student-course">
             <h3>Your Enrolled Courses</h3>
             <br />
@@ -85,6 +94,7 @@
             <br />
             <br />
             <br />
+        }
         <h3>Available Courses</h3>
             <br />
             <table class="table">
@@ -134,9 +144,10 @@
 
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
-        if (String.IsNullOrEmpty(user.UserID.ToString()))
+        if (user.UserTypeID != Constants.UserType_Student)
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
+           // NavigationManager.NavigateTo("/NotAuthorize/");
         }
         else
         {
