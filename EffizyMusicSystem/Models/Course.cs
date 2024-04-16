@@ -22,10 +22,11 @@ namespace EffizyMusicSystem.Models
        
         public string CourseDescription { get; set; }
 
-        
+        [Required(ErrorMessage = "Please select an instrument.")]
         [Display(Name = "Instrument")]
         public int InstrumentID { get; set; }
 
+        [Required(ErrorMessage = "Please select an instructor.")]
         [Display(Name = "Instructor")]
         public int InstructorID { get; set; }
 
@@ -37,10 +38,8 @@ namespace EffizyMusicSystem.Models
         [StringLength(30)]
         public string EstimatedTime { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Please select an instrument.")]
         public Instrument Instrument { get; set; }
 
-        [Required(ErrorMessage = "Please select an instructor.")]
         public Instructor Instructor { get; set; }
 
         public virtual ICollection<Module> Modules { get; set; }

@@ -6,7 +6,9 @@
 <h3>Add Course</h3>
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
-    @* <DataAnnotationsValidator /> *@
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
 
     <div class="row">
         <div class="col-md-6">
@@ -52,11 +54,12 @@
 
         <div class="col-md-6">
             <div class="mb-3">
-                <label class="form-label">Select Instrument</label>
+                <label for="InstrumentID" class="form-label">Select Instrument</label>
+                @* <label for="Instrument" class="form-label">Choose Course:</label> *@
                 <div class="col-md-6">
                     @* <select class="form-select" name="model.InstrumentID"> *@
                     <InputSelect @bind-Value="model.InstrumentID" class="form-select" name="model.InstrumentID">
-                        <option value="0">--Select an option--</option>
+                        <option value="">--Select an option--</option>
                         @if (Instruments != null)
                         {
 
