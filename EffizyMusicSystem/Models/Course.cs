@@ -22,11 +22,11 @@ namespace EffizyMusicSystem.Models
        
         public string CourseDescription { get; set; }
 
-        [Required(ErrorMessage = "Please select an instrument.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select an instrument.")]
         [Display(Name = "Instrument")]
         public int InstrumentID { get; set; }
 
-        [Required(ErrorMessage = "Please select an instructor.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select an instructor.")]
         [Display(Name = "Instructor")]
         public int InstructorID { get; set; }
 

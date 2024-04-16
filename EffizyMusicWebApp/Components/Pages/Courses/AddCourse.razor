@@ -7,7 +7,6 @@
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
 
     <div class="row">
@@ -41,7 +40,7 @@
                 <label class="form-label">Skill Level </label>
                 <div class="col-md-6">
                     <InputSelect @bind-Value="model.SkillLevel" class="form-select" name="model.SkillLevel">
-                        <option value="">--Select an option--</option>
+                        <option value="0">--Select an option--</option>
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
                         <option value="Advanced">Advanced</option>
@@ -58,7 +57,7 @@
                 <div class="col-md-6">
                     @* <select class="form-select" name="model.InstrumentID"> *@
                     <InputSelect @bind-Value="model.InstrumentID" class="form-select" name="model.InstrumentID">
-                        <option value="">--Select an option--</option>
+                        <option value="0">--Select an option--</option>
                         @if (Instruments != null)
                         {
 
