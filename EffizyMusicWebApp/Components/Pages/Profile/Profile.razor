@@ -1,0 +1,168 @@
+﻿@page "/profile"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+@rendermode InteractiveServer
+
+@inject IUserService UserService
+@inject NavigationManager NavigationManager // Inject NavigationManager here
+@inject IUserProfileService UserProfileService
+@inject IUserProfileService InstructorService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="container">
+    <h3>User Profile</h3>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ErrorMessage
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">
+            Profile
+        </div>
+        <div class="card-body">
+            @if (CurrentUserType == "Student")
+            {
+                @if (StudentProfile != null)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@GetAvatarUrl(StudentProfile.Gender)" class="rounded-circle" alt="Avatar" width="150" height="150" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-3">First Name:</dt>
+                                <dd class="col-sm-9">@StudentProfile.FirstName</dd>
+                                <dt class="col-sm-3">Last Name:</dt>
+                                <dd class="col-sm-9">@StudentProfile.LastName</dd>
+                                <dt class="col-sm-3">Gender:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Gender</dd>
+                                <dt class="col-sm-3">Phone:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Phone</dd>
+                                @* <dt class="col-sm-3">Grades:</dt>
+                                <dd class="col-sm-9">@StudentProfile.Grades</dd> *@
+                                <dt class="col-sm-3">Payment Plan:</dt>
+                                <dd class="col-sm-9">@StudentProfile.PaymentPlan</dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Student profile not found.</p>
+                }
+            }
+            else if (CurrentUserType == "Instructor")
+            {
+                @if (InstructorProfile != null)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@GetAvatarUrl(InstructorProfile.Gender)" class="rounded-circle" alt="Avatar" width="150" height="150" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-3">First Name:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.FirstName</dd>
+                                <dt class="col-sm-3">Last Name:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.LastName</dd>
+                                <dt class="col-sm-3">Gender:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Gender</dd>
+                                <dt class="col-sm-3">Phone:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Phone</dd>
+                                <dt class="col-sm-3">Highest Qualification:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.HighestMusicQualification</dd>
+                                <dt class="col-sm-3">Years of Experience:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.YearsOfExperience</dd>
+                                <dt class="col-sm-3">Reference Email:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.ReferenceEmail</dd>
+                                <dt class="col-sm-3">Reference Phone:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.ReferencePhone</dd>
+                                <dt class="col-sm-3">Status:</dt>
+                                <dd class="col-sm-9">@InstructorProfile.Status</dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Instructor profile not found.</p>
+                }
+            }
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <button class="btn btn-primary" @onclick="EditProfile">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Student StudentProfile { get; set; }
+    private Instructor InstructorProfile { get; set; }
+    private string CurrentUserType { get; set; }
+    private string ErrorMessage { get; set; }
+    private User user;
+    private int userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<User>("User");
+            user = result.Value ?? new User();
+            userId = user.UserID;
+
+            if (user.UserTypeID == Constants.UserType_Student)
+            {
+                CurrentUserType = "Student";
+                StudentProfile = await UserProfileService.GetStudentProfileAsync(userId);
+            }
+            else if (user.UserTypeID == Constants.UserType_Instructor)
+            {
+                CurrentUserType = "Instructor";
+                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error retrieving user profile: {ex.Message}";
+        }
+    }
+
+    private async Task EditProfile()
+    {
+        try
+        {
+            if (CurrentUserType == "Student" && StudentProfile != null)
+            {
+                NavigationManager.NavigateTo("/editStudentProfile/" + StudentProfile.StudentID);
+            }
+            else if (CurrentUserType == "Instructor" && InstructorProfile != null)
+            {
+                NavigationManager.NavigateTo("/editInstructorProfile/" + InstructorProfile.InstructorID);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error navigating to edit profile: {ex.Message}";
+        }
+    }
+
+    private string GetAvatarUrl(string gender)
+    {
+        //male and female avatar images
+        return gender.ToLower() == "male"
+            ? "data:image/png;base64,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"
+            : "data:image/png;base64,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";
+    }
+}

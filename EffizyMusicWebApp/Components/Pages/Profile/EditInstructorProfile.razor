@@ -1,0 +1,109 @@
+﻿@page "/editInstructorProfile/{InstructorID:int}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Services
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject IUserProfileService UserProfileService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<div class="container">
+    <h3>Edit Instructor Profile</h3>
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Message
+        </div>
+    }
+
+    @if (InstructorProfile != null)
+    {
+        <EditForm Model="@InstructorProfile" OnValidSubmit="@UpdateProfile">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="FirstName" class="form-label">First Name</label>
+                <InputText id="FirstName" class="form-control" @bind-Value="InstructorProfile.FirstName" />
+            </div>
+
+            <div class="mb-3">
+                <label for="LastName" class="form-label">Last Name</label>
+                <InputText id="LastName" class="form-control" @bind-Value="InstructorProfile.LastName" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Phone" class="form-label">Phone</label>
+                <InputText id="Phone" class="form-control" @bind-Value="InstructorProfile.Phone" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Qualification" class="form-label">Highest Qualification</label>
+                <InputText id="Qualification" class="form-control" @bind-Value="InstructorProfile.HighestMusicQualification" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Experience" class="form-label">Years of Experience</label>
+                <InputNumber id="Experience" class="form-control" @bind-Value="InstructorProfile.YearsOfExperience" />
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Changes</button>
+        </EditForm>
+    }
+    else
+    {
+        <p>Instructor profile not found.</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int InstructorID { get; set; }
+    private Instructor InstructorProfile { get; set; }
+    private string Message { get; set; }
+    private User user;
+    private int userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<User>("User");
+            user = result.Value ?? new User();
+            userId = user.UserID;
+
+            if (user.UserTypeID == Constants.UserType_Instructor)
+            {
+                InstructorProfile = await UserProfileService.GetInstructorProfileAsync(userId);
+                if (InstructorProfile == null)
+                {
+                    Message = "Instructor profile not found.";
+                }
+            }
+            else
+            {
+                Message = "Unauthorized access: You are not an instructor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error retrieving instructor profile: {ex.Message}";
+        }
+    }
+
+    private async Task UpdateProfile()
+    {
+        try
+        {
+            await UserProfileService.UpdateInstructorProfileAsync(InstructorProfile);
+            NavigationManager.NavigateTo("/profile");
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error updating the instructor profile: {ex.Message}";
+        }
+    }
+}

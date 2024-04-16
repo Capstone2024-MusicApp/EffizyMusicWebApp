@@ -20,6 +20,7 @@ namespace EffizyMusicSystem.Services
             Task<List<Instructor>> GetInstructorsAsync();
             Task<List<string>> GetDistinctSkillLevels();
 
+            Task<List<Course>> GetCourseByInstructorAsync(int instructorId);
             Task<List<Course>> GetCourses(int instrumentID, string skillLevel);      
             Task<List<Course>> GetCoursesByInstrumentAndSkillLevel(int instrumentId, string skillLevel);
     }

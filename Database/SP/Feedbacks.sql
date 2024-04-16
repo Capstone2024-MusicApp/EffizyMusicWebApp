@@ -3,12 +3,12 @@ AS
 	DECLARE @ProcedureName VARCHAR(30) = 'sp_getFeedback';
 
 	BEGIN
-		select f.feedbackid, 
+		select top 100 f.feedbackid, 
 			   f.comments, 
 			   f.feedbackdate, 
 			   f.UserID,
-			   (case when usertypeid =  2 then i.lastname else s.lastname end) lastname,
-			   (case when usertypeid =  2 then i.firstname else s.firstname end) firstname
+			   (case when usertypeid = 1 then '' when usertypeid =  2 then i.lastname else s.lastname end) lastname,
+			   (case when usertypeid = 1 then 'admin' when usertypeid =  2 then i.firstname else s.firstname end) firstname
 		from feedbacks f 
 		inner join users u on f.userid = u.userid
 		left join students s on u.userid = s.userid

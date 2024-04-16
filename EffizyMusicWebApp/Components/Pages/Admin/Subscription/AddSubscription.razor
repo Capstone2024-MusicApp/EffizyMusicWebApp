@@ -1,4 +1,8 @@
 ﻿@page "/subscription/addSubscription"
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject SubscriptionService subscriptionService
 @inject CourseService courseService
 @inject NavigationManager NavigationManager
@@ -55,12 +59,17 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         courses = await courseService.GetCoursesAsync();
     }
 
     private async Task SaveSubscription()
     {
-        Message = ""; // Clear previous message
+        Message = "";
 
         if (string.IsNullOrEmpty(subscription.Description))
         {
@@ -82,7 +91,16 @@ else
 
         try
         {
-            // Formatting amount to always have 2 decimal places
+
+            bool existingSubscription = await subscriptionService.CheckExistingSubscriptionAsync(subscription.Description, subscription.CourseID);
+
+            if (existingSubscription)
+            {
+                Message = "A subscription of this type for this course already exists.";
+                return;
+            }
+
+
             subscription.Amount = Math.Round(subscription.Amount, 2);
 
             await subscriptionService.AddSubscriptionAsync(subscription);
