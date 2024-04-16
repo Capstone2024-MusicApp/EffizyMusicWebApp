@@ -78,6 +78,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-danger" @onclick="RemoveCourse">Delete</button>
         <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
     </EditForm>
     @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -133,6 +134,24 @@ else
         catch (Exception ex)
         {
             ErrorMessage = "Error updating course: " + ex.Message;
+        }
+    }
+
+    public async Task RemoveCourse()
+    {
+        try
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the Course named {course.CourseCode}? It will delete related Modules, Lessons and Quizes associated with it. Please double check before proceeding");
+            if (confirmed)
+            {
+                await EffizyService.DeleteCourse(CourseID);
+                NavigationManager.NavigateTo("/courses");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error deleting course: " + ex.Message;
         }
     }
 
