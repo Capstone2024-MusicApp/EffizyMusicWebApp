@@ -159,24 +159,6 @@ else
         }
     }
 
-    public async Task RemoveCourse()
-    {
-        try
-        {
-            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the Course named {course.CourseCode}? It will delete related Modules, Lessons and Quizes associated with it. Please double check before proceeding");
-            if (confirmed)
-            {
-                await EffizyService.DeleteCourse(CourseID);
-                NavigationManager.NavigateTo("/courses");
-            }
-        }
-
-        catch (Exception ex)
-        {
-            ErrorMessage = "Error deleting course: " + ex.Message;
-        }
-    }
-
     private void CancelEdit()
     {
         NavigationManager.NavigateTo("/courses");
