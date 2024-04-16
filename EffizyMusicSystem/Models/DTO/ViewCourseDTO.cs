@@ -16,6 +16,7 @@ namespace EffizyMusicSystem.Models.DTO
         public string EstimatedTime { get; set; } = string.Empty;
         public string Instrument { get; set; } = string.Empty;
         public string Instructor { get; set; } = string.Empty;
+        public double InstructorRating { get; set; } = 0;
         [NotMapped]
         public virtual ICollection<Module>? Modules { get; set; }
         [NotMapped]

@@ -26,6 +26,8 @@
     }
     else
     {
+        @if(user == null || user.UserID != 0)
+        {
         <div class="main-student-course">
             <h3>Your Enrolled Courses</h3>
             <br />
@@ -92,6 +94,7 @@
             <br />
             <br />
             <br />
+        }
         <h3>Available Courses</h3>
             <br />
             <table class="table">
@@ -144,7 +147,7 @@
         if (user.UserTypeID != Constants.UserType_Student)
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
-            NavigationManager.NavigateTo("/NotAuthorize/");
+           // NavigationManager.NavigateTo("/NotAuthorize/");
         }
         else
         {
