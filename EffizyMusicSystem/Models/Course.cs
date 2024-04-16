@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,7 @@ namespace EffizyMusicSystem.Models
         public int InstrumentID { get; set; }
 
         [Required(ErrorMessage = "Please select an instructor.")]
-        //[Display(Name = "Instructor")]
+        [Display(Name = "Instructor")]
         public int InstructorID { get; set; }
 
         [Required(ErrorMessage = "Please select a skill level.")]
@@ -39,7 +40,6 @@ namespace EffizyMusicSystem.Models
 
         public Instrument Instrument { get; set; }
 
-        [Required(ErrorMessage = "Please select an instructor.")]
         public Instructor Instructor { get; set; }
 
         public virtual ICollection<Module> Modules { get; set; }

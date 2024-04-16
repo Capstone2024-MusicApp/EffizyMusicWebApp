@@ -40,6 +40,7 @@ namespace EffizyMusicSystem.Services
         public List<FeedbackDTO> GetFeedbackDTOs();
         public void InsertFeedback(Feedback feedback);
         public void DeleteFeedback(Feedback feedback);
+  
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -213,6 +214,11 @@ namespace EffizyMusicSystem.Services
             }
 
         }
+
+
+
+
+
         public void AddCourse(Course entity)
         {
             try
@@ -220,11 +226,13 @@ namespace EffizyMusicSystem.Services
                 _context.Courses.Add(entity);
                 _context.SaveChanges();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
         }
+
+
         #endregion
         #region Modules
         /// <summary>
