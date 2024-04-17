@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.SessionStorage" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
     <Compile Remove="Controllers\**" />
     <Content Remove="Controllers\**" />
     <EmbeddedResource Remove="Controllers\**" />
@@ -20,15 +20,15 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
-    <PackageReference Include="Blazor.Bootstrap" Version="2.0.0" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.5.0" />
+    <PackageReference Include="Blazor.Bootstrap" Version="2.1.0" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.5.1" />
     <PackageReference Include="FontAwesome" Version="4.7.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

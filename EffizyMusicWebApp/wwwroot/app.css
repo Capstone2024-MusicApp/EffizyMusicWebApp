@@ -1,12 +1,12 @@
 html, body {
     font-family: 'Raleway', sans-serif !important;
     opacity: 0;
-    animation: fadeInAnimation 3s ease-in forwards;
+    animation: fadeInAnimation 1s ease-in forwards;
 }
 
 @keyframes fadeInAnimation {
     from {
-        opacity: 0;
+        opacity: 0.5;
     }
 
     to {
@@ -238,3 +238,18 @@ h1:focus {
 .accordion-button:not(.collapsed) {
     background-color: inherit;
 }
+
+.ratingview {
+    display: inline-block;
+    font-size: 24px;
+}
+
+.starview {
+    cursor: pointer;
+    color: gray;
+    transition: color 0.3s;
+}
+
+    .starview, .selected {
+        color: gold;
+    }

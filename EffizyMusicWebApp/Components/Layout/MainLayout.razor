@@ -12,13 +12,23 @@
         <div class="top-row px-2">
             @if (isLogin)
             {
+                <button @onclick="@Logout" class="btn btn-md btn-primary">Logout</button>
+            }
+            else
+            {
+                <a href="/loginForm" class="btn btn-md btn-primary">Login</a>
+            }
+
+          
+            @* @if (isLogin == false)
+            {
                 <span><strong>Welcome, <span class="text-danger">@fullName</span></strong></span>
                 <button @onclick="@Logout" class="btn-link">Logout</button>
             }
             else
             {
-                <a href="/loginForm" role="button">Login</a>
-            }
+                <button @onclick="@Logout" class="btn-link">Logout</button>
+            } *@
         </div>
         <article class="content px-4">
             @Body
@@ -40,16 +50,23 @@
     protected override async Task OnInitializedAsync()
     {
         isLogin = await IsUserLoggedIn();
-        if (isLogin)
-        {
-            await LoadUserDetails();
-        }
+        
     }
 
     private async Task<bool> IsUserLoggedIn()
     {
         var userIdResult = await ProtectedSessionStore.GetAsync<int>("UserID");
         return userIdResult.Success && userIdResult.Value != 0;
+
+        if (isLogin)
+        {
+            return true;
+
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private async Task LoadUserDetails()
@@ -89,8 +106,22 @@
         await ProtectedSessionStore.DeleteAsync("Email");
         await ProtectedSessionStore.DeleteAsync("UserID");
         await ProtectedSessionStore.DeleteAsync("UserTypeID");
+        await ProtectedSessionStore.DeleteAsync("User");
+        
 
         // Redirect to login page
         NavigationManager.NavigateTo("/loginForm", forceLoad: true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check if the user is logged in
+            isLogin = await IsUserLoggedIn();
+
+            // Update the button text
+            StateHasChanged();
+        }
     }
 }
