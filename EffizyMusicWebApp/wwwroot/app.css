@@ -250,6 +250,6 @@ h1:focus {
     transition: color 0.3s;
 }
 
-    .starview, .selected {
+ .selected {
         color: gold;
     }

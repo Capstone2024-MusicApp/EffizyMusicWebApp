@@ -134,10 +134,10 @@ AS
 			  ,c.EstimatedTime
 			  ,im.InstrumentType Instrument
 			  ,id.FirstName + ' ' + id.LastName Instructor
-			  ,ROUND((select sum(rating) from InstructorRatings ir
+			  ,coalesce(ROUND((select sum(rating) from InstructorRatings ir
 			    where ir.InstructorID = id.InstructorID) / 
 			  (select count(*) from InstructorRatings ir
-			    where ir.InstructorID = id.InstructorID), 0) InstructorRating
+			    where ir.InstructorID = id.InstructorID), 0), 0) InstructorRating
 		from courses c
 		inner join instruments im on c.InstrumentID = im.InstrumentID
 		inner join instructors id on c.InstructorID = id.instructorId
