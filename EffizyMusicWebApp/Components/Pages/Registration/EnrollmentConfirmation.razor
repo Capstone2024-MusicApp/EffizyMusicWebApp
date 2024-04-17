@@ -5,6 +5,11 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.WebUtilities
 
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
@@ -14,6 +19,10 @@
 {
     <p class="text-success">Payment Successful!</p>
     <p>Thank you for your enrollment.</p>
+    @if (directToLogin)
+    {
+        <p>Redirecting to Home page in 3 seconds...</p>
+    }
 }
 else if (paymentStatus == "cancel")
 {
@@ -55,6 +64,9 @@ else
     private Enrollment existingEnrollment;
     private Payment payment;
     private string payerID;
+
+    private User user;
+    private bool directToLogin = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,16 +152,46 @@ else
                 {
                     ErrorMessage = "Payment not found for PaymentID: " + PaymentID;
                 }
+
+
+                user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+                if (user == null || user.UserID == 0)
+                {
+                    directToLogin = true;
+                    user = _context.Users.Where(x => x.UserID == UserID).ToList().FirstOrDefault();
+                    if(user == null)
+                    {
+                        ErrorMessage = "Unable to automatically log in the user..";
+                    }
+                    else
+                    {
+                        await ProtectedSessionStore.SetAsync("Email", user.Email);
+                        await ProtectedSessionStore.SetAsync("UserID", user.UserID);
+                        await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
+
+                        await ProtectedSessionStore.SetAsync("User", user);
+
+                        await Task.Delay(2000);
+                        
+
+                        //Redirect to specific page.
+                        NavigationManager.NavigateTo("/", true);
+
+                    }
+                }
             }
             else
             {
                 ErrorMessage = "PaymentStatus is not 'success'. Skipping enrollment creation.";
             }
+
         }
         catch (Exception ex)
         {
             ErrorMessage = "Error handling PayPal response: " + ex.Message;
         }
+
+
     }
 
     private void LogQueryParameters(Uri uri)

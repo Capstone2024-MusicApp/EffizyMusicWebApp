@@ -48,7 +48,7 @@ else
             @if(noAccess)
             {
                 <div class="alert alert-warning" role="alert" style="text-align: center;">Your enrollment for this course has ended. Please click on button below to re-enrol.</div>
-                <a href="/StudentCourse/ViewCourse/@studentCourse.CourseID" class="btn btn-primary">Re-Enroll Now</a>
+                <div style="text-align: center;"><a href="/StudentCourse/ViewCourse/@studentCourse.CourseID" class="btn btn-primary">Re-Enroll Now</a></div>
             }
             else
             {
