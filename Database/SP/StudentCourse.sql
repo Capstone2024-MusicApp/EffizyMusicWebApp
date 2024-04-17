@@ -11,6 +11,8 @@ AS
 			  ,e.StudentID
 			  ,e.UserID
 			  ,ProgressStatus 
+			  ,e.EnrollmentDate
+			  ,e.EnrollmentEndDate
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
 				and ProgressStatus = 'COMPLETE') +
@@ -50,6 +52,8 @@ AS
 			  , StudentID
 			  ,UserID
 			  , ProgressStatus 
+			  ,e.EnrollmentDate
+			  ,e.EnrollmentEndDate
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
 				and ProgressStatus = 'COMPLETE') +
