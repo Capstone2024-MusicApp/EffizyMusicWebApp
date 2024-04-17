@@ -45,6 +45,14 @@ else
             <label style="text-align: center; margin: auto; display: block; max-width: 60%"> @studentCourse.CourseDescription</label>
             <br />
             <br />
+            @if(noAccess)
+            {
+                <div class="alert alert-warning" role="alert" style="text-align: center;">Your enrollment for this course has ended. Please click on button below to re-enrol.</div>
+                <a href="/StudentCourse/ViewCourse/@studentCourse.CourseID" class="btn btn-primary">Re-Enroll Now</a>
+            }
+            else
+            {
+                
             <div class="lesson-frame" style="text-align: center;">
                 <div class="progress">
 
@@ -162,6 +170,7 @@ else
                 </Accordion>
 
             </div>
+            }
 
         </div>
     }
@@ -180,6 +189,7 @@ else
     public Module selectedModule = new Module();
     public List<QuestionnaireDTO>? questionnaire;
     private double completePercentage;
+    public bool noAccess = false;
 
     private User user { get; set; }
 
@@ -200,7 +210,7 @@ else
 
     }
 
- 
+
     private void setSelectedModule(int LessonNumber)
     {
         Boolean moduleFound = false;
@@ -294,7 +304,14 @@ else
         EffizyService.SetMissingLessonProgress(EnrollmentID);
         studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
 
-
+        if(DateTime.Now >= studentCourse.EnrollmentDate && DateTime.Now <= studentCourse.EnrollmentEndDate)
+        {
+            noAccess = false;
+        }
+        else
+        {
+            noAccess = true;
+        }
 
         setSelectedModule();
 

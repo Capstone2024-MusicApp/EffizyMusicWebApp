@@ -51,6 +51,8 @@ else
     public int enrollmentDuration { get; set; }
 
     private Enrollment newEnrollment;
+
+    private Enrollment existingEnrollment;
     private Payment payment;
     private string payerID;
 
@@ -79,20 +81,39 @@ else
                     return;
                 }
 
-                // Create a new Enrollment with the provided details
-                newEnrollment = new Enrollment
-                    {
-                        CourseID = int.Parse(CourseID),
-                        StudentID = int.Parse(StudentID),
-                        PaymentID = int.Parse(PaymentID),
-                        UserID = UserID,
-                        EnrollmentDate = DateTime.Now,
-                        EnrollmentEndDate = DateTime.Now.AddMonths(enrollmentDuration),
-                        ProgressStatus = "Not Started",
-                        EnrollmentStatus = "Enrolled"
-                    };
+                existingEnrollment = _context.Enrollments.Where(x => x.UserID == UserID && x.CourseID == int.Parse(CourseID)).ToList().FirstOrDefault();
 
-                _context.Enrollments.Add(newEnrollment);
+                if (existingEnrollment == null)
+                {
+                    // Create a new Enrollment with the provided details
+                    newEnrollment = new Enrollment
+                        {
+                            CourseID = int.Parse(CourseID),
+                            StudentID = int.Parse(StudentID),
+                            PaymentID = int.Parse(PaymentID),
+                            UserID = UserID,
+                            EnrollmentDate = DateTime.Now,
+                            EnrollmentEndDate = DateTime.Now.AddMonths(enrollmentDuration),
+                            ProgressStatus = "Not Started",
+                            EnrollmentStatus = "Enrolled"
+                        };
+
+                    _context.Enrollments.Add(newEnrollment);
+                }
+                else
+                {
+                    if (DateTime.Now < existingEnrollment.EnrollmentEndDate)
+                    {
+                        existingEnrollment.EnrollmentEndDate = existingEnrollment.EnrollmentEndDate.AddMonths(enrollmentDuration);
+                    }
+                    else
+                    {
+                        existingEnrollment.EnrollmentEndDate = DateTime.Now.AddMonths(enrollmentDuration);
+                    }
+                    existingEnrollment.EnrollmentStatus = "Enrolled";
+
+                    _context.Enrollments.Update(existingEnrollment);
+                }
                 await _context.SaveChangesAsync();
 
                 ErrorMessage = "Enrollment status updated to Completed.";
