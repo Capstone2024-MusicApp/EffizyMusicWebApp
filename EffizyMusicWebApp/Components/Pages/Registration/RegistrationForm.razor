@@ -110,7 +110,7 @@
             <div class="col-md-6">
                 <div class="mb-4">
                     <label for="Instrument" class="form-label">Instrument:</label>
-                    <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select">
+                    <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select" @oninput="InstrumentChanged">
                         <option value="0" disabled selected>Select Instrument</option>
                         @foreach (var inst in instruments)
                         {
@@ -274,7 +274,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
 {
     <div class="mt-4 mb-4">
         <h3>Instructor Registration</h3>
-        <p>Registration Successful, Click here to login.</p>
+        <p>Registration Successful, Admin will contact you once your registration is approved</p>
     </div>
 }
 
