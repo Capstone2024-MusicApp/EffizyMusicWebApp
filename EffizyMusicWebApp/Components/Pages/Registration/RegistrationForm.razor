@@ -39,11 +39,11 @@
                     <InputText id="Password" @bind-Value="user.Password" type="password" class="form-control" />
                     <ValidationMessage For="@(() => user.Password)" />
                 </div>
-                <div class="mb-4">
+                @* <div class="mb-4">
                     <label for="ConfirmPassword" class="form-label">Confirm Password:</label>
                     <InputText id="ConfirmPassword" @bind-Value="user.ConfirmPassword" type="password" class="form-control" />
                     <ValidationMessage For="@(() => user.ConfirmPassword)" />
-                </div>
+                </div> *@
 
                 @if (userTypes != null)
                 {
@@ -592,7 +592,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         try
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
-            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            // user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             bool userCreated = await userService.CreateUserAsync(user);
             if (!userCreated)
             {
@@ -641,7 +641,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
         try
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
-            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            // user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             if (selectedUserType == "Student")
             {
                 user.UserTypeID = Constants.UserType_Student;

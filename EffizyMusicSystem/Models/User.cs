@@ -22,9 +22,9 @@ namespace EffizyMusicSystem.Models
         public string Password { get; set; }
 
         //[NotMapped] // Not mapped to database
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
-        [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; }
+        //[Compare("Password", ErrorMessage = "Passwords do not match")]
+        //[DataType(DataType.Password)]
+        //public string ConfirmPassword { get; set; }
 
         public int UserTypeID { get; set; }
         public UserType UserType { get; set; }

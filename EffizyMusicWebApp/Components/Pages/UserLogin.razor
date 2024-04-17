@@ -3,11 +3,14 @@
 @using EffizyMusicSystem.DAL
 @using EffizyMusicSystem.Services
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Enum
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.EntityFrameworkCore
 @inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IConfiguration Configuration
 
 <div class="container justify-content-center mt-4 mb-4">
     <EditForm Model="@user" OnValidSubmit="LoginUser" FormName="login" class="row g-3 justify-content-center">
@@ -58,22 +61,23 @@
 
             if (user != null)
             {
-                await ProtectedSessionStore.SetAsync("Email", user.Email);
-                await ProtectedSessionStore.SetAsync("UserID", user.UserID);
-                await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
+                    await ProtectedSessionStore.SetAsync("Email", user.Email);
+                    await ProtectedSessionStore.SetAsync("UserID", user.UserID);
+                    await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
 
-                await ProtectedSessionStore.SetAsync("User", user);
-                var model = await ProtectedSessionStore.GetAsync<User>("User");
+                    await ProtectedSessionStore.SetAsync("User", user);
+                    var model = await ProtectedSessionStore.GetAsync<User>("User");
 
-                //You can get values from session from any other page, e.g
-                var email = await ProtectedSessionStore.GetAsync<String>("Email");
-                var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
-                var UserTypeID = await ProtectedSessionStore.GetAsync<int>("UserTypeID");
+                    //You can get values from session from any other page, e.g
+                    var email = await ProtectedSessionStore.GetAsync<String>("Email");
+                    var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
+                    var UserTypeID = await ProtectedSessionStore.GetAsync<int>("UserTypeID");
 
 
-                //Redirect to specific page.
-                NavigationManager.NavigateTo("/", true);
+                    //Redirect to specific page.
+                    NavigationManager.NavigateTo("/", true);
 
+               
             }
             else
             {
@@ -81,6 +85,8 @@
                 user = new User();
             }
         }
+
+
         catch (Exception ex)
         {
             // Handle exception, log, etc.
@@ -88,5 +94,4 @@
         }
     }
 
-   
 }

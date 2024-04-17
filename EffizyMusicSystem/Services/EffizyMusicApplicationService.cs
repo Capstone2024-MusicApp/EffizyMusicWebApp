@@ -1066,7 +1066,7 @@ namespace EffizyMusicSystem.Services
                     return new User
                     {
                         UserID = user.UserID,
-                        ConfirmPassword = user.ConfirmPassword, // Handle possible null
+                        /*ConfirmPassword = user.ConfirmPassword,*/ // Handle possible null
                         Email = user.Email, // Handle possible null
                         Password = user.Password, // Handle possible null
                         UserTypeID = user.UserTypeID // Handle possible null
