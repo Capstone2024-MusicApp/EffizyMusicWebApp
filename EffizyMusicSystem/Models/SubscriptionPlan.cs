@@ -19,6 +19,8 @@ namespace EffizyMusicSystem.Models
         public string Description { get; set; }
         public decimal Amount { get; set; } = 0.00m;
 
+        public int EnrollmentDuration { get; set; }
+
         [Required]
         [Display(Name = "Course ID")]
         public int CourseID { get; set; }
