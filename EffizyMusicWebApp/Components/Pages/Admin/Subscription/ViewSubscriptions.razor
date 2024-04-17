@@ -21,6 +21,10 @@ else
             <tr>
                 <th>Subscription ID</th>
                 <th>Description</th>
+                <th>
+                    Enrollment Duration (months)
+
+                </th>
                 <th>Amount</th>
                 <th>Course</th>
                 <th>Action</th>
@@ -33,6 +37,7 @@ else
                 <tr>
                     <td>@subscription.SubscriptionID</td>
                     <td>@subscription.Description</td>
+                    <td>@subscription.EnrollmentDuration</td>
                     <td>@subscription.Amount.ToString("0.00")</td>
                     <td>@subscription.Course.Title</td>
                     <td>
