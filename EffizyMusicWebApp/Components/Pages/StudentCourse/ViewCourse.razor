@@ -213,7 +213,7 @@
                 EffizyService.AddPayment(payment);
                 // await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
 
-                string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={student.StudentID}&CourseID={courseDetails.CourseId}&PaymentID={payment.PaymentID}&UserID={user.UserID}";
+                string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={student.StudentID}&CourseID={courseDetails.CourseId}&PaymentID={payment.PaymentID}&UserID={user.UserID}&enrollmentDuration={selectedSubcription.EnrollmentDuration}";
                 string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
                 returnUrl = WebUtility.UrlEncode(returnUrl);
                 cancelUrl = WebUtility.UrlEncode(cancelUrl);

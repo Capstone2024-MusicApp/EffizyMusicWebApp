@@ -35,6 +35,13 @@ else
             <ValidationMessage For="@(() => subscription.Amount)" />
         </div>
 
+        
+        <div class="form-group">
+            <label for="EnrollmentDuration">Enrollment Duration:</label>
+            <InputNumber id="EnrollmentDuration" @bind-Value="@subscription.EnrollmentDuration" class="form-control mb-3" min="1"/>
+            <ValidationMessage For="@(() => subscription.Amount)" />
+        </div>
+
         <div class="form-group">
             <label for="CourseID">Course:</label>
             <select id="CourseID" @bind="@subscription.CourseID" class="form-control mb-5">

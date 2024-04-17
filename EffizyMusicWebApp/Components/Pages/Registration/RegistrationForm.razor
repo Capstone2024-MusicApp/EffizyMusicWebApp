@@ -708,7 +708,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 if (selectedSubscription != null && selectedSubscription.Amount > 0)
                 {
                     decimal paymentAmount = selectedSubscription.Amount;
-                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}";
+                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}&enrollmentDuration={selectedSubscription.EnrollmentDuration}";
                     string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
                     returnUrl = WebUtility.UrlEncode(returnUrl);
                     cancelUrl = WebUtility.UrlEncode(cancelUrl);

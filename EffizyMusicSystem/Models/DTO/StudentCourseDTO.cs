@@ -21,6 +21,9 @@ namespace EffizyMusicSystem.Models.DTO
 
         public required string ProgressStatus { get; set; }
 
+        public DateTime EnrollmentDate { get; set; }
+        public DateTime EnrollmentEndDate { get; set; } 
+
         public int CompletedLessons { get; set; }
         public int TotalLessons { get; set; }
         [NotMapped]

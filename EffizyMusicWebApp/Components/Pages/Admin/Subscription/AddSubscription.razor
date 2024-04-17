@@ -29,10 +29,16 @@ else
         <input id="Amount" @bind="@subscription.Amount" class="form-control mb-3" type="number" step="0.01" />
     </div>
 
+
+    <div class="form-group">
+        <label for="EnrollmentDuration">Enrollment Duration (in months):</label>
+        <InputNumber id="EnrollmentDuration" @bind-Value="@subscription.EnrollmentDuration" class="form-control mb-3" min="1"/>
+    </div>
+
     <div class="form-group mb-5">
         <label for="CourseID">Course ID:</label>
         <select id="Title" @bind="@subscription.CourseID" class="form-control mb-3" required>
-            <option value="" disabled selected>Select Course</option>
+            <option value="0" disabled selected>Select Course</option>
             @if (courses != null)
             {
                 @foreach (var course in courses)
@@ -88,6 +94,14 @@ else
             Message = "Please select a course.";
             return;
         }
+
+        if (subscription.EnrollmentDuration <= 0)
+        {
+            Message = "Please enter a valid Enrollment Duration.";
+            return;
+        }
+        
+
 
         try
         {

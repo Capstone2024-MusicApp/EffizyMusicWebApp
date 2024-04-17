@@ -19,6 +19,7 @@ namespace EffizyMusicSystem.Models
         public string Description { get; set; }
         public decimal Amount { get; set; } = 0.00m;
 
+        [Range(1, int.MaxValue, ErrorMessage = "Please enter a valid enrollment duration.")]
         public int EnrollmentDuration { get; set; }
 
         [Required]
