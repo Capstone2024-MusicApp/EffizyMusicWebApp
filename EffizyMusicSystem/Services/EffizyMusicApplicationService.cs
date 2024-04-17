@@ -172,13 +172,26 @@ namespace EffizyMusicSystem.Services
                     DeleteModule(data.ModuleID);
                 }
             }
-            
+            DeleteEnrolledCourse(id); //Remove the enrolled courses if any
+
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
                 _context.Remove(existingID);
                 await _context.SaveChangesAsync();
             }
+        }
+        private async Task DeleteEnrolledCourse(int courseId)
+        {
+            var enrollment =  await _context.Enrollments.Where(x=>x.CourseID == courseId).ToListAsync();
+            if(enrollment.Count > 0)
+            {
+                foreach (var deleteEnrolledCourse in enrollment)
+                {
+                    _context.Remove(deleteEnrolledCourse.EnrollmentID);
+                }
+                await _context.SaveChangesAsync();
+            }          
         }
 
        #endregion
