@@ -13,6 +13,10 @@
 @using System.Web
 @using Microsoft.AspNetCore.WebUtilities
 
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject UserTypeService userTypeService
 @inject InstrumentService instrumentService
 @inject NavigationManager navigationManager
@@ -685,6 +689,12 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
 
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
+
+                await ProtectedSessionStore.SetAsync("Email", user.Email);
+                await ProtectedSessionStore.SetAsync("UserID", user.UserID);
+                await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
+                await ProtectedSessionStore.SetAsync("User", user);
+
                 await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
             }
             else
