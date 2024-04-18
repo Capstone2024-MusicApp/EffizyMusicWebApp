@@ -13,6 +13,10 @@
 @using System.Web
 @using Microsoft.AspNetCore.WebUtilities
 
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject UserTypeService userTypeService
 @inject InstrumentService instrumentService
 @inject NavigationManager navigationManager
@@ -110,7 +114,7 @@
             <div class="col-md-6">
                 <div class="mb-4">
                     <label for="Instrument" class="form-label">Instrument:</label>
-                    <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select">
+                    <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select" @oninput="InstrumentChanged">
                         <option value="0" disabled selected>Select Instrument</option>
                         @foreach (var inst in instruments)
                         {
@@ -274,7 +278,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
 {
     <div class="mt-4 mb-4">
         <h3>Instructor Registration</h3>
-        <p>Registration Successful, Click here to login.</p>
+        <p>Registration Successful, Admin will contact you once your registration is approved</p>
     </div>
 }
 
@@ -685,6 +689,12 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
 
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
+
+                await ProtectedSessionStore.SetAsync("Email", user.Email);
+                await ProtectedSessionStore.SetAsync("UserID", user.UserID);
+                await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
+                await ProtectedSessionStore.SetAsync("User", user);
+
                 await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
             }
             else
@@ -708,7 +718,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
                 if (selectedSubscription != null && selectedSubscription.Amount > 0)
                 {
                     decimal paymentAmount = selectedSubscription.Amount;
-                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}";
+                    string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={studentID}&CourseID={courseID}&PaymentID={paymentID}&UserID={userID}&enrollmentDuration={selectedSubscription.EnrollmentDuration}";
                     string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
                     returnUrl = WebUtility.UrlEncode(returnUrl);
                     cancelUrl = WebUtility.UrlEncode(cancelUrl);

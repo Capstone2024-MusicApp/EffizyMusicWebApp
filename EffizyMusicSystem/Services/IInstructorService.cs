@@ -14,6 +14,7 @@ namespace EffizyMusicSystem.Services
         Task<bool> RejectInstructorAsync(int instructorId);
         Task<Instructor> GetInstructorByIdWithInstrumentAsync(int id);
         Task<Instructor> GetInstructorByUserIdAsync(int userId);
+        Task<List<Instructor>> GetAllInstructorsAsync();
 
     }
 

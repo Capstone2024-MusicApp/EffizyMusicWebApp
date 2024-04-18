@@ -45,6 +45,14 @@ else
             <label style="text-align: center; margin: auto; display: block; max-width: 60%"> @studentCourse.CourseDescription</label>
             <br />
             <br />
+            @if(noAccess)
+            {
+                <div class="alert alert-warning" role="alert" style="text-align: center;">Your enrollment for this course has ended. Please click on button below to re-enrol.</div>
+                <div style="text-align: center;"><a href="/StudentCourse/ViewCourse/@studentCourse.CourseID" class="btn btn-primary">Re-Enroll Now</a></div>
+            }
+            else
+            {
+                
             <div class="lesson-frame" style="text-align: center;">
                 <div class="progress">
 
@@ -54,6 +62,7 @@ else
                 <div style="float: left">Not started</div>
                 <div style="float: right">Completed</div>
                 <div style="margin: 0 auto; width: 100px;">In Progress</div>
+                <br />
                 <label class="video-lesson-title">@selectedModule.Title - @selectedLesson.Title </label>
                 <br />
                 @if (selectedLesson.LessonContent != null)
@@ -61,13 +70,13 @@ else
                     var base64 = Convert.ToBase64String(selectedLesson.LessonContent);
                     var src = $"data:video/mp4;base64,{base64}";
 
-                    <video controls="controls" height="600px" id="videoTagId" @onended="VideoComplete">
+                    <video controls="controls" height="600px" id="videoTagId" @onended="VideoComplete" controlsList="nodownload"  >
                         <source src="@src" type="video/mp4" />
                     </video>
                 }
                 else
                 {
-                    <video controls="controls" height="600px" id="videoTagId" @onended="VideoComplete">
+                    <video controls="controls" height="600px" id="videoTagId" @onended="VideoComplete" controlsList="nodownload">
                     </video>
                 }
                 <br />
@@ -162,9 +171,15 @@ else
                 </Accordion>
 
             </div>
+            }
 
         </div>
     }
+    
+                    <script>
+                    const div = document.getElementById("videoTagId");
+                    div.addEventListener("contextmenu", (e) => { e.preventDefault() });
+                    </script> 
 }
 @code {
     [Parameter]
@@ -175,6 +190,7 @@ else
     public Module selectedModule = new Module();
     public List<QuestionnaireDTO>? questionnaire;
     private double completePercentage;
+    public bool noAccess = false;
 
     private User user { get; set; }
 
@@ -194,6 +210,8 @@ else
 
 
     }
+
+
     private void setSelectedModule(int LessonNumber)
     {
         Boolean moduleFound = false;
@@ -287,7 +305,14 @@ else
         EffizyService.SetMissingLessonProgress(EnrollmentID);
         studentCourse = EffizyService.GetStudentCourse(EnrollmentID);
 
-      
+        if(DateTime.Now >= studentCourse.EnrollmentDate && DateTime.Now <= studentCourse.EnrollmentEndDate)
+        {
+            noAccess = false;
+        }
+        else
+        {
+            noAccess = true;
+        }
 
         setSelectedModule();
 

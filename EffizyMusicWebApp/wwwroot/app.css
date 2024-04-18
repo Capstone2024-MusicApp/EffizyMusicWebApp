@@ -107,7 +107,6 @@ h1:focus {
     width: fit-content;
     min-height: max-content;
     border-radius: 10px;
-    background: #efefef;
     margin: auto;
     padding: 0px 30px 20px 30px;
 }
@@ -250,6 +249,6 @@ h1:focus {
     transition: color 0.3s;
 }
 
-    .starview, .selected {
+ .selected {
         color: gold;
     }

@@ -5,6 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.WebUtilities
 
+
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
@@ -47,9 +48,15 @@ else
     [Parameter]
     public int UserID { get; set; }
 
+    [Parameter]
+    public int enrollmentDuration { get; set; }
+
     private Enrollment newEnrollment;
+
+    private Enrollment existingEnrollment;
     private Payment payment;
     private string payerID;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,6 +73,7 @@ else
                 CourseID = queryParameters.TryGetValue("CourseID", out var courseIdValues) ? courseIdValues.FirstOrDefault() : "";
                 PaymentID = queryParameters.TryGetValue("PaymentID", out var paymentIdValues) ? paymentIdValues.FirstOrDefault() : "";
                 UserID = queryParameters.TryGetValue("UserID", out var userIdValues) ? int.Parse(userIdValues.FirstOrDefault()) : 0;
+                enrollmentDuration = queryParameters.TryGetValue("enrollmentDuration", out var enrollmentDurationValues) ? int.Parse(enrollmentDurationValues.FirstOrDefault()) : 0;
 
                 // Check if required parameters are not null
                 if (string.IsNullOrEmpty(StudentID) || string.IsNullOrEmpty(CourseID) || string.IsNullOrEmpty(PaymentID) || UserID == 0)
@@ -75,19 +83,39 @@ else
                     return;
                 }
 
-                // Create a new Enrollment with the provided details
-                newEnrollment = new Enrollment
-                    {
-                        CourseID = int.Parse(CourseID),
-                        StudentID = int.Parse(StudentID),
-                        PaymentID = int.Parse(PaymentID),
-                        UserID = UserID,
-                        EnrollmentDate = DateTime.Now,
-                        ProgressStatus = "Not Started",
-                        EnrollmentStatus = "Enrolled"
-                    };
+                existingEnrollment = _context.Enrollments.Where(x => x.UserID == UserID && x.CourseID == int.Parse(CourseID)).ToList().FirstOrDefault();
 
-                _context.Enrollments.Add(newEnrollment);
+                if (existingEnrollment == null)
+                {
+                    // Create a new Enrollment with the provided details
+                    newEnrollment = new Enrollment
+                        {
+                            CourseID = int.Parse(CourseID),
+                            StudentID = int.Parse(StudentID),
+                            PaymentID = int.Parse(PaymentID),
+                            UserID = UserID,
+                            EnrollmentDate = DateTime.Now,
+                            EnrollmentEndDate = DateTime.Now.AddMonths(enrollmentDuration),
+                            ProgressStatus = "Not Started",
+                            EnrollmentStatus = "Enrolled"
+                        };
+
+                    _context.Enrollments.Add(newEnrollment);
+                }
+                else
+                {
+                    if (DateTime.Now < existingEnrollment.EnrollmentEndDate)
+                    {
+                        existingEnrollment.EnrollmentEndDate = existingEnrollment.EnrollmentEndDate.AddMonths(enrollmentDuration);
+                    }
+                    else
+                    {
+                        existingEnrollment.EnrollmentEndDate = DateTime.Now.AddMonths(enrollmentDuration);
+                    }
+                    existingEnrollment.EnrollmentStatus = "Enrolled";
+
+                    _context.Enrollments.Update(existingEnrollment);
+                }
                 await _context.SaveChangesAsync();
 
                 ErrorMessage = "Enrollment status updated to Completed.";
@@ -114,16 +142,22 @@ else
                 {
                     ErrorMessage = "Payment not found for PaymentID: " + PaymentID;
                 }
+
+
+                
             }
             else
             {
                 ErrorMessage = "PaymentStatus is not 'success'. Skipping enrollment creation.";
             }
+
         }
         catch (Exception ex)
         {
             ErrorMessage = "Error handling PayPal response: " + ex.Message;
         }
+
+
     }
 
     private void LogQueryParameters(Uri uri)

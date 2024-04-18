@@ -999,7 +999,7 @@ namespace EffizyMusicSystem.Services
                 quizProgress = new QuizProgress();
                 quizProgress.EnrollmentID = enrollmentID;
                 quizProgress.QuizID = quizID;
-                quizProgress.Grade = 0;
+                quizProgress.Grade = grade;
                 _context.QuizesProgress.Add(quizProgress);
                 _context.SaveChanges();
             }

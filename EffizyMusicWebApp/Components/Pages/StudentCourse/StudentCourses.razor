@@ -43,6 +43,8 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Course Code</th>
+                            <th>Enrollment Start</th>
+                            <th>Enrollment End</th>
                             <th>Progress</th>
                             <th>Access</th>
                             <th></th>
@@ -55,6 +57,8 @@
                                 <td>@course.Title</td>
                                 <td>@course.CourseDescription</td>
                                 <td>@course.CourseCode</td>
+                                <td>@course.EnrollmentDate.ToString("MMMM, dd yyyy")</td>
+                                <td>@course.EnrollmentEndDate.ToString("MMMM, dd yyyy")</td>
                                 <td>@{
                                         double percentageComplete;
                                         if (course.TotalLessons == 0)

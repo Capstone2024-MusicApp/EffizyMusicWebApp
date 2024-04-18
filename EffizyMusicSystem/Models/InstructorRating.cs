@@ -18,7 +18,7 @@ namespace EffizyMusicSystem.Models
         public double Rating { get; set; }
 
         [Required(ErrorMessage = "Feedback is Required")]
-        public string Feedback { get; set; } = string.Empty;
+        public string Feedback { get; set; }
 
 
         [Required(ErrorMessage = "Please select the Instructor")]

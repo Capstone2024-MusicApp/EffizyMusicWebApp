@@ -9,60 +9,52 @@
 @inject NavigationManager NavService
 <PageTitle>Rate Instructor</PageTitle>
 <h2 class="display-3 text-center">Rate Instructor</h2>
+<hr />
 
- @if (InstructorList == null)
+@if (InstructorList == null)
 {
     <p class="text-center"><em>Loading...</em></p>
-} 
+}
 
-<EditForm FormName="Submit-Rating" method="post" Model="@RatingData" OnValidSubmit="SaveRating" class="form mt-4">    
-    
-        @if (IsRatingAdded || IsError)
-        {
-    <div class="mt-2 alert">
+<EditForm FormName="Submit-Rating" method="post" Model="@RatingData" OnValidSubmit="SaveRating" class="form mt-4">
+
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    @if (IsRatingAdded || IsError)
+    {
+        <div class="mt-2 text-center">
             <p class="text-primary h4">@Message</p>
         </div>
-        }
-    
+    }
+
     <div class="row justify-content-center">
         <div class="col-md-6">
-    <div class="form-outline mt-2">
-        <label for="instructor" class="form-label">Instructor:</label>
-        <InputSelect class="form-control" @bind-Value="RatingData.InstructorID" required>
-            <option value="">[Please Choose the Instructor...]</option>
-            @foreach (var inst in InstructorList)
-            {
-                <option value="@inst.InstructorID">@inst.FirstName @inst.LastName</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => RatingData.InstructorID)" class="row" />
-    </div>
-  @*   <div class="form-outline mt-2">
-        <label>Rate this:</label>
-        <div class="rating">
-            <InputRadioGroup @bind-Value="RatingData.Rating" class="form-control">
-                        <InputRadio Value="1" /> <label for="star5" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
-                        <InputRadio Value="2" /> <label for="star4" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
-                        <InputRadio Value="3" /> <label for="star3" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
-                        <InputRadio Value="4" /> <label for="star2" class="form-label"><i class="fa fa-star-o" aria-hidden="true"></i></label>
-                        <InputRadio Value="5" /> <label for="star1" class="form-label"><i class="fa fa-info-circle fa-2x" aria-hidden="true"></i></label>
-            </InputRadioGroup>
-        </div>
-    </div> *@
+            <div class="form-outline mt-2">
+                <label for="instructor" class="form-label">Instructor:</label>
+                <InputSelect class="form-control" @bind-Value="RatingData.InstructorID" required>
+                    <option value="">[Please Choose the Instructor...]</option>
+                    @foreach (var inst in InstructorList)
+                    {
+                        <option value="@inst.InstructorID">@inst.FirstName @inst.LastName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => RatingData.InstructorID)"/>
+            </div>
             <div class="form-outline mt-2">
                 <label>Rate the Instructor:</label>
-                <RatingComponent CurrentRating="@RatingData.Rating" RatingChanged="@HandleRatingChange" />                
+                <RatingComponent CurrentRating="@RatingData.Rating" RatingChanged="@HandleRatingChange"/>
+                <ValidationMessage For="@(() => RatingData.Rating)"/>
             </div>
-   
-    <div class="form-outline mt-2">
-                <label for="Feedback" class="form-label">Feedback:</label>
-        <InputTextArea @bind-Value="RatingData.Feedback" class="form-control" id="Feedback" style="min-height: 150px"  />
-    </div>    
-    <button type="submit" class="btn btn-primary mt-4">Submit Feedback</button>
 
-    @* <input type="submit" class="btn btn-primary m-2" id="submit" value="Submit FeedBack"> *@
-   
-    </div>
+            <div class="form-outline mt-2">
+                <label for="Feedback" class="form-label">Feedback:</label>
+                <InputTextArea @bind-Value="RatingData.Feedback" class="form-control" id="Feedback" style="min-height: 150px" />
+                <ValidationMessage For="@(() => RatingData.Feedback)" />
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Submit Feedback</button>
+
+            @* <input type="submit" class="btn btn-primary m-2" id="submit" value="Submit FeedBack"> *@
+
+        </div>
     </div>
 </EditForm>
 
@@ -85,13 +77,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        User user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
+        user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
         // var UserID = ProtectedSessionStore.GetAsync<int>("UserID");
         if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Instructor)
         {
             NavService.NavigateTo("/NotAuthorize/");
         }
-        InstructorList = EffizyService.GetInstructors();
+        InstructorList = EffizyService.GetInstructors();        
     }
 
     private void HandleRatingChange(int newRating)
@@ -104,18 +96,26 @@
     {
         try
         {
-            RatingData.UserID = user.UserID;
-            IsRatingAdded = await EffizyService.AddRating(RatingData);
-            if (IsRatingAdded)
+            if (RatingData.Rating == 0)
             {
-                Message = "Your Rating has been added";
-                ResetForm();
+                IsError = true;
+                Message = "Please Add a Rating";
             }
             else
             {
-                IsError = true;
-                Message = "Error in Adding Rating";
-            }
+                RatingData.UserID = user.UserID;
+                IsRatingAdded = await EffizyService.AddRating(RatingData);
+                if (IsRatingAdded)
+                {
+                    Message = "Your Rating has been added";
+                    ResetForm();
+                }
+                else
+                {
+                    IsError = true;
+                    Message = "Error in Adding Rating";
+                }
+            }           
         }
         catch (Exception ex)
         {
@@ -126,6 +126,5 @@
     private void ResetForm()
     {
         RatingData = new();
-        InstructorList = new();
     }
 }

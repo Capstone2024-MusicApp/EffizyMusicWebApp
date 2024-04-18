@@ -1,4 +1,4 @@
-﻿@page "/admin/approve-instructors"
+﻿@page "/admin/view-instructors"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components
@@ -11,9 +11,9 @@
 
 @rendermode InteractiveServer
 
-<h3>Approve/Reject Instructors</h3>
+<h3>All Instructors</h3>
 
-@if (PendingInstructors != null && PendingInstructors.Any())
+@if (Instructors != null && Instructors.Any())
 {
     <table class="table table-striped">
         <thead>
@@ -26,11 +26,12 @@
                 <th>Status</th>
                 <th>Instrument</th>
                 <th>Years of Experience</th>
-                <th>Actions</th>
+                <th>Reference Email</th>
+                <th>Reference Phone</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var instructor in PendingInstructors)
+            @foreach (var instructor in Instructors)
             {
                 <tr>
                     <td>@instructor.FirstName</td>
@@ -41,9 +42,8 @@
                     <td>@instructor.Status</td>
                     <td>@(instructor.Instrument != null ? instructor.Instrument.InstrumentType : "N/A")</td>
                     <td>@instructor.YearsOfExperience</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="@(() => ViewPendingInstructor(instructor.InstructorID))">View</button>
-                    </td>
+                    <td>@instructor.ReferenceEmail</td>
+                    <td>@instructor.ReferencePhone</td>
                 </tr>
             }
         </tbody>
@@ -51,12 +51,19 @@
 }
 else
 {
-    <p>No pending instructors.</p>
+    <p>No instructors found.</p>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
 }
 
 @code {
-    private List<Instructor> PendingInstructors { get; set; }
-
+    private List<Instructor> Instructors { get; set; }
+    private string ErrorMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,16 +72,11 @@ else
         {
             NavigationManager.NavigateTo("/NotAuthorize/");
         }
-        await LoadPendingInstructors();
+        await LoadInstructors();
     }
 
-    private async Task LoadPendingInstructors()
+    private async Task LoadInstructors()
     {
-        PendingInstructors = await InstructorService.GetPendingInstructorsAsync();
-    }
-
-    private void ViewPendingInstructor(int instructorId)
-    {
-        NavigationManager.NavigateTo($"/admin/view-pending-instructor/{instructorId}");
+        Instructors = await InstructorService.GetAllInstructorsAsync();
     }
 }
