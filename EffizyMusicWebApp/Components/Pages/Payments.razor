@@ -19,7 +19,6 @@ else
                 <th>Payment Method</th>
                 <th>Date</th>
                 <th>Amount</th>
-                <th>Billing Address</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -40,7 +39,6 @@ else
                         <td>@entity.PaymentMethod</td>
                         <td>@entity.PaymentDate.ToShortDateString()</td>
                         <td>@entity.Amount</td>
-                        <td>@entity.BillingAddress</td>
                         @if (entity.PaymentStatus.ToLower() == "Completed".ToLower())
                         {
                             <td><span class="btn btn-success">@entity.PaymentStatus</span></td>

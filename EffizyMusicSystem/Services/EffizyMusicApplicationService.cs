@@ -28,6 +28,7 @@ namespace EffizyMusicSystem.Services
         Task<List<Course>> GetCourses();
         List<Course> GetCourseList();
 
+        Task<Enrollment> GetStudentEnrolledCourse(int courseId);
         Task<List<Module>> GetModules();
         Task<Module> GetModuleByID(int id);
         Task<List<Lesson>> GetModuleLessons(int moduleId);
@@ -157,7 +158,7 @@ namespace EffizyMusicSystem.Services
         public async Task<List<Course>> GetCourses()
         {
 
-            var courses = await _context.Courses.ToListAsync();
+            var courses = await _context.Courses.OrderBy(x => x.CourseCode).ToListAsync();
             return courses != null ? courses : new List<Course>();
 
 
@@ -172,13 +173,26 @@ namespace EffizyMusicSystem.Services
                     DeleteModule(data.ModuleID);
                 }
             }
-            
+            //DeleteEnrolledCourse(id); //Remove the enrolled courses if any
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
                 _context.Remove(existingID);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<Enrollment> GetStudentEnrolledCourse(int courseId)
+        {
+            try
+            {
+                return await _context.Enrollments.Where(x => x.CourseID == courseId).FirstOrDefaultAsync();
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+            
+            
         }
 
        #endregion
@@ -980,10 +994,10 @@ namespace EffizyMusicSystem.Services
 
         }
 
-        public ViewCourseDTO GetCourseDetails(int CourseID)
+        public ViewCourseDTO GetCourseDetails(int CourseID, int userID)
         {
             ViewCourseDTO viewCourseDTO;
-            viewCourseDTO =  _context.Database.SqlQuery<ViewCourseDTO>($"EXECUTE sp_getCourseDetials {CourseID}").ToList().FirstOrDefault() ?? new ViewCourseDTO();
+            viewCourseDTO =  _context.Database.SqlQuery<ViewCourseDTO>($"EXECUTE sp_getCourseDetials {CourseID}, {userID}").ToList().FirstOrDefault() ?? new ViewCourseDTO();
             viewCourseDTO.Modules = _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == viewCourseDTO.CourseId).OrderBy(m => m.ModuleOrder).ToList();
             viewCourseDTO.Subscriptions = _context.Subscriptions.Where(x => x.CourseID == CourseID).ToList();
 
@@ -1103,6 +1117,32 @@ namespace EffizyMusicSystem.Services
         {
 
             _context.Payments.Add(payment);
+            _context.SaveChanges();
+        }
+
+        public void SwitchCourse(int CourseID, int EnrollmentID)
+        {
+            ICollection<LessonProgress> lp = _context.LessonsProgress.Where(x => x.EnrollmentID == EnrollmentID).ToList();
+            foreach(LessonProgress l in lp) 
+            {
+                _context.LessonsProgress.Remove(l);
+            }
+
+            ICollection<QuizProgress> qp = _context.QuizesProgress.Where(x => x.EnrollmentID == EnrollmentID).ToList();
+
+            foreach (QuizProgress q in qp)
+            {
+                _context.QuizesProgress.Remove(q);
+            }
+
+            Enrollment enrollment = _context.Enrollments.Where(x => x.EnrollmentID == EnrollmentID).ToList().FirstOrDefault();
+            if (enrollment != null) 
+            {
+                enrollment.CourseID = CourseID;
+                _context.Enrollments.Update(enrollment);
+
+            }
+
             _context.SaveChanges();
         }
     }

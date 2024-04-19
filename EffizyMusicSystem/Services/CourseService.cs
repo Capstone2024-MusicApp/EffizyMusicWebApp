@@ -28,7 +28,6 @@ namespace EffizyMusicSystem.Services
 
         public async Task<Course> GetCourseBySubscriptionIdAsync(int subscriptionCourseId)
         {
-            // Assuming Subscriptions table has a CourseID
             return await _context.Courses
                 .Where(c => c.CourseID == subscriptionCourseId)
                 .FirstOrDefaultAsync();
@@ -86,6 +85,26 @@ namespace EffizyMusicSystem.Services
         public async Task<Course> GetCourseById(int courseId)
         {
             return await _context.Courses.FindAsync(courseId);
+        }
+        public async Task<int?> CheckCourseExists(int courseId)
+        {
+          
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course != null)
+            {
+                return course.CourseID;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<int?> GetSelectedCourseID(int instrumentID, string skillLevel)
+        {
+
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.InstrumentID == instrumentID && c.SkillLevel == skillLevel);
+            return course?.CourseID;
         }
     }
 }

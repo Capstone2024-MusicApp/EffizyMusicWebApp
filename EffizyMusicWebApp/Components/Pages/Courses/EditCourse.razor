@@ -75,17 +75,29 @@
             <InputText @bind-Value="course.EstimatedTime" class="form-control" />
             <ValidationMessage For="@(() => course.EstimatedTime)" />
         </div>
-
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="submit" class="btn btn-danger" @onclick="RemoveCourse">Delete</button>
-        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+        <div class="mt-2 d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">Save</button>
+            @if (StudentEnrollments == null)
+            {
+                <button type="submit" class="btn btn-danger" @onclick="RemoveCourse">Delete</button>
+            }
+            <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+        </div>
+       
     </EditForm>
+    <div class="mt-2 text-center">
+        <span class="toolTip" data-bs-placement="bottom" title="Please note that the courses that are already enrolled by students cannot be deleted">
+            Important Information <Icon Name="IconName.InfoCircle"></Icon>
+        </span>
+    </div>
     @if (!string.IsNullOrEmpty(ErrorMessage))
     {
         <div class="alert alert-danger" role="alert">
             @ErrorMessage
         </div>
     }
+   
+
 }
 else
 {
@@ -99,6 +111,7 @@ else
     private Course course;
     private List<Instrument> Instruments = new List<Instrument>();
     private List<Instructor> Instructors = new List<Instructor>();
+    private Enrollment StudentEnrollments;
     private List<string> Skills = new List<string> { "Beginner", "Intermediate", "Advanced" }; // Sample SkillLevels
 
     private string ErrorMessage { get; set; } = "";
@@ -112,10 +125,11 @@ else
             {
                 NavigationManager.NavigateTo("/NotAuthorize/");
             }
-            
+
             course = await CourseService.GetCourseByIdAsync(CourseID);
             Instruments = await CourseService.GetInstrumentsAsync();
             Instructors = await CourseService.GetInstructorsAsync();
+            StudentEnrollments = await EffizyService.GetStudentEnrolledCourse(CourseID);
 
             if (course != null)
             {
