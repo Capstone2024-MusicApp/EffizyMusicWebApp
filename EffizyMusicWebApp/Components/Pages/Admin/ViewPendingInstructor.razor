@@ -21,7 +21,7 @@
         <p><strong>Gender:</strong> @Instructor.Gender</p>
         <p><strong>Phone:</strong> @Instructor.Phone</p>
         <p><strong>Location:</strong> @Instructor.Location</p>
-        <p><strong>Status:</strong> @Instructor.Status</p>
+        <p><strong>Status:</strong> @Instructor.Status.ToUpper()</p>
         <p><strong>Instrument:</strong> @((Instructor.Instrument != null) ? Instructor.Instrument.InstrumentType : "N/A")</p>
         <p><strong>Years of Experience:</strong> @Instructor.YearsOfExperience</p>
         <p><strong>Reference Email:</strong> @Instructor.ReferenceEmail</p>
