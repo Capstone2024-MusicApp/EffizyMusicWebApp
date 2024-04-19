@@ -20,4 +20,10 @@ namespace EffizyMusicSystem.Enum
         C,
         D
     }
+
+    public enum Status
+    {
+        Active,
+        Pending
+    }
 }
