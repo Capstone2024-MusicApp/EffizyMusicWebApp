@@ -65,7 +65,8 @@ AS
 				and m.CourseID = c.CourseID) +
 				(select count(*) from Modules m
 				inner join Quizes q on m.ModuleID = q.ModuleID
-				and m.CourseID = c.CourseID) TotalLessons
+				and m.CourseID = c.CourseID
+				and current_timestamp >= e.EnrollmentDate and current_timestamp <= e.EnrollmentEndDate) TotalLessons
 		from courses c 
 		inner join enrollments e on c.CourseId = e.CourseID 
 		where EnrollmentID = @in_enrollmentID;
@@ -126,7 +127,8 @@ AS
 GO
 
 CREATE OR ALTER PROCEDURE sp_getCourseDetials
-	@in_courseID INT
+	@in_courseID INT,
+	@in_userID INT
 AS
 	DECLARE @ProcedureName VARCHAR(30) = 'sp_getCourseDetials';
 
@@ -142,6 +144,12 @@ AS
 			    where ir.InstructorID = id.InstructorID) / 
 			  (select count(*) from InstructorRatings ir
 			    where ir.InstructorID = id.InstructorID), 0), 0) InstructorRating
+			 ,(select count(*) from Courses c2
+			   inner join Enrollments e on e.CourseID = c2.CourseID
+			   where c2.CourseCode = c.CourseCode
+			   and c2.CourseID <> c.CourseID
+			   and e.UserID = @in_userID
+			   ) enrolledSameCourseCode
 		from courses c
 		inner join instruments im on c.InstrumentID = im.InstrumentID
 		inner join instructors id on c.InstructorID = id.instructorId
@@ -155,3 +163,5 @@ AS
 		END
 	END
 GO
+
+EXECUTE sp_getCourseDetials 3, 0
