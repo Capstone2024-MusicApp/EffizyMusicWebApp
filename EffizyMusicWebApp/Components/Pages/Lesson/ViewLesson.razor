@@ -17,7 +17,12 @@
 }
 else
 {
-    <table class="table table-hover align-middle table-bordered">
+    <div class="mb-3">
+        <a href='/AddLesson' class="btn btn-primary" role="button">
+            <Icon Name="IconName.PersonAdd"></Icon>
+        </a>
+    </div>   
+    <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
                 <th>Lesson Number</th>
@@ -57,10 +62,7 @@ else
                             <p>No video attached.</p>
                         }
                     </td>
-                    <td>
-                        <a href='/AddLesson' class="btn btn-primary" role="button">
-                            <Icon Name="IconName.PersonAdd"></Icon>
-                        </a>
+                    <td>                       
                         <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
                             <Icon Name="IconName.PencilSquare"></Icon>
                         </a>
