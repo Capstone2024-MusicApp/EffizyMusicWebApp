@@ -46,7 +46,7 @@
     protected override async Task OnInitializedAsync()
     {
         User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
-        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student || user.UserTypeID == Constants.UserType_Instructor)
         {
             NavigationManager.NavigateTo("/NotAuthorize/");
         }

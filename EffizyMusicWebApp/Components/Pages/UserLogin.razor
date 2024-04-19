@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject EffizyMusicSystem.Services.IInstructorService InstructService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container justify-content-center mt-4 mb-4">
@@ -58,6 +59,32 @@
 
             if (user != null)
             {
+                if (user.UserTypeID == 2)//if login user is instructor
+                {
+                    var instructor = await InstructService.GetInstructorByUserIdAsync(user.UserID);
+                    // if (instructor != null && instructor.Status.ToUpper() != "ACTIVE")
+                    // {
+                    //     ErrorMessage = "Unable to login, Your status is pending for approval from admin.";
+                    //     user = new User();
+                    //     return;
+                    // }
+                    if (instructor != null)
+                    {
+                        if (instructor.Status.ToUpper() == "REJECTED")
+                        {
+                            ErrorMessage = "Unable to login, your account has been rejected.";
+                            user = new User();
+                            return;
+                        }
+                        else if (instructor.Status.ToUpper() == "PENDING")
+                        {
+                            ErrorMessage = "Unable to login, your account is pending for approval from admin.";
+                            user = new User();
+                            return;
+                        }
+                    }
+                }
+
                 await ProtectedSessionStore.SetAsync("Email", user.Email);
                 await ProtectedSessionStore.SetAsync("UserID", user.UserID);
                 await ProtectedSessionStore.SetAsync("UserTypeID", user.UserTypeID);
@@ -65,15 +92,18 @@
                 await ProtectedSessionStore.SetAsync("User", user);
                 var model = await ProtectedSessionStore.GetAsync<User>("User");
 
-                //You can get values from session from any other page, e.g
+                    //You can get values from session from any other page, e.g
                 var email = await ProtectedSessionStore.GetAsync<String>("Email");
                 var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
                 var UserTypeID = await ProtectedSessionStore.GetAsync<int>("UserTypeID");
 
-
                 //Redirect to specific page.
-                NavigationManager.NavigateTo("/", true);
+                NavigationManager.NavigateTo("/profile", true);
 
+                    //Redirect to specific page.
+                    NavigationManager.NavigateTo("/", true);
+
+               
             }
             else
             {
@@ -81,6 +111,8 @@
                 user = new User();
             }
         }
+
+
         catch (Exception ex)
         {
             // Handle exception, log, etc.
@@ -88,5 +120,4 @@
         }
     }
 
-   
 }

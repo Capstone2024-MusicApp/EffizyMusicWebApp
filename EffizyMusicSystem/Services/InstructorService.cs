@@ -24,6 +24,11 @@ namespace EffizyMusicSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<Instructor> GetInstructorByUserIdAsync(int userId)
+        {
+            return await _context.Instructors.FirstOrDefaultAsync(i => i.UserID == userId);
+        }
+
         public async Task<Instructor> GetInstructorByIdWithInstrumentAsync(int id)
         {
             return await _context.Instructors

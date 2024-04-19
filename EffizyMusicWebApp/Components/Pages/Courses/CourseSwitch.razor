@@ -1,0 +1,267 @@
+﻿@page "/course-switch"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
+@using Microsoft.EntityFrameworkCore;
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject UserTypeService userTypeService
+@inject InstrumentService instrumentService
+@inject NavigationManager NavigationManager
+@inject IUserProfileService UserProfileService
+@inject SubscriptionService subscriptionService
+@inject CourseService courseService
+@inject EnrollmentService enrollmentService
+
+<EditForm Model="course">
+    <div class="col-md-6">
+        <!-- Instrument selection -->
+        <div class="mb-4">
+            <label for="Instrument" class="form-label">Instrument:</label>
+            <InputSelect id="Instrument" @bind-Value="course.InstrumentID" class="form-select" @oninput="InstrumentChanged">
+                <option value="0" disabled selected>Select Instrument</option>
+                @foreach (var inst in instruments)
+                {
+                    <option value="@inst.InstrumentID">@inst.InstrumentType</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => course.InstrumentID)" />
+        </div>
+
+        <!-- Skill Level selection -->
+        <div class="mb-4">
+            <label for="SkillLevel" class="form-label">Skill Level:</label>
+            <InputSelect id="SkillLevel" @bind-Value="course.SkillLevel" class="form-select" @oninput="SkillLevelChanged">
+                <option value="" disabled selected>Select Skill Level</option>
+                @foreach (var skillLevel in distinctSkillLevels)
+                {
+                    <option value="@skillLevel">@skillLevel</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => course.SkillLevel)" />
+        </div>
+
+        <!-- Course selection -->
+        <div class="mb-4">
+            <label for="Course" class="form-label">Course:</label>
+            @if (courses != null)
+            {
+                <InputSelect id="Course" @bind-Value="selectedCourseID" class="form-select" @oninput="@(async (args) => await CourseChanged(args.Value.ToString()))">
+                    <option value="" disabled selected>Select Course</option>
+                    @foreach (var course in courses)
+                    {
+                        <option value="@course.CourseID">@course.Title</option>
+                    }
+                </InputSelect>
+
+                <ValidationMessage For="@(() => selectedCourseID)" />
+            }
+            else
+            {
+                <p>Loading courses...</p>
+            }
+        </div>
+
+        <!-- Navigation buttons -->
+        <!-- Success message for course switch -->
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="alert alert-success" role="alert">
+                @Message
+            </div>
+        }
+
+        <!-- Error message for course switch failure -->
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+        <div class="col-12">
+            <button type="button" class="btn btn-secondary me-2" @onclick="GoBack">Back</button>
+            <button class="btn btn-primary" @onclick="@(async () => await UpdateCourse(selectedCourse))">Switch Course</button>
+        </div>
+    </div>
+</EditForm>
+
+
+@code 
+{
+    private Course course = new Course();
+    private int selectedSubscriptionID;
+    private List<Instrument> instruments = new List<Instrument>();
+    private List<Course> courses = new List<Course>();
+    private List<string> distinctSkillLevels = new List<string>();
+    private Course selectedCourse = new Course();
+    private string Message = "";
+    private string ErrorMessage = "";
+
+    private int? selectedCourseID = null;
+    private int userId;
+    private int oldCourseId;
+    private int newCourseId;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            instruments = await instrumentService.GetInstruments();
+            distinctSkillLevels = await courseService.GetDistinctSkillLevels();
+            course.InstrumentID = 0;
+            course.SkillLevel = "";
+            selectedSubscriptionID = 0;
+
+            User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+            userId = user.UserID;
+
+            // Retrieve the ID of the existing course the user is enrolled in
+            var enrollment = await enrollmentService.GetEnrollmentByUserId(userId);
+            if (enrollment != null)
+            {
+                oldCourseId = enrollment.CourseID;
+            }
+
+            await LoadCourses(course.InstrumentID, course.SkillLevel);
+        }
+        catch (Exception ex)
+        {
+            Message = "An error occurred during initialization: " + ex.Message;
+        }
+    }
+
+    async Task InstrumentChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            if (int.TryParse(e.Value?.ToString(), out int instrumentID))
+            {
+                course.InstrumentID = instrumentID;
+                await LoadCourses(course.InstrumentID, course.SkillLevel);
+                selectedCourseID = await courseService.GetSelectedCourseID(course.InstrumentID, course.SkillLevel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = "An error occurred during instrument change: " + ex.Message;
+        }
+    }
+
+    async Task SkillLevelChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            course.SkillLevel = e.Value?.ToString();
+            await LoadCourses(course.InstrumentID, course.SkillLevel);
+            selectedCourseID = await courseService.GetSelectedCourseID(course.InstrumentID, course.SkillLevel);
+        }
+        catch (Exception ex)
+        {
+            Message = "An error occurred during skill level change: " + ex.Message;
+        }
+    }
+
+    async Task LoadCourses(int instrumentID, string skillLevel)
+    {
+        try
+        {
+            courses = await courseService.GetCourses(instrumentID, skillLevel);
+            if (courses == null)
+            {
+                Message = "No courses found.";
+            }
+            else
+            {
+                Message = "";
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Message = "An error occurred while loading courses: " + ex.Message;
+        }
+    }
+
+    async Task CourseChanged(string courseId)
+    {
+        try
+        {
+            if (int.TryParse(courseId, out int courseID))
+            {
+                selectedCourseID = courseID; // Set the selectedCourseID
+                Console.WriteLine($"Selected Course ID: {selectedCourseID}"); // Add this line for debugging
+                selectedCourse = await courseService.GetCourseById(courseID);
+                if (selectedCourse != null)
+                {
+                    // Proceed with course update
+                    await UpdateCourse(selectedCourse);
+                }
+                else
+                {
+                    // Display error message for invalid course ID
+                    Message = "Invalid Course ID";
+                }
+            }
+            else
+            {
+                // Display error message for invalid course ID
+                Message = "Invalid Course ID";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Display error message for exception
+            Message = "An error occurred during course change: " + ex.Message;
+        }
+    }
+
+    private async Task UpdateCourse(Course selectedCourse)
+    {
+        try
+        {
+            // Reset error message
+            ErrorMessage = "";
+
+            // Validate that the selected course exists
+            if (selectedCourseID == null || selectedCourseID == 0)
+            {
+                ErrorMessage = "Invalid course selected.";
+                return;
+            }
+
+            // Check if the course ID exists
+            int? courseId = await courseService.CheckCourseExists(selectedCourseID.Value);
+            if (courseId.HasValue)
+            {
+                // Course exists, you can proceed with updating the enrollment
+                await enrollmentService.UpdateEnrollment(userId, oldCourseId, courseId.Value);
+                // Set the success message
+                Message = "Successful Course Switch.";
+
+                // Navigate after a delay
+                await Task.Delay(3000);
+                NavigationManager.NavigateTo("/StudentCourse/StudentCourses");
+            }
+            else
+            {
+                // Course does not exist
+                ErrorMessage = "The selected course does not exist.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred: " + ex.Message;
+            // Log or handle the exception further as needed
+        }
+    }
+
+
+
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/previous-page");
+    }
+}
