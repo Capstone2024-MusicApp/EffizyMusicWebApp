@@ -62,11 +62,26 @@
                 if (user.UserTypeID == 2)//if login user is instructor
                 {
                     var instructor = await InstructService.GetInstructorByUserIdAsync(user.UserID);
-                    if (instructor != null && instructor.Status.ToUpper() != "ACTIVE")
+                    // if (instructor != null && instructor.Status.ToUpper() != "ACTIVE")
+                    // {
+                    //     ErrorMessage = "Unable to login, Your status is pending for approval from admin.";
+                    //     user = new User();
+                    //     return;
+                    // }
+                    if (instructor != null)
                     {
-                        ErrorMessage = "Unable to login, Your status is pending for approval from admin.";
-                        user = new User();
-                        return;
+                        if (instructor.Status.ToUpper() == "REJECTED")
+                        {
+                            ErrorMessage = "Unable to login, your account has been rejected.";
+                            user = new User();
+                            return;
+                        }
+                        else if (instructor.Status.ToUpper() == "PENDING")
+                        {
+                            ErrorMessage = "Unable to login, your account is pending for approval from admin.";
+                            user = new User();
+                            return;
+                        }
                     }
                 }
 
