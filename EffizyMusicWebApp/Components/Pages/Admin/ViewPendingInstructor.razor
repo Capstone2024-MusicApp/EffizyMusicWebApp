@@ -78,7 +78,7 @@ else
         try
         {
             await InstructorService.ApproveInstructorAsync(Instructor.InstructorID);
-            Instructor.Status = "Approved";
+            Instructor.Status = "Active";
             NavigationManager.NavigateTo("/admin/view-instructors");
         }
         catch (Exception ex)
