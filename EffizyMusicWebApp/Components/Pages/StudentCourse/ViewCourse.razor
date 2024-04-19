@@ -127,30 +127,42 @@
         </table>
         <br />
         <br />
-        <label>Interested in Enrolling on this course?</label>
+       
         @if (user == null || user.UserID == 0)
         {
+            <label>Interested in Enrolling on this course?</label>
             <br />
             <button type="submit" class="btn btn-primary" @onclick="RegisterNow">Register Now</button>
         }
         else
         {
-            <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
-                <option value="0">Select Subscription</option>
-                @if (courseDetails.Subscriptions != null && courseDetails.Subscriptions.Count > 0)
+             
+                <br />
+                @if (courseDetails.enrollmentIDToSwitch != 0)
                 {
-                    @foreach (var sub in courseDetails.Subscriptions)
-                    {
-                        <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
-                    }
+                    <label>Since you are currently enrolled on this same course code. You are eligible to switch</label>
+                    <br />
+                    <button type="submit" class="btn btn-primary" @onclick="SwitchCourse">Switch to this course</button>
                 }
                 else
                 {
-                    <p>No subscriptions found for @courseDetails.Title</p>
+                    <label>Interested in Enrolling on this course?</label>
+                    <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
+                        <option value="0">Select Subscription</option>
+                        @if (courseDetails.Subscriptions != null && courseDetails.Subscriptions.Count > 0)
+                        {
+                            @foreach (var sub in courseDetails.Subscriptions)
+                            {
+                                <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
+                            }
+                        }
+                        else
+                        {
+                            <p>No subscriptions found for @courseDetails.Title</p>
+                        }
+                    </InputSelect>
+                    <button type="submit" class="btn btn-primary" @onclick="EnrollNow">Enroll Now</button>
                 }
-            </InputSelect>
-            <br />
-            <button type="submit" class="btn btn-primary" @onclick="EnrollNow">Enroll Now</button>
         }
         }
     </div>
@@ -173,7 +185,7 @@
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
 
-        courseDetails = EffizyService.GetCourseDetails(CourseID);
+        courseDetails = EffizyService.GetCourseDetails(CourseID, user.UserID);
 
 
         student = EffizyService.GetStudentFromUser(user.UserID);
@@ -182,6 +194,18 @@
     protected void RegisterNow()
     {
         NavigationManager.NavigateTo("/registrationForm");
+    }
+
+    public async Task SwitchCourse()
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Switching course will wipe out your current progress. Are you sure you want to switch?");
+
+        if(confirmed)
+        {
+            EffizyService.SwitchCourse(courseDetails.CourseId, courseDetails.enrollmentIDToSwitch);
+
+            NavigationManager.NavigateTo("/StudentCourse/StudentCourses");
+        }
     }
 
     protected void EnrollNow()

@@ -31,21 +31,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //string apiUrl = "https://localhost:7164/api/Modules/GetModule/" + moduleId;
-        //await Http.GetFromJsonAsync<Module>(apiUrl);
+        
         model = EffizyService.GetModule(moduleId); 
     }
 
     protected async Task RemoveModule()
     {
         EffizyService.DeleteModule(moduleId);
-        // string apiUrl = "https://localhost:7164/api/Modules/" + moduleId;
-        // await Http.DeleteAsync(apiUrl);
+        
         Cancel();
     }
 
     void Cancel()
     {
-        NavigationManager.NavigateTo("/Modules/");
+        NavigationManager.NavigateTo("/modules");
     }
 }
