@@ -116,26 +116,15 @@
 
     [SupplyParameterFromForm]
     protected Course model { get; set; }
+    public User user = new();
 
     protected List<Instrument> Instruments { get; set; }
 
     protected List<Instructor> Instructors { get; set; }
-    private User User = new();
+    
     private bool IsInstructor { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        User = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
-        if (User.UserID == 0 || User.UserTypeID == Constants.UserType_Student)
-        {
-            NavigationManager.NavigateTo("/NotAuthorize/");
-        }
-        if (User.UserTypeID == Constants.UserType_Instructor)
-        {
-            // Get InstructorID from UserId
-            IsInstructor = User.UserTypeID == Constants.UserType_Instructor;
-            var InsProfile = await UserProfileService.GetInstructorProfileAsync(User.UserID);
-            model.InstructorID = InsProfile.InstructorID;
-        }
         if (model == null) // && string.IsNullOrEmpty(model.Title)
         {
             model = new Course();
@@ -143,6 +132,18 @@
             Instruments = EffizyService.GetInstruments();
 
             Instructors = EffizyService.GetInstructors();
+        }
+        user = (await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User();
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
+        if (user.UserTypeID == Constants.UserType_Instructor)
+        {
+            // Get InstructorID from UserId
+            IsInstructor = user.UserTypeID == Constants.UserType_Instructor;
+            var InsProfile = await UserProfileService.GetInstructorProfileAsync(user.UserID);
+            model.InstructorID = InsProfile.InstructorID;
         }
     }
 
