@@ -9,6 +9,7 @@
 @inject ICourseService CourseService
 @inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
+@inject IUserProfileService UserProfileService
 @inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
 
@@ -51,7 +52,7 @@
 
         <div class="form-group">
             <label>Instructor</label>
-            <select class="form-control" @bind="course.InstructorID">
+            <select class="form-control" @bind="course.InstructorID" disabled="@IsInstructor">
                 @foreach (var instruc in Instructors)
                 {
                     <option value="@instruc.InstructorID">@($"{instruc.FirstName} {instruc.LastName}")</option>
@@ -112,6 +113,7 @@ else
     private List<Instrument> Instruments = new List<Instrument>();
     private List<Instructor> Instructors = new List<Instructor>();
     private Enrollment StudentEnrollments;
+    public bool IsInstructor{ get; set; }
     private List<string> Skills = new List<string> { "Beginner", "Intermediate", "Advanced" }; // Sample SkillLevels
 
     private string ErrorMessage { get; set; } = "";
@@ -124,6 +126,13 @@ else
             if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
             {
                 NavigationManager.NavigateTo("/NotAuthorize/");
+            }
+            if (user.UserTypeID == Constants.UserType_Instructor)
+            {
+                // Get InstructorID from UserId
+                IsInstructor = user.UserTypeID == Constants.UserType_Instructor;
+                var InsProfile = await UserProfileService.GetInstructorProfileAsync(user.UserID);
+                course.InstructorID = InsProfile.InstructorID;
             }
 
             course = await CourseService.GetCourseByIdAsync(CourseID);
