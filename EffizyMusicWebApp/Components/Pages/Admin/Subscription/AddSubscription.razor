@@ -1,4 +1,8 @@
 ﻿@page "/subscription/addSubscription"
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject SubscriptionService subscriptionService
 @inject CourseService courseService
 @inject NavigationManager NavigationManager
@@ -25,10 +29,16 @@ else
         <input id="Amount" @bind="@subscription.Amount" class="form-control mb-3" type="number" step="0.01" />
     </div>
 
+
+    <div class="form-group">
+        <label for="EnrollmentDuration">Enrollment Duration (in months):</label>
+        <InputNumber id="EnrollmentDuration" @bind-Value="@subscription.EnrollmentDuration" class="form-control mb-3" min="1"/>
+    </div>
+
     <div class="form-group mb-5">
         <label for="CourseID">Course ID:</label>
         <select id="Title" @bind="@subscription.CourseID" class="form-control mb-3" required>
-            <option value="" disabled selected>Select Course</option>
+            <option value="0" disabled selected>Select Course</option>
             @if (courses != null)
             {
                 @foreach (var course in courses)
@@ -55,12 +65,17 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         courses = await courseService.GetCoursesAsync();
     }
 
     private async Task SaveSubscription()
     {
-        Message = ""; // Clear previous message
+        Message = "";
 
         if (string.IsNullOrEmpty(subscription.Description))
         {
@@ -80,9 +95,26 @@ else
             return;
         }
 
+        if (subscription.EnrollmentDuration <= 0)
+        {
+            Message = "Please enter a valid Enrollment Duration.";
+            return;
+        }
+        
+
+
         try
         {
-            // Formatting amount to always have 2 decimal places
+
+            bool existingSubscription = await subscriptionService.CheckExistingSubscriptionAsync(subscription.Description, subscription.CourseID);
+
+            if (existingSubscription)
+            {
+                Message = "A subscription of this type for this course already exists.";
+                return;
+            }
+
+
             subscription.Amount = Math.Round(subscription.Amount, 2);
 
             await subscriptionService.AddSubscriptionAsync(subscription);

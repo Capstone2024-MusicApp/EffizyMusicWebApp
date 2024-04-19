@@ -24,12 +24,11 @@ namespace EffizyMusicSystem.Models
 
         public required DateTime EnrollmentDate { get; set; }
 
+        public DateTime EnrollmentEndDate { get; set; }
+
         public  required string ProgressStatus { get; set; }
 
         public int UserID { get; set; }
-
-        public string PayerID { get; set; }
-
 
         public Student Student { get; set; }
         [JsonIgnore]

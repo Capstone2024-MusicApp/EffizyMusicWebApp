@@ -9,13 +9,22 @@ AS
 			  ,CourseDescription
 			  ,CourseCode
 			  ,e.StudentID
+			  ,e.UserID
 			  ,ProgressStatus 
+			  ,e.EnrollmentDate
+			  ,e.EnrollmentEndDate
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
-				and ProgressStatus = 'COMPLETE') CompletedLessons
-			  ,(select count(*) from Modules m
+				and ProgressStatus = 'COMPLETE') +
+				(select count(*) from QuizesProgress qp
+				where qp.EnrollmentId = e.EnrollmentID
+				and qp.Grade >= 80) CompletedLessons
+			  ,((select count(*) from Modules m
 			    inner join Lessons l on m.ModuleID = l.ModuleID
-				and m.CourseID = c.CourseID) TotalLessons
+				and m.CourseID = c.CourseID) +
+				(select count(*) from Modules m
+				inner join Quizes q on m.ModuleID = q.ModuleID
+				and m.CourseID = c.CourseID)) TotalLessons
 		from enrollments  e
 		inner join courses c on e.CourseID = c.CourseID
 		inner join students s on e.StudentID = s.StudentID
@@ -41,12 +50,21 @@ AS
 			  , CourseDescription
 			  , CourseCode
 			  , StudentID
+			  ,UserID
 			  , ProgressStatus 
+			  ,e.EnrollmentDate
+			  ,e.EnrollmentEndDate
 			  ,(select count(*) from LessonsProgress lp
 				where lp.EnrollmentId = e.EnrollmentID
-				and ProgressStatus = 'COMPLETE') CompletedLessons
+				and ProgressStatus = 'COMPLETE') +
+				(select count(*) from QuizesProgress qp
+				where qp.EnrollmentId = e.EnrollmentID
+				and qp.Grade >= 80)  CompletedLessons
 			  ,(select count(*) from Modules m
 				inner join Lessons l on m.ModuleID = l.ModuleID
+				and m.CourseID = c.CourseID) +
+				(select count(*) from Modules m
+				inner join Quizes q on m.ModuleID = q.ModuleID
 				and m.CourseID = c.CourseID) TotalLessons
 		from courses c 
 		inner join enrollments e on c.CourseId = e.CourseID 
@@ -95,13 +113,45 @@ AS
 		inner join Modules m on l.ModuleID = m.ModuleID
 		inner join Courses c on m.CourseID = c.CourseID
 		inner join Enrollments e on e.CourseID = c.CourseID
-		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID)
-		and e.EnrollmentID = @in_enrollmentID;
+		where not exists(select 'x' from LessonsProgress lp where lp.EnrollmentID = @in_enrollmentID and lp.LessonID = l.LessonNumber)
+		and e.EnrollmentID = @in_enrollmentID
+		order by m.ModuleOrder, l.LessonOrder;
 
 
 		IF @@ERROR <> 0 
 		BEGIN
 			RAISERROR('sp_getMissingLessonProgress - Error getting missing lesson progress.',16,1)
+		END
+	END
+GO
+
+CREATE OR ALTER PROCEDURE sp_getCourseDetials
+	@in_courseID INT
+AS
+	DECLARE @ProcedureName VARCHAR(30) = 'sp_getCourseDetials';
+
+	BEGIN
+		select c.CourseId
+			  ,c.Title
+			  ,c.CourseDescription
+			  ,c.SkillLevel
+			  ,c.EstimatedTime
+			  ,im.InstrumentType Instrument
+			  ,id.FirstName + ' ' + id.LastName Instructor
+			  ,coalesce(ROUND((select sum(rating) from InstructorRatings ir
+			    where ir.InstructorID = id.InstructorID) / 
+			  (select count(*) from InstructorRatings ir
+			    where ir.InstructorID = id.InstructorID), 0), 0) InstructorRating
+		from courses c
+		inner join instruments im on c.InstrumentID = im.InstrumentID
+		inner join instructors id on c.InstructorID = id.instructorId
+		where courseID = @in_courseID;
+
+
+
+		IF @@ERROR <> 0 
+		BEGIN
+			RAISERROR('sp_getCourseDetials - Error getting missing course details.',16,1)
 		END
 	END
 GO

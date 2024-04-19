@@ -4,6 +4,7 @@ using EffizyMusicSystem.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EffizyMusicSystem.Migrations
 {
     [DbContext(typeof(EffizyMusicContext))]
-    partial class EffizyMusicContextModelSnapshot : ModelSnapshot
+    [Migration("20240413052410_RemovedGradesFromStudent")]
+    partial class RemovedGradesFromStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -123,9 +126,6 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<int>("TotalLessons")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
                     b.ToTable((string)null);
 
                     b.ToView(null, (string)null);
@@ -147,9 +147,6 @@ namespace EffizyMusicSystem.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("EnrollmentDate");
-
-                    b.Property<DateTime>("EnrollmentEndDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("EnrollmentStatus")
                         .IsRequired()
@@ -640,9 +637,6 @@ namespace EffizyMusicSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EnrollmentDuration")
-                        .HasColumnType("int");
-
                     b.HasKey("SubscriptionID");
 
                     b.HasIndex("CourseID");
@@ -657,6 +651,10 @@ namespace EffizyMusicSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
+
+                    b.Property<string>("ConfirmPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()

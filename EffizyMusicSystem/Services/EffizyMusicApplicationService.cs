@@ -30,14 +30,17 @@ namespace EffizyMusicSystem.Services
 
         Task<List<Module>> GetModules();
         Task<Module> GetModuleByID(int id);
+        Task<List<Lesson>> GetModuleLessons(int moduleId);
 
         Task<Course> GetCourseByID(int id);
         Task DeleteCourse(int id);
-
+        List<Payment> GetUserPayments(int UserId);
+        Task<List<Module>> GetModulesByCourseID(int courseId);
         public List<Feedback> GetFeedback();
         public List<FeedbackDTO> GetFeedbackDTOs();
         public void InsertFeedback(Feedback feedback);
         public void DeleteFeedback(Feedback feedback);
+  
     }
 
     public class EffizyMusicApplicationService : IEffizyMusicApplicationService
@@ -211,6 +214,11 @@ namespace EffizyMusicSystem.Services
             }
 
         }
+
+
+
+
+
         public void AddCourse(Course entity)
         {
             try
@@ -218,11 +226,13 @@ namespace EffizyMusicSystem.Services
                 _context.Courses.Add(entity);
                 _context.SaveChanges();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
         }
+
+
         #endregion
         #region Modules
         /// <summary>
@@ -234,6 +244,17 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return await _context.Modules.ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task<List<Module>> GetModulesByCourseID(int courseId)
+        {
+            try
+            {
+                return await _context.Modules.Where(x => x.Course.CourseID == courseId).ToListAsync();
             }
             catch
             {
@@ -395,25 +416,40 @@ namespace EffizyMusicSystem.Services
                 throw;
             }
         }
-        public void AddQuizResult(QuizResult entity)
+        public async Task AddQuizResult(QuizResult entity)
         {
             try
             {
-                _context.QuizResults.Add(entity);
-                _context.SaveChanges();
+                _context.QuizResults.AddAsync(entity);
+                _context.SaveChangesAsync();
             }
             catch
             {
                 throw;
             }
         }
+
+        public async Task SaveQuizResult(QuizResult entity)
+        {
+            QuizResult qr = _context.QuizResults.Where(q => q.QuizId == entity.QuizId && q.UserId == entity.UserId && q.QuestionId == entity.QuestionId).FirstOrDefault();
+            if(qr == null)
+            {
+                await AddQuizResult(entity);
+            }
+            else
+            {
+                qr.SelectedChoice = entity.SelectedChoice;
+                qr.CreatedDate = entity.CreatedDate;
+                await UpdateQuizResult(qr);
+            }
+        }
         //To Update the records of a particluar QuizResult
-        public void UpdateQuizResult(QuizResult entity)
+        public async Task UpdateQuizResult(QuizResult entity)
         {
             try
             {
                 _context.Entry(entity).State = EntityState.Modified;
-                _context.SaveChanges();
+                _context.SaveChangesAsync();
             }
             catch
             {
@@ -595,6 +631,18 @@ namespace EffizyMusicSystem.Services
             try
             {
                 return _context.Payments.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
+        public List<Payment> GetUserPayments(int UserId)
+        {
+            try
+            {
+                return _context.Payments.Where(x=>x.UserID == UserId).ToList();
             }
             catch
             {
@@ -850,14 +898,67 @@ namespace EffizyMusicSystem.Services
 
         public StudentCourseDTO? GetStudentCourse(int enrollmentID)
         {
+
+            Boolean disableNextModule = true;
+            Boolean isFirstModule = true;
             StudentCourseDTO? studentCourse = _context.Database.SqlQuery<StudentCourseDTO>($"EXECUTE sp_getStudentCourse {enrollmentID}").ToList().FirstOrDefault();
             //StudentCourseDTO? studentCourse = studentCourseList.FirstOrDefault();
 
             studentCourse.Modules =  _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == studentCourse.CourseID).OrderBy(m => m.ModuleOrder).ToList();
 
-            
             studentCourse.LessonProgress = _context.LessonsProgress.Where(lp => lp.EnrollmentID == studentCourse.EnrollmentID).ToList();
             studentCourse.QuizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == studentCourse.EnrollmentID).ToList();
+
+            foreach (Module module in studentCourse.Modules)
+            {
+                module.EnableForStudent = true;
+
+                int quizPassed = 0;
+                foreach (Lesson lesson in module.Lessons)
+                {
+                    lesson.ProgressStatus = studentCourse.LessonProgress.Where(x => x.LessonID == lesson.LessonNumber).FirstOrDefault().ProgressStatus ?? Constants.ProgressStatus_NotStarted;
+                }
+
+                foreach (Quiz quiz in module.Quizzes)
+                {
+                    QuizProgress qp = studentCourse.QuizProgress.Where(x => x.QuizID == quiz.Id).FirstOrDefault() ?? new QuizProgress();
+                    quiz.Grade = qp.Grade;
+                    if(quiz.Grade >= 80)
+                    {
+                        quizPassed++;
+                    }
+                }
+
+                if(disableNextModule && !isFirstModule)
+                {
+                    module.EnableForStudent = false;
+                }
+                else 
+                {
+                    if(!disableNextModule)
+                    {
+                        module.EnableForStudent = true;
+                    }
+                    
+                    if (quizPassed == module.Quizzes.Count)
+                    {
+                        disableNextModule = false;
+                        module.EnableForStudent = true;
+                    }
+                    else
+                    {
+                        if (!isFirstModule) { 
+                        disableNextModule = true;
+                        }
+                    }
+                }
+
+
+
+                isFirstModule = false;
+            }
+
+
 
             return studentCourse;
             
@@ -879,7 +980,18 @@ namespace EffizyMusicSystem.Services
 
         }
 
-        public void setQuizProgress(int enrollmentID, int quizID, float grade, bool ignoreWhenFound)
+        public ViewCourseDTO GetCourseDetails(int CourseID)
+        {
+            ViewCourseDTO viewCourseDTO;
+            viewCourseDTO =  _context.Database.SqlQuery<ViewCourseDTO>($"EXECUTE sp_getCourseDetials {CourseID}").ToList().FirstOrDefault() ?? new ViewCourseDTO();
+            viewCourseDTO.Modules = _context.Modules.Include(l => l.Lessons.OrderBy(a => a.LessonOrder)).Include(q => q.Quizzes).Where(m => m.Course.CourseID == viewCourseDTO.CourseId).OrderBy(m => m.ModuleOrder).ToList();
+            viewCourseDTO.Subscriptions = _context.Subscriptions.Where(x => x.CourseID == CourseID).ToList();
+
+            return viewCourseDTO;
+
+        }
+
+        public void setQuizProgress(int enrollmentID, int quizID, float grade)
         {
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
             if(quizProgress == null)
@@ -887,19 +999,19 @@ namespace EffizyMusicSystem.Services
                 quizProgress = new QuizProgress();
                 quizProgress.EnrollmentID = enrollmentID;
                 quizProgress.QuizID = quizID;
-                quizProgress.Grade = 0;
+                quizProgress.Grade = grade;
                 _context.QuizesProgress.Add(quizProgress);
                 _context.SaveChanges();
             }
             else
             {
-                if (!ignoreWhenFound)
-                {
-                    quizProgress.Grade = grade;
+                    if (quizProgress.Grade < grade)
+                    {
+                        quizProgress.Grade = grade;
 
-                    _context.QuizesProgress.Update(quizProgress);
-                    _context.SaveChanges();
-                }
+                        _context.QuizesProgress.Update(quizProgress);
+                        _context.SaveChanges();
+                    }
             }
 
         }
@@ -944,12 +1056,56 @@ namespace EffizyMusicSystem.Services
         {
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
-                string hashPassword = PasswordHasher.HashPassword(password);
-                return _context.Users.Where(u => u.Email == email && u.Password == u.Password).FirstOrDefault();
+                string hashedPassword = PasswordHasher.HashPassword(password);
+
+                var user = _context.Users
+                    .FirstOrDefault(u => u.Email == email && u.Password == hashedPassword);
+
+                if (user != null)
+                {
+                    return new User
+                    {
+                        UserID = user.UserID,
+                        /*ConfirmPassword = user.ConfirmPassword,*/ // Handle possible null
+                        Email = user.Email, // Handle possible null
+                        Password = user.Password, // Handle possible null
+                        UserTypeID = user.UserTypeID // Handle possible null
+                    };
+                }
             }
-            else
-                return null;
+
+            return null;
+        }
+
+        public bool DoesEnrolmentMatchUer(int enrollmentID, int userID)
+        {
+            bool enrollmentMatch = false;
+            Enrollment enrollment = _context.Enrollments.Where(x => x.EnrollmentID == enrollmentID && x.UserID == userID).ToList().FirstOrDefault();
+
+            if(enrollment == null)
+            {
+                enrollmentMatch = false;
+            }
+            else 
+            {
+                enrollmentMatch = true;
+            }
+
+            return enrollmentMatch;
+        }
+
+        public Student GetStudentFromUser(int userID)
+        {
+            return _context.Students.Where(x => x.UserID == userID).ToList().FirstOrDefault();
+        }
+
+        public void AddPayment(Payment payment)
+        {
+
+            _context.Payments.Add(payment);
+            _context.SaveChanges();
         }
     }
+
     #endregion
 }

@@ -1,7 +1,11 @@
-﻿@page "/admin/view-instructor/{InstructorId}"
+﻿@page "/admin/view-pending-instructor/{InstructorId}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Services
 @using Microsoft.AspNetCore.Components
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject IInstructorService InstructorService
 @inject NavigationManager NavigationManager
 
@@ -41,13 +45,17 @@ else
 @code {
     [Parameter]
     public string InstructorId { get; set; }
-     
     private Instructor Instructor { get; set; }
     private string ErrorMessage { get; set; }
     public Instrument Instrument { get; set; } // Navigation property
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         await LoadInstructor();
     }
 
@@ -65,39 +73,31 @@ else
         }
     }
 
-    private async Task ApproveInstructorAsync()
+    async Task ApproveInstructorAsync()
     {
-        if (Instructor != null)
+        try
         {
-            var success = await InstructorService.ApproveInstructorAsync(Instructor.InstructorID);
-            if (success)
-            {
-                Instructor.Status = "Approved"; 
-                ErrorMessage = null;
-                NavigationManager.NavigateTo("/admin/approve-instructors");
-            }
-            else
-            {
-                ErrorMessage = "Failed to approve instructor.";
-            }
+            await InstructorService.ApproveInstructorAsync(Instructor.InstructorID);
+            Instructor.Status = "Approved";
+            NavigationManager.NavigateTo("/admin/view-instructors");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
         }
     }
 
-    private async Task RejectInstructorAsync()
+    async Task RejectInstructorAsync()
     {
-        if (Instructor != null)
+        try
         {
-            var success = await InstructorService.RejectInstructorAsync(Instructor.InstructorID);
-            if (success)
-            {
-                Instructor.Status = "Rejected";
-                ErrorMessage = null;
-                NavigationManager.NavigateTo("/admin/approve-instructors");
-            }
-            else
-            {
-                ErrorMessage = "Failed to reject instructor.";
-            }
+            await InstructorService.RejectInstructorAsync(Instructor.InstructorID);
+            Instructor.Status = "Rejected";
+            NavigationManager.NavigateTo("/admin/view-instructors");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
         }
     }
 }

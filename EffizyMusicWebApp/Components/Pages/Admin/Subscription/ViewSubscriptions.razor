@@ -1,6 +1,9 @@
 ﻿@page "/Subscription/ViewSubscriptions"
 @using Microsoft.AspNetCore.Components
-
+@using EffizyMusicSystem.Utils
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject SubscriptionService subscriptionService
 @inject NavigationManager NavigationManager
 
@@ -18,6 +21,10 @@ else
             <tr>
                 <th>Subscription ID</th>
                 <th>Description</th>
+                <th>
+                    Enrollment Duration (months)
+
+                </th>
                 <th>Amount</th>
                 <th>Course</th>
                 <th>Action</th>
@@ -30,6 +37,7 @@ else
                 <tr>
                     <td>@subscription.SubscriptionID</td>
                     <td>@subscription.Description</td>
+                    <td>@subscription.EnrollmentDuration</td>
                     <td>@subscription.Amount.ToString("0.00")</td>
                     <td>@subscription.Course.Title</td>
                     <td>
@@ -53,6 +61,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        User user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
         subscriptions = await subscriptionService.GetSubscriptionsAsync();
     }
 

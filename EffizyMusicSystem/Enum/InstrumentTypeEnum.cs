@@ -8,9 +8,9 @@ namespace EffizyMusicSystem.Enum
 {
     public enum InstrumentTypeEnum
     {
-        Drums = 1,
+        Piano = 1,
         Guitar = 2,
-        Voilin = 3
+        Drums = 3
     }
 
     public enum Choices
@@ -19,5 +19,11 @@ namespace EffizyMusicSystem.Enum
         B,
         C,
         D
+    }
+
+    public enum Status
+    {
+        Active,
+        Pending
     }
 }

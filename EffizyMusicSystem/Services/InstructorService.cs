@@ -24,6 +24,11 @@ namespace EffizyMusicSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<Instructor> GetInstructorByUserIdAsync(int userId)
+        {
+            return await _context.Instructors.FirstOrDefaultAsync(i => i.UserID == userId);
+        }
+
         public async Task<Instructor> GetInstructorByIdWithInstrumentAsync(int id)
         {
             return await _context.Instructors
@@ -33,27 +38,54 @@ namespace EffizyMusicSystem.Services
 
         public async Task<bool> ApproveInstructorAsync(int instructorId)
         {
-            var instructor = await _context.Instructors.FindAsync(instructorId);
-            if (instructor != null && instructor.User != null && instructor.User.UserType != null)
+            try
             {
-                instructor.User.UserType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Instructor" && u.UserTypeID == 1); // Change to "Active" status
-                await _context.SaveChangesAsync();
-                return true;
+                var instructor = await _context.Instructors.FindAsync(instructorId);
+                if (instructor != null)
+                {
+                    instructor.Status = "approved";
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Instructor not found.");
+                }
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to approve instructor.", ex);
+            }
         }
+
 
         public async Task<bool> RejectInstructorAsync(int instructorId)
         {
-            var instructor = await _context.Instructors.FindAsync(instructorId);
-            if (instructor != null && instructor.User != null && instructor.User.UserType != null)
+            try
             {
-                instructor.User.UserType = await _context.UserTypes.FirstOrDefaultAsync(u => u.Description == "Student" && u.UserTypeID == 1); // Change to "Student" status
-                await _context.SaveChangesAsync();
-                return true;
+                var instructor = await _context.Instructors.FindAsync(instructorId);
+                if (instructor != null)
+                {
+                    instructor.Status = "Rejected";
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Instructor not found.");
+                }
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to reject instructor.", ex);
+            }
         }
-        
+
+        public async Task<List<Instructor>> GetAllInstructorsAsync()
+        {
+            return await _context.Instructors
+                .Include(i => i.Instrument)
+                .ToListAsync();
+        }
     }
 }

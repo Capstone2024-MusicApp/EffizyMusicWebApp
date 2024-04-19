@@ -1,0 +1,251 @@
+﻿@page "/StudentCourse/ViewCourse/{CourseID:int}"
+@using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Models.DTO
+@using EffizyMusicSystem.Utils
+@using System.Web
+@using System.Text.RegularExpressions;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Net.Http
+@using System.Net
+@using System.Globalization
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ILogger<StudentCourses> Logger
+
+@rendermode InteractiveServer
+
+
+<div class="container">
+
+    <h2>View Course</h2>
+    <br />
+    <br />
+    <div class="main-student-course">
+        @if (courseDetails.CourseId == 0)
+        {
+            <div style="margin: auto; vertical-align:middle; width: 100% height: 100%">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        }
+        else
+        {
+        <h3>@courseDetails.Title</h3>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
+            <label class="vc-instructed-by">by @courseDetails.Instructor</label>
+            <div class="ratingview">
+            <span class="starview @(1 <= courseDetails.InstructorRating  ? "selected" : "")">
+                &#9733;
+            </span>
+
+            <span class="starview @(2 <= courseDetails.InstructorRating  ? "selected" : "")">
+                &#9733;
+            </span>
+
+                <span class="starview @(3 <= courseDetails.InstructorRating ? "selected" : "")">
+                &#9733;
+            </span>
+
+                <span class="starview @(4 <= courseDetails.InstructorRating  ? "selected" : "")">
+                &#9733;
+            </span>
+
+            <span class="starview @(5 <= courseDetails.InstructorRating  ? "selected" : "")">
+                &#9733;
+            </span>
+            </div>
+        <br />
+        <br />
+
+        <table class="table">
+            <!-- <thead>
+                    <tr>
+                        <th>Instrument Type</th>
+                        <th>Skill Level</th>
+                        <th>Estimated Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td> @courseDetails.Instrument</td>
+                        <td>@courseDetails.SkillLevel</td>
+                        <td> @courseDetails.EstimatedTime</td>
+                    </tr>
+                    </tbody>-->
+            <tr>
+                <td style="text-align: center; padding-left: 10px;">Instrument Type:    @courseDetails.Instrument </td>
+                <td style="text-align: center; margin: auto;">Skill Level:    @courseDetails.SkillLevel</td>
+                <td style="text-align: center; margin: auto;">Estimated Time:    @courseDetails.EstimatedTime</td>
+            </tr>
+        </table>
+        <br />
+        <p>
+            @{
+                MarkupString desc = (MarkupString)@courseDetails.CourseDescription.Replace("\r\n", "<br />").Replace("\n", "<br />");
+
+            }
+            @desc
+        </p>
+
+        <br />
+
+        <h3>Modules</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Module Title</th>
+                    <th># of Lessons</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (courseDetails.Modules != null)
+                {
+                    @foreach (var module in courseDetails.Modules)
+                    {
+                        <tr>
+                            <td> @module.Title</td>
+                            <td>@module.Lessons.Count</td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+        <br />
+        <br />
+        <label>Interested in Enrolling on this course?</label>
+        @if (user == null || user.UserID == 0)
+        {
+            <br />
+            <button type="submit" class="btn btn-primary" @onclick="RegisterNow">Register Now</button>
+        }
+        else
+        {
+            <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
+                <option value="0">Select Subscription</option>
+                @if (courseDetails.Subscriptions != null && courseDetails.Subscriptions.Count > 0)
+                {
+                    @foreach (var sub in courseDetails.Subscriptions)
+                    {
+                        <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
+                    }
+                }
+                else
+                {
+                    <p>No subscriptions found for @courseDetails.Title</p>
+                }
+            </InputSelect>
+            <br />
+            <button type="submit" class="btn btn-primary" @onclick="EnrollNow">Enroll Now</button>
+        }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CourseID { get; set; }
+
+    public ViewCourseDTO courseDetails { get; set; } = new ViewCourseDTO();
+    private User user = new User();
+    private Student student = new Student();
+
+    public int selectedSubscriptionID;
+    public string ErrorMessage = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+
+
+        courseDetails = EffizyService.GetCourseDetails(CourseID);
+
+
+        student = EffizyService.GetStudentFromUser(user.UserID);
+    }
+
+    protected void RegisterNow()
+    {
+        NavigationManager.NavigateTo("/registrationForm");
+    }
+
+    protected void EnrollNow()
+    {
+        try
+        {
+
+            if (selectedSubscriptionID != 0 || courseDetails.Subscriptions.Count != 0)
+            {
+                ErrorMessage = String.Empty;
+                SubscriptionPlan selectedSubcription = new SubscriptionPlan();
+                selectedSubcription = courseDetails.Subscriptions.Where(x => x.SubscriptionID == selectedSubscriptionID).ToList().FirstOrDefault();
+
+                Payment payment = new Payment
+                    {
+                        PaymentDate = DateTime.Now,
+                        PaymentMethod = "PayPal",
+                        Amount = (double)selectedSubcription.Amount,
+                        PaymentStatus = "Pending",
+                        UserID = user.UserID,
+                        PayerID = "Waiting on Payment",
+                        BillingAddress = "Default Address",
+                        City = "Default City",
+                        Province = "Default Province",
+                        PostalCode = "Default Postal Code",
+                        Country = "Default Country"
+                    };
+
+                EffizyService.AddPayment(payment);
+                // await MakePayment(selectedCourse.CourseID, student.StudentID, payment.PaymentID, user.UserID);
+
+                string returnUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=success&StudentID={student.StudentID}&CourseID={courseDetails.CourseId}&PaymentID={payment.PaymentID}&UserID={user.UserID}&enrollmentDuration={selectedSubcription.EnrollmentDuration}";
+                string cancelUrl = $"{NavigationManager.BaseUri}enrollmentConfirmation?paymentStatus=cancel";
+                returnUrl = WebUtility.UrlEncode(returnUrl);
+                cancelUrl = WebUtility.UrlEncode(cancelUrl);
+                string paypalUrl = "https://www.sandbox.paypal.com";
+                string business = "sb-aq647o29855470@business.example.com";
+                string itemName = "Student Registration Payment";
+                string currencyCode = "CAD";
+                var paypalRedirectUrl = $"{paypalUrl}/cgi-bin/webscr" +
+                    $"?cmd=_xclick" +
+                    $"&business={business}" +
+                    $"&item_name={itemName}" +
+                    $"&amount={payment.Amount.ToString("0.00", CultureInfo.InvariantCulture)}" +
+                    $"&currency_code={currencyCode}" +
+                    $"&return={returnUrl}" +
+                    $"&cancel_return={cancelUrl}" +
+                    $"&address_override=1";
+                Console.WriteLine("Redirecting to PayPal with URL: " + paypalRedirectUrl);
+                NavigationManager.NavigateTo(paypalRedirectUrl);
+            }
+
+            else
+            {
+                ErrorMessage = "Selected subscription does not have a valid amount.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred during payment: " + ex.Message;
+        }
+
+    }
+
+
+
+}

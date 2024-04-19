@@ -1,4 +1,4 @@
-﻿@page "/takeQuiz/{quizId:int}/{count:int}"
+﻿@page "/takeQuiz/{quizId:int}/{count:int}/{enrollmentID:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
@@ -11,6 +11,12 @@
     @* <DataAnnotationsValidator /> *@
     <div class="mb-3">
         <label class="form-label"><b>Question Text</b></label>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
         <div class="col-md-4">
             <label class="form-label">@model.QuestionText</label>
         </div>
@@ -72,6 +78,12 @@
 
     [Parameter]
     public int count { get; set; }
+    [Parameter]
+    public int enrollmentId { get; set; }
+
+    public string ErrorMessage { get; set; } = String.Empty;
+
+    private User user;
     //int count = 0;
 
     Question model = new Question();
@@ -81,8 +93,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bool isLogin = await IsUserLogin();
-        if(isLogin == false)
+
+        user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        bool isLogin; //= await IsUserLogin();
+
+        if(user == null || user.UserID == 0)
         {
             NavigationManager.NavigateTo("/loginForm", true);
             return;
@@ -94,6 +109,7 @@
 
     protected async Task SaveAnswer()
     {
+        ErrorMessage = String.Empty;
         if (!string.IsNullOrEmpty(model.QuestionText) && !string.IsNullOrEmpty(model.AnswerValue))
         {
             string answer = "E";
@@ -112,26 +128,28 @@
                     answer = "D";
                     break;
             }
-            var UserID = await ProtectedSessionStore.GetAsync<int>("UserID");
-            int userId = Convert.ToInt32(UserID.Value);
 
             QuizResult quizResult = new QuizResult
                 {
                     QuestionId = model.Id,
                     QuizId = model.QuizId,
                     SelectedChoice = answer,
-                    UserId = userId,
+                    UserId = user.UserID,
                     CreatedDate = DateTime.Now
                 };
 
             count++;
-            EffizyService.AddQuizResult(quizResult);
+            await EffizyService.SaveQuizResult(quizResult);
             if (count == totalCount)
             {
-                NavigationManager.NavigateTo("/quizResults/" + quizId, true);
+                NavigationManager.NavigateTo("/quizResults/" + quizId + "/" + enrollmentId, true);
             }
             else
-                NavigationManager.NavigateTo("/takeQuiz/" + quizId + "/" + count, true);
+                NavigationManager.NavigateTo("/takeQuiz/" + quizId + "/" + count + "/" + enrollmentId, true);
+        }
+        else
+        {
+            ErrorMessage = "Please select a correct answer.";
         }
     }
 

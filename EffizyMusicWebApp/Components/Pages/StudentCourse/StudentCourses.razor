@@ -1,92 +1,136 @@
 @page "/StudentCourse/StudentCourses"
 @using EffizyMusicSystem.Models
+@using EffizyMusicSystem.Utils
 @using EffizyMusicSystem.Models.DTO
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject NavigationManager NavigationManager
 
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 
 @inject ILogger<StudentCourses> Logger
 
-<div class="container">
-<h2>Courses</h2>
-<br />
-@if (availablecourses == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="main-student-course">
-        <h3>Your Enrolled Courses</h3>
-        <br />
-        @if (enrolledCourses == null)
+<div class="container"> 
+
+     <h2>Courses</h2>
+    <br />
+    @if (availablecourses == null)
+    {
+        <div style="margin: auto; vertical-align:middle; width: 100% height: 100%">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if(user == null || user.UserID != 0)
         {
-            <p><em>No enrolled courses.</em></p>
+        <div class="main-student-course">
+            <h3>Your Enrolled Courses</h3>
+            <br />
+            @if (enrolledCourses == null)
+            {
+                <p><em>No enrolled courses.</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Course Code</th>
+                            <th>Enrollment Start</th>
+                            <th>Enrollment End</th>
+                            <th>Progress</th>
+                            <th>Access</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in enrolledCourses)
+                        {
+                            <tr>
+                                <td>@course.Title</td>
+                                <td>@course.CourseDescription</td>
+                                <td>@course.CourseCode</td>
+                                <td>@course.EnrollmentDate.ToString("MMMM, dd yyyy")</td>
+                                <td>@course.EnrollmentEndDate.ToString("MMMM, dd yyyy")</td>
+                                <td>@{
+                                        double percentageComplete;
+                                        if (course.TotalLessons == 0)
+                                        { 
+                                            percentageComplete = 100; 
+                                        }
+                                        else
+                                        {
+                                            percentageComplete = Math.Round(((double)course.CompletedLessons / (double)course.TotalLessons) * 100, 2);
+                                        }
+                                    }
+                                        @percentageComplete%
+                                    
+                                </td>
+                                <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                                <td>
+                                    @if(course.CompletedLessons >= @course.TotalLessons)
+                                        {
+                                            {
+                                                <Icon Name="IconName.CheckCircleFill" Style="padding-left: 5px;" Color="IconColor.Success" Size="IconSize.x5" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <Icon Name="IconName.CircleHalf" Style="padding-left: 5px;" Color="IconColor.Info" Size="IconSize.x5" />
+                                        }
+                                    </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+             }
+        </div>
+            @*  <PaginationComponent CurrentPage="@cp"
+        TotalPages="@TotalPagesEnrolledCourse"
+        onPageChange="@HandlePageChange" /> *@
+            <br />
+            <br />
+            <br />
         }
-        else
-        {
+        <h3>Available Courses</h3>
+            <br />
             <table class="table">
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Course Code</th>
-                        <th>Progress</th>
-                        <th>Access</th>
+                        <th>View</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var course in enrolledCourses)
+                    @foreach (var course in availablecourses)
                     {
                         <tr>
                             <td>@course.Title</td>
                             <td>@course.CourseDescription</td>
                             <td>@course.CourseCode</td>
-                            <td>@course.CompletedLessons of @course.TotalLessons</td>
-                            <td><a href="\StudentCourse\AccessCourse\@course.EnrollmentID">Access Course</a></td>
+                            <td><a href="/StudentCourse/ViewCourse/@course.CourseID">View Course</a></td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-        @*  <PaginationComponent CurrentPage="@cp"
-    TotalPages="@TotalPagesEnrolledCourse"
-    onPageChange="@HandlePageChange" /> *@
-        <br />
-        <br />
-        <br />
-        <h3>Available Courses</h3>
-        <br />
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Course Code</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var course in availablecourses)
-                {
-                    <tr>
-                        <td>@course.Title</td>
-                        <td>@course.CourseDescription</td>
-                        <td>@course.CourseCode</td>
-                        <td><a href="">View Course</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
-@* <PaginationComponent CurrentPage="@cp"
-                     TotalPages="@TotalPagesCourse"
-                     onPageChange="@HandlePageChange" /> *@
+        
+                
+                @* <PaginationComponent CurrentPage="@cp"
+                         TotalPages="@TotalPagesCourse"
+                         onPageChange="@HandlePageChange" /> *@
+    }
 
 </div>
+
 @code {
     private List<Course>? availablecourses;
     private List<StudentCourseDTO>? enrolledCourses;
@@ -104,9 +148,10 @@ else
 
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
 
-        if (String.IsNullOrEmpty(user.UserID.ToString()))
+        if (user.UserTypeID != Constants.UserType_Student)
         {
             Logger.LogWarning("Student Course being accessed but no login detected.");
+           // NavigationManager.NavigateTo("/NotAuthorize/");
         }
         else
         {
@@ -131,3 +176,4 @@ else
 
 
 }
+
