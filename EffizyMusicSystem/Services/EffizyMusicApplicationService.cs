@@ -28,6 +28,7 @@ namespace EffizyMusicSystem.Services
         Task<List<Course>> GetCourses();
         List<Course> GetCourseList();
 
+        Task<Enrollment> GetStudentEnrolledCourse(int courseId);
         Task<List<Module>> GetModules();
         Task<Module> GetModuleByID(int id);
         Task<List<Lesson>> GetModuleLessons(int moduleId);
@@ -172,8 +173,7 @@ namespace EffizyMusicSystem.Services
                     DeleteModule(data.ModuleID);
                 }
             }
-            DeleteEnrolledCourse(id); //Remove the enrolled courses if any
-
+            //DeleteEnrolledCourse(id); //Remove the enrolled courses if any
             var existingID = _context.Courses.Find(id);
             if (existingID != null)
             {
@@ -181,17 +181,18 @@ namespace EffizyMusicSystem.Services
                 await _context.SaveChangesAsync();
             }
         }
-        private async Task DeleteEnrolledCourse(int courseId)
+        public async Task<Enrollment> GetStudentEnrolledCourse(int courseId)
         {
-            var enrollment =  await _context.Enrollments.Where(x=>x.CourseID == courseId).ToListAsync();
-            if(enrollment.Count > 0)
+            try
             {
-                foreach (var deleteEnrolledCourse in enrollment)
-                {
-                    _context.Remove(deleteEnrolledCourse.EnrollmentID);
-                }
-                await _context.SaveChangesAsync();
-            }          
+                return await _context.Enrollments.Where(x => x.CourseID == courseId).FirstOrDefaultAsync();
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+            
+            
         }
 
        #endregion
