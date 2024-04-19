@@ -1,8 +1,13 @@
 ﻿@page "/course/add"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Enum
+@using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
+@inject IUserProfileService UserProfileService
 @inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 <h3>Add Course</h3>
 <hr />
 <EditForm Model="@model" OnValidSubmit="SaveCourse" FormName="addcourse">
@@ -75,7 +80,7 @@
                 <label class="form-label">Select Instructor</label>
                 <div class="col-md-6">
                     @* <select class="form-select" name="model.InstructorID"> *@
-                    <InputSelect @bind-Value="model.InstructorID" class="form-select" name="model.InstructorID">
+                    <InputSelect @bind-Value="model.InstructorID" class="form-select" name="model.InstructorID" disabled="@IsInstructor">
                         <option value="0">--Select an option--</option>
                         @if (Instructors != null)
                         {
@@ -115,10 +120,22 @@
     protected List<Instrument> Instruments { get; set; }
 
     protected List<Instructor> Instructors { get; set; }
-
-
+    private User User = new();
+    private bool IsInstructor { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        User = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
+        if (User.UserID == 0 || User.UserTypeID == Constants.UserType_Student)
+        {
+            NavigationManager.NavigateTo("/NotAuthorize/");
+        }
+        if (User.UserTypeID == Constants.UserType_Instructor)
+        {
+            // Get InstructorID from UserId
+            IsInstructor = User.UserTypeID == Constants.UserType_Instructor;
+            var InsProfile = await UserProfileService.GetInstructorProfileAsync(User.UserID);
+            model.InstructorID = InsProfile.InstructorID;
+        }
         if (model == null) // && string.IsNullOrEmpty(model.Title)
         {
             model = new Course();
