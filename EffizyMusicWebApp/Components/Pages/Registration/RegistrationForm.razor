@@ -63,7 +63,12 @@
                         <ValidationMessage For="@(() => selectedUserType)" />
                     </div>
                 }
-
+                @if (isNextButtonPressed && (string.IsNullOrEmpty(selectedUserType) || selectedUserType == "0"))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        Please select a user role.
+                    </div>
+                }
                 <div class="col-12">
                     <button class="btn btn-primary">Next</button>
                 </div>
@@ -380,7 +385,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     private int PaymentID { get; set; }
     private int StudentID { get; set; }
     private int UserID { get; set; }
-
+    bool isNextButtonPressed = false;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -533,48 +538,90 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
             Message = "An error occurred while loading subscriptions: " + ex.Message;
         }
     }
-    private async Task NextStep()
+
+
+
+private async Task NextStep()
+
+{
+
+    try
+
     {
-        try
-        {
-            if (selectedUserType == "Student")
-            {
-                if (CurrentStep == 1)
-                {
-                    student.InstrumentID = selectedInstrumentID;
-                    CurrentStep++;
 
-                    if (course.CourseID != 0)
-                    {
-                        LoadSubscriptionDetails(course.CourseID);
-                    }
-                }
-                else if (CurrentStep == 2)
-                {
-                    // Check if Terms and Conditions are accepted
-                    if (!student.TermsAndConditions)
-                    {
-                        Message = "You must agree to the Terms and Conditions to proceed.";
-                        return;
-                    }
+        isNextButtonPressed = true;
 
-                    CurrentStep++;
-                    Message = "";
-                }
-            }
-            else if (selectedUserType == "Instructor")
-            {
-                if (CurrentStep == 1)
-                {
-                    CurrentStep++;
-                }
-            }
-        }
-        catch (Exception ex)
+        if (selectedUserType == "Student")
+
         {
-            Message = "An error occurred during next step: " + ex.Message;
+
+            if (CurrentStep == 1)
+
+            {
+
+                student.InstrumentID = selectedInstrumentID;
+
+                CurrentStep++;
+
+                if (course.CourseID != 0)
+
+                {
+
+                    LoadSubscriptionDetails(course.CourseID);
+
+                }
+
+            }
+
+            else if (CurrentStep == 2)
+
+            {
+
+                // Check if Terms and Conditions are accepted
+
+                if (!student.TermsAndConditions)
+
+                {
+
+                    Message = "You must agree to the Terms and Conditions to proceed.";
+
+                    return;
+
+                }
+ 
+                CurrentStep++;
+
+                Message = "";
+
+            }
+
         }
+
+        else if (selectedUserType == "Instructor")
+
+        {
+
+            if (CurrentStep == 1)
+
+            {
+
+                CurrentStep++;
+
+            }
+
+        }
+
     }
+
+    catch (Exception ex)
+
+    {
+
+        Message = "An error occurred during next step: " + ex.Message;
+
+    }
+
+}
 
     void GoBack()
     {
