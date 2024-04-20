@@ -1,4 +1,4 @@
-﻿@page "/AddModule/"
+﻿@page "/AddModule/{CourseId:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
@@ -28,20 +28,23 @@
         <InputNumber class="form-control" @bind-Value="ModuleData.ModuleOrder" />
 
     </div>
-
     <div class="form-outline mt-2 col-md-6">
         <label for="course" class="form-label">Choose Course:</label>
-        <select class="form-control" @onchange="HandleSelectedValue" required>
-            <option value="">[Please Choose the Course...]</option>
-
-            @foreach (var course in CourseList)
-            {
-                <option value="@course.CourseID">@course.CourseDescription (CourseCode : @course.CourseCode)</option>
-            }
-
+        <select class="form-control" @onchange="HandleSelectedValue" disabled>
+            <select class="form-control" @onchange="HandleSelectedValue" disabled>
+                @if (ModuleData.Course != null)
+                {
+                    <option value="@ModuleData.Course.CourseID">@ModuleData.Course.CourseDescription</option>
+                }
+                else
+                {
+                    <option value="">Loading...</option>
+                }
+            </select>
         </select>
         <ValidationMessage For="@(() => ModuleData.Course)" />
-      </div>
+    </div>
+
     <button type="submit" class="btn btn-primary mt-4"><i class="fa fa-plus-square" aria-hidden="true"></i>  Add Module</button>
 </EditForm>
 
@@ -70,18 +73,18 @@
         if (user.UserID == 0 || user.UserTypeID == Constants.UserType_Student)
         {
             NavigationManager.NavigateTo("/NotAuthorize/");
-        }
-        CourseList = EffizyService.GetCourseList();
+        }        
+        ModuleData.Course = await EffizyService.GetCourseByID(CourseId);
     }
     public async Task SaveModuleInfo()
     {
         try
         {
-            ModuleData.Course = await EffizyService.GetCourseByID(CourseId);
+            // ModuleData.Course = await EffizyService.GetCourseByID(CourseId);
             IsModuleAdded = await EffizyService.AddModules(ModuleData);
             if (IsModuleAdded)
             {
-                NavigationManager.NavigateTo("/Modules/");
+                NavigationManager.NavigateTo($"/modules/{CourseId}");
                 ResetForm();
             }
             else

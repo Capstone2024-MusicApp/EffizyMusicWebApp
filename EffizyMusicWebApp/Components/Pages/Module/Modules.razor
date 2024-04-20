@@ -25,7 +25,7 @@ else
     else
     {
         <div class="mb-3">
-            <a href="/AddModule" class="btn btn-primary">
+            <a href="/AddModule/@CourseId" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Module
             </a>
         </div>
@@ -49,11 +49,11 @@ else
                    
                     @* <td>@module.Description</td> *@
                     <td>
-                        
-                        <a href='/module/edit/@module.ModuleID' class="btn btn-primary" role="button">
+
+                            <a href='/module/edit/@CourseId/@module.ModuleID' class="btn btn-primary" role="button">
                             Edit
                         </a>
-                        <a href='/module/delete/@module.ModuleID' class="btn btn-warning" role="button">
+                            <a href='/module/delete/@CourseId/@module.ModuleID' class="btn btn-warning" role="button">
                             Delete
                         </a>
                         <a href='/quizes/@module.ModuleID' class="btn btn-outline-dark" role="button">

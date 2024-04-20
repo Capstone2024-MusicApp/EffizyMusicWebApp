@@ -1,4 +1,4 @@
-﻿@page "/AddLesson/"
+﻿@page "/AddLesson/{ModuleId:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
@@ -36,7 +36,7 @@
                 <label for="LessonOrder" class="form-label">Lesson Order:</label>
                 <InputNumber @bind-Value="LessonData.LessonOrder" class="form-control"></InputNumber>
             </div>
-            <div class="form-outline mt-2">
+   @*          <div class="form-outline mt-2">
                 <label for="module" class="form-label">Choose Module:</label>
                 <select class="form-control" @onchange="HandleSelectedValue" required>
                     <option value="">[Please Choose the Module...]</option>
@@ -47,8 +47,8 @@
                 </select>
 
                  <ValidationMessage For="@(() => LessonData.Module)" /> 
-                @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> *@
-            </div>
+                @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> 
+            </div> *@
             <button type="submit" class="btn btn-primary mt-4">Add Lesson</button>
         </div>
     </div>
@@ -62,6 +62,7 @@
 
     private ElementReference fileInput;
 
+
     [Parameter]
     public bool IsLessonAdded { get; set; }
 
@@ -69,7 +70,7 @@
     public string ErrorMessage { get; set; } = string.Empty;
 
     // private byte[] videoBytes;
-
+    [Parameter]
     public int ModuleId { get; set; }
     private long maxFileSize = 20 * 1024 * 1024;
 
@@ -94,7 +95,7 @@
         IsLessonAdded = await EffizyService.AddLesson(LessonData);
         if (IsLessonAdded)
         {
-            NavService.NavigateTo("/ViewLesson/");
+            NavService.NavigateTo($"/lessons/{ModuleId}");
         }
         else
         {

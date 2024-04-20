@@ -1,4 +1,4 @@
-﻿@page "/module/delete/{moduleId:int}"
+﻿@page "/module/delete/{CourseId:int}/{moduleId:int}"
 @using EffizyMusicSystem.Models
 @inject NavigationManager NavigationManager
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
@@ -27,6 +27,9 @@
     [Parameter]
     public int moduleId { get; set; }
 
+    [Parameter]
+    public int CourseId { get; set; }
+
     EffizyMusicSystem.Models.Module model = new EffizyMusicSystem.Models.Module();
 
     protected override async Task OnInitializedAsync()
@@ -44,6 +47,6 @@
 
     void Cancel()
     {
-        NavigationManager.NavigateTo("/courses");
+        NavigationManager.NavigateTo($"/modules/{CourseId}");
     }
 }

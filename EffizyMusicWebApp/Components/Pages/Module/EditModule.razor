@@ -1,4 +1,4 @@
-﻿@page "/module/edit/{moduleId:int}"
+﻿@page "/module/edit/{CourseId:int}/{moduleId:int}"
 @using EffizyMusicSystem.Models
 @inject EffizyMusicSystem.Services.EffizyMusicApplicationService EffizyService
 @inject NavigationManager NavigationManager
@@ -30,6 +30,8 @@
 
 @code {
     [Parameter]
+    public int CourseId { get; set; }
+    [Parameter]
     public int moduleId { get; set; }
 
     [SupplyParameterFromForm]
@@ -56,6 +58,6 @@
 
      public void Cancel()
      {
-        NavigationManager.NavigateTo("/modules");
+        NavigationManager.NavigateTo($"/modules/{CourseId}");
      }
 }

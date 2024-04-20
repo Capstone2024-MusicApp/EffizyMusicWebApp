@@ -127,23 +127,24 @@ else
             {
                 NavigationManager.NavigateTo("/NotAuthorize/");
             }
+           
+
+            course = await CourseService.GetCourseByIdAsync(CourseID);
+            Instruments = await CourseService.GetInstrumentsAsync();
+            Instructors = await CourseService.GetInstructorsAsync();
+            StudentEnrollments = await EffizyService.GetStudentEnrolledCourse(CourseID);
+           
+            if (course != null)
+            {
+                course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
+                course.InstructorID = course.Instructor?.InstructorID ?? 0;
+            }
             if (user.UserTypeID == Constants.UserType_Instructor)
             {
                 // Get InstructorID from UserId
                 IsInstructor = user.UserTypeID == Constants.UserType_Instructor;
                 var InsProfile = await UserProfileService.GetInstructorProfileAsync(user.UserID);
                 course.InstructorID = InsProfile.InstructorID;
-            }
-
-            course = await CourseService.GetCourseByIdAsync(CourseID);
-            Instruments = await CourseService.GetInstrumentsAsync();
-            Instructors = await CourseService.GetInstructorsAsync();
-            StudentEnrollments = await EffizyService.GetStudentEnrolledCourse(CourseID);
-
-            if (course != null)
-            {
-                course.InstrumentID = course.Instrument?.InstrumentID ?? 0;
-                course.InstructorID = course.Instructor?.InstructorID ?? 0;
             }
         }
         catch (Exception ex)

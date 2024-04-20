@@ -1,5 +1,4 @@
-﻿@page "/EditLesson"
-@page "/EditLesson/{LessonNumber:int}"
+﻿@page "/EditLesson/{moduleId:int}/{LessonNumber:int}"
 @using EffizyMusicSystem.Models
 @using EffizyMusicSystem.Utils
 @inject EffizyMusicSystem.Services.IEffizyMusicApplicationService EffizyService
@@ -70,6 +69,8 @@
 @code {
     [Parameter]
     public int LessonNumber { get; set; }
+    [Parameter]
+    public int moduleId {get;set;}
 
     private Module SelectedModule { get; set; }
 
@@ -101,7 +102,7 @@
         {
             LessonData.Module = SelectedModule;
             await EffizyService.UpdateLesson(LessonData);
-            NavigationManager.NavigateTo("/ViewLesson");
+            NavigationManager.NavigateTo($"/lessons/{moduleId}");
         }
         catch (Exception ex)
         {
@@ -122,7 +123,7 @@
             if (confirmed)
             {
                 await EffizyService.DeleteLesson(LessonNumber);
-                NavigationManager.NavigateTo("/ViewLesson");
+                NavigationManager.NavigateTo($"/lessons/{moduleId}");
             }
         }
 
@@ -134,6 +135,6 @@
 
     private void CancelEdit()
     {
-        NavigationManager.NavigateTo("/ViewLesson");
+        NavigationManager.NavigateTo($"/lessons/{moduleId}");
     }
 }

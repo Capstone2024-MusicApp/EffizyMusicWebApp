@@ -18,7 +18,7 @@
 else
 {
     <div class="mb-3">
-        <a href='/AddLesson' class="btn btn-primary" role="button">
+        <a href='/AddLesson/@ModuleID' class="btn btn-primary" role="button">
             <Icon Name="IconName.PersonAdd"></Icon>
         </a>
     </div>   
@@ -63,7 +63,7 @@ else
                         }
                     </td>
                     <td>                       
-                        <a href='/EditLesson/@lesson.LessonNumber' class="btn btn-warning" role="button">
+                        <a href='/EditLesson/@ModuleID/@lesson.LessonNumber' class="btn btn-warning" role="button">
                             <Icon Name="IconName.PencilSquare"></Icon>
                         </a>
                         @* <button class="btn btn-danger" role="button"> Delete</button> *@
