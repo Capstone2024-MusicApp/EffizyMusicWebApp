@@ -38,132 +38,135 @@
         }
         else
         {
-        <h3>@courseDetails.Title</h3>
+            <h3>@courseDetails.Title</h3>
 
-        @if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <div class="alert alert-danger" role="alert">
-                @ErrorMessage
-            </div>
-        }
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ErrorMessage
+                </div>
+            }
             <label class="vc-instructed-by">by @courseDetails.Instructor</label>
             <div class="ratingview">
-            <span class="starview @(1 <= courseDetails.InstructorRating  ? "selected" : "")">
-                &#9733;
-            </span>
+                <span class="starview @(1 <= courseDetails.InstructorRating  ? "selected" : "")">
+                    &#9733;
+                </span>
 
-            <span class="starview @(2 <= courseDetails.InstructorRating  ? "selected" : "")">
-                &#9733;
-            </span>
+                <span class="starview @(2 <= courseDetails.InstructorRating  ? "selected" : "")">
+                    &#9733;
+                </span>
 
                 <span class="starview @(3 <= courseDetails.InstructorRating ? "selected" : "")">
-                &#9733;
-            </span>
+                    &#9733;
+                </span>
 
                 <span class="starview @(4 <= courseDetails.InstructorRating  ? "selected" : "")">
-                &#9733;
-            </span>
+                    &#9733;
+                </span>
 
-            <span class="starview @(5 <= courseDetails.InstructorRating  ? "selected" : "")">
-                &#9733;
-            </span>
+                <span class="starview @(5 <= courseDetails.InstructorRating  ? "selected" : "")">
+                    &#9733;
+                </span>
             </div>
-        <br />
-        <br />
+            <br />
+            <br />
 
-        <table class="table">
-            <!-- <thead>
+            <table class="table">
+                <!-- <thead>
+                        <tr>
+                            <th>Instrument Type</th>
+                            <th>Skill Level</th>
+                            <th>Estimated Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td> @courseDetails.Instrument</td>
+                            <td>@courseDetails.SkillLevel</td>
+                            <td> @courseDetails.EstimatedTime</td>
+                        </tr>
+                        </tbody>-->
+                <tr>
+                    <td style="text-align: center; padding-left: 10px;">Instrument Type:    @courseDetails.Instrument </td>
+                    <td style="text-align: center; margin: auto;">Skill Level:    @courseDetails.SkillLevel</td>
+                    <td style="text-align: center; margin: auto;">Estimated Time:    @courseDetails.EstimatedTime</td>
+                </tr>
+            </table>
+            <br />
+            <p>
+                @{
+                    MarkupString desc = (MarkupString)@courseDetails.CourseDescription.Replace("\r\n", "<br />").Replace("\n", "<br />");
+
+                }
+                @desc
+            </p>
+
+            <br />
+
+            <h3>Modules</h3>
+            <table class="table">
+                <thead>
                     <tr>
-                        <th>Instrument Type</th>
-                        <th>Skill Level</th>
-                        <th>Estimated Time</th>
+                        <th>Module Title</th>
+                        <th># of Lessons</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td> @courseDetails.Instrument</td>
-                        <td>@courseDetails.SkillLevel</td>
-                        <td> @courseDetails.EstimatedTime</td>
-                    </tr>
-                    </tbody>-->
-            <tr>
-                <td style="text-align: center; padding-left: 10px;">Instrument Type:    @courseDetails.Instrument </td>
-                <td style="text-align: center; margin: auto;">Skill Level:    @courseDetails.SkillLevel</td>
-                <td style="text-align: center; margin: auto;">Estimated Time:    @courseDetails.EstimatedTime</td>
-            </tr>
-        </table>
-        <br />
-        <p>
-            @{
-                MarkupString desc = (MarkupString)@courseDetails.CourseDescription.Replace("\r\n", "<br />").Replace("\n", "<br />");
-
-            }
-            @desc
-        </p>
-
-        <br />
-
-        <h3>Modules</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Module Title</th>
-                    <th># of Lessons</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (courseDetails.Modules != null)
-                {
-                    @foreach (var module in courseDetails.Modules)
+                    @if (courseDetails.Modules != null)
                     {
-                        <tr>
-                            <td> @module.Title</td>
-                            <td>@module.Lessons.Count</td>
-                        </tr>
+                        @foreach (var module in courseDetails.Modules)
+                        {
+                            <tr>
+                                <td> @module.Title</td>
+                                <td>@module.Lessons.Count</td>
+                            </tr>
+                        }
                     }
-                }
 
-            </tbody>
-        </table>
-        <br />
-        <br />
-       
-        @if (user == null || user.UserID == 0)
-        {
-            <label>Interested in Enrolling on this course?</label>
+                </tbody>
+            </table>
             <br />
-            <button type="submit" class="btn btn-primary" @onclick="RegisterNow">Register Now</button>
-        }
-        else
-        {
-             
-                <br />
-                @if (courseDetails.enrollmentIDToSwitch != 0)
+            <br />
+
+            @if (user.UserTypeID == Constants.UserType_Student || user == null || user.UserID == 0)
+            {
+                @if (user == null || user.UserID == 0)
                 {
-                    <label>Since you are currently enrolled on this same course code. You are eligible to switch</label>
+                    <label>Interested in Enrolling on this course?</label>
                     <br />
-                    <button type="submit" class="btn btn-primary" @onclick="SwitchCourse">Switch to this course</button>
+                    <button type="submit" class="btn btn-primary" @onclick="RegisterNow">Register Now</button>
                 }
                 else
                 {
-                    <label>Interested in Enrolling on this course?</label>
-                    <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
-                        <option value="0">Select Subscription</option>
-                        @if (courseDetails.Subscriptions != null && courseDetails.Subscriptions.Count > 0)
-                        {
-                            @foreach (var sub in courseDetails.Subscriptions)
+
+                    <br />
+                    @if (courseDetails.enrollmentIDToSwitch != 0)
+                    {
+                        <label>Since you are currently enrolled on this same course code. You are eligible to switch</label>
+                        <br />
+                        <button type="submit" class="btn btn-primary" @onclick="SwitchCourse">Switch to this course</button>
+                    }
+                    else
+                    {
+                        <label>Interested in Enrolling on this course?</label>
+                        <InputSelect id="SelectedSubscription" @bind-Value="selectedSubscriptionID" class="form-select">
+                            <option value="0">Select Subscription</option>
+                            @if (courseDetails.Subscriptions != null && courseDetails.Subscriptions.Count > 0)
                             {
-                                <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
+                                @foreach (var sub in courseDetails.Subscriptions)
+                                {
+                                    <option value="@sub.SubscriptionID">@sub.Description - @sub.Amount</option>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <p>No subscriptions found for @courseDetails.Title</p>
-                        }
-                    </InputSelect>
-                    <button type="submit" class="btn btn-primary" @onclick="EnrollNow">Enroll Now</button>
+                            else
+                            {
+                                <p>No subscriptions found for @courseDetails.Title</p>
+                            }
+                        </InputSelect>
+                        <button type="submit" class="btn btn-primary" @onclick="EnrollNow">Enroll Now</button>
+                    }
                 }
-        }
+            }
         }
     </div>
 </div>
@@ -200,7 +203,7 @@
     {
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Switching course will wipe out your current progress. Are you sure you want to switch?");
 
-        if(confirmed)
+        if (confirmed)
         {
             EffizyService.SwitchCourse(courseDetails.CourseId, courseDetails.enrollmentIDToSwitch);
 
