@@ -39,7 +39,7 @@
          <div class="form-outline mt-2">
             <label for="content" class="form-label">Lesson Content:</label>
             <Icon Name="IconName.Upload"></Icon>
-            <input type="file" onchange="HandleFileSelected">
+            <InputFile OnChange="@HandleFileSelected" />
             @if (LessonData.LessonContent != null)
         {
             <p>File Name: @LessonData.LessonFileName</p>           
@@ -80,6 +80,7 @@
     public List<Module> ModuleList = new();
     private Lesson LessonData = new();
     private string ErrorMessage { get; set; } = "";
+    private long maxFileSize = 30 * 1024 * 1024;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +117,28 @@
     {     
         string selectedModuleName = e.Value.ToString();
         SelectedModule = ModuleList.FirstOrDefault(m => m.Title == selectedModuleName);
+    }
+
+    private async void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using (var stream = new MemoryStream())
+            {
+                await file.OpenReadStream(maxFileSize).CopyToAsync(stream);
+                // Reset the stream position to the beginning
+                stream.Seek(0, SeekOrigin.Begin);
+
+                // Convert the memory stream to a byte array
+                byte[] videoBytes = stream.ToArray();
+
+                // Assign the byte array to the LessonContent property
+                LessonData.LessonContent = videoBytes;
+            }
+
+            LessonData.LessonFileName = e.File.Name;
+        }
     }
 
     public async Task RemoveLesson()
