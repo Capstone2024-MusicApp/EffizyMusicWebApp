@@ -31,6 +31,7 @@ namespace EffizyMusicSystem.DAL
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<StudentCourseDTO> StudentCourseDTOs { get; set; }
+        public DbSet<ApiKey> ApiKeys { get; set; }
 
         public virtual DbSet<QuizResult> QuizResults { get; set; } = null!;
 
