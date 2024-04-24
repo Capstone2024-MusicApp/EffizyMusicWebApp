@@ -19,7 +19,6 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Subscription ID</th>
                 <th>Description</th>
                 <th>
                     Enrollment Duration (months)
@@ -35,7 +34,6 @@ else
             @foreach (var subscription in subscriptions)
             {
                 <tr>
-                    <td>@subscription.SubscriptionID</td>
                     <td>@subscription.Description</td>
                     <td>@subscription.EnrollmentDuration</td>
                     <td>@subscription.Amount.ToString("0.00")</td>
