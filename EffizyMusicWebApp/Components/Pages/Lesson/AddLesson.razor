@@ -50,6 +50,14 @@
                 @* <ValidationMessage For="@(() => ModuleData.Course.CourseDescription)" class="row" /> 
             </div> *@
             <button type="submit" class="btn btn-primary mt-4">Add Lesson</button>
+            @if(submitting)
+            {
+                <div style="margin: auto; vertical-align:middle; text-align:center; ">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </EditForm>
@@ -72,12 +80,14 @@
     // private byte[] videoBytes;
     [Parameter]
     public int ModuleId { get; set; }
-    private long maxFileSize = 30 * 1024 * 1024;
+    private long maxFileSize = 70 * 1024 * 1024;
 
     public List<Module> ModuleList = new();
 
     [SupplyParameterFromForm]
     protected Lesson LessonData { get; set; } = new();
+
+    Boolean submitting = false;
 
     protected override async Task OnInitializedAsync()
     {

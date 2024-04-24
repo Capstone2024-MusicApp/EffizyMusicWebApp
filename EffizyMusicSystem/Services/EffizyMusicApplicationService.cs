@@ -1005,6 +1005,11 @@ namespace EffizyMusicSystem.Services
 
         }
 
+        public QuizProgress getQuizProgress(int enrollmentId, int quizID)
+        {
+            return _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentId && qp.QuizID == quizID).FirstOrDefault();
+        }
+
         public void setQuizProgress(int enrollmentID, int quizID, float grade)
         {
             QuizProgress quizProgress = _context.QuizesProgress.Where(qp => qp.EnrollmentID == enrollmentID && qp.QuizID == quizID).FirstOrDefault();
@@ -1014,18 +1019,27 @@ namespace EffizyMusicSystem.Services
                 quizProgress.EnrollmentID = enrollmentID;
                 quizProgress.QuizID = quizID;
                 quizProgress.Grade = grade;
+                quizProgress.LastTaken = DateTime.Today;
                 _context.QuizesProgress.Add(quizProgress);
                 _context.SaveChanges();
             }
             else
             {
-                    if (quizProgress.Grade < grade)
-                    {
-                        quizProgress.Grade = grade;
+
+                if (quizProgress.Grade < grade)
+                {
+                    quizProgress.Grade = grade;
+                    quizProgress.LastTaken = DateTime.Today;
+                }
+                else
+                {
+                    quizProgress.LastTaken = DateTime.Today;
+                }
 
                         _context.QuizesProgress.Update(quizProgress);
                         _context.SaveChanges();
-                    }
+                    
+                
             }
 
         }

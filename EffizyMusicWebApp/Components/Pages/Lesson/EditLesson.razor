@@ -61,6 +61,15 @@
         <button type="submit" class="btn btn-danger" @onclick="RemoveLesson">Delete</button>
         <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
     </div>
+
+        @if (submitting)
+        {
+            <div style="margin: auto; vertical-align:middle; text-align:center; ">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        }
     </div>
 </EditForm> 
 @* @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -80,7 +89,9 @@
     public List<Module> ModuleList = new();
     private Lesson LessonData = new();
     private string ErrorMessage { get; set; } = "";
-    private long maxFileSize = 30 * 1024 * 1024;
+    private long maxFileSize = 70 * 1024 * 1024;
+
+    public Boolean submitting = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,6 +115,7 @@
     {
         try
         {
+            submitting = true;
             LessonData.Module = SelectedModule;
             await EffizyService.UpdateLesson(LessonData);
             NavigationManager.NavigateTo($"/lessons/{moduleId}");

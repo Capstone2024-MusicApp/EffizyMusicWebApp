@@ -7,6 +7,12 @@
 
 <h3>Take Quiz</h3>
 <hr />
+@if(qp != null && qp.LastTaken.AddDays(1) > DateTime.Today)
+{
+    <div class="alert alert-warning" role="alert" style="text-align: center;">You will need 24 hours to re-attempt the quiz. You can retake this quiz on @qp.LastTaken.AddDays(1)</div>
+}
+else
+{
 <EditForm Model="@model" OnValidSubmit="SaveAnswer" FormName="takeQuiz">
     @* <DataAnnotationsValidator /> *@
     <div class="mb-3">
@@ -72,6 +78,7 @@
         </a>
     </div>
     </EditForm>
+    }
 @code {
     [Parameter]
     public int quizId { get; set; }
@@ -87,6 +94,7 @@
     //int count = 0;
 
     Question model = new Question();
+    QuizProgress qp;
 
     List<Question> questions = new List<Question>();
     public int totalCount = 0;
@@ -97,6 +105,8 @@
         user = ((await ProtectedSessionStore.GetAsync<User>("User")).Value ?? new User());
         bool isLogin; //= await IsUserLogin();
 
+        qp = EffizyService.getQuizProgress(enrollmentId, quizId);
+        
         if(user == null || user.UserID == 0)
         {
             NavigationManager.NavigateTo("/loginForm", true);
