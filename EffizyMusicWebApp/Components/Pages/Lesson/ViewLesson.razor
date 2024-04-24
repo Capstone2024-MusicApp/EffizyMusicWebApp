@@ -42,7 +42,7 @@ else
                     <td>@lesson.LessonMode</td>
                     <td>@lesson.LessonOrder</td>
                     <td>
-                        @if (lesson.LessonContent != null)
+                        @if (lesson.LessonFileName != null)
                         {
                             @*  var base64 = Convert.ToBase64String(lesson.LessonContent);
                 var src = $"data:video/mp4;base64,{base64}";

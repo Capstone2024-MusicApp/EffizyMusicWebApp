@@ -15,7 +15,6 @@ else
     <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
-                <th>Payment ID</th>
                 <th>Payment Method</th>
                 <th>Date</th>
                 <th>Amount</th>
@@ -35,7 +34,6 @@ else
                 foreach (var entity in GetItemsOnCurrentPage())
                 {
                     <tr>
-                        <td>@entity.PaymentID</td>
                         <td>@entity.PaymentMethod</td>
                         <td>@entity.PaymentDate.ToShortDateString()</td>
                         <td>@entity.Amount</td>
