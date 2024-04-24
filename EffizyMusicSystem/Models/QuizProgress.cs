@@ -14,6 +14,8 @@ namespace EffizyMusicSystem.Models
         public int QuizProgressID { get; set; }
         public int EnrollmentID { get; set; }
 
+        public DateTime LastTaken { get; set; }
+
         public int QuizID { get; set; }
 
         public float Grade { get; set; }
