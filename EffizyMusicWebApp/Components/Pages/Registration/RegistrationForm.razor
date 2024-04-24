@@ -23,6 +23,7 @@
 @inject SubscriptionService subscriptionService
 @inject EffizyMusicContext _context
 @inject PayPalService PayPalService
+@inject IEmailService EmailService
 
 @rendermode InteractiveServer
 @if (CurrentStep == 1)
@@ -377,6 +378,7 @@ else if (selectedUserType == "Instructor" && CurrentStep == 2)
     [Inject] private IUserService userService { get; set; }
     [Inject] private CourseService courseService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
+
     private Instructor instructor = new Instructor();
     decimal amount = 0.00M;
     decimal paymentAmount = 0;
@@ -643,7 +645,7 @@ private async Task NextStep()
         try
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
-             user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
+            user.ConfirmPassword = PasswordHasher.HashPassword(user.ConfirmPassword);
             bool userCreated = await userService.CreateUserAsync(user);
             if (!userCreated)
             {
@@ -654,6 +656,11 @@ private async Task NextStep()
             bool instructorCreated = await CreateInstructorAsync(instructor);
             if (instructorCreated)
             {
+                string recipientEmail = "efizzymusic.ca@gmail.com"; // Change to actual admin email
+                string subject = "New Instructor Registration";
+                string message = "A new instructor has registered and is waiting for approval.";
+
+                await EmailService.SendEmailAsync(recipientEmail, subject, message);
                 CurrentStep = 3;
                 return;
             }

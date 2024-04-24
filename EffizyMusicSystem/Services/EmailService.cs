@@ -4,18 +4,23 @@ using SendGrid;
 using System;
 using System.Threading.Tasks;
 using EffizyMusicSystem.DAL;
+using EffizyMusicSystem.Models;
 
 namespace EffizyMusicSystem.Services
 {
     public class EmailService : IEmailService
     {
         private readonly EffizyMusicContext _context;
+        private readonly string _apiKey;
 
         public EmailService(EffizyMusicContext context)
         {
             _context = context;
         }
-
+        public EmailService()
+        {
+            _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+        }
         public async Task<string> GetApiKeyAsync()
         {
             var apiKeyEntity = await _context.ApiKeyConfig.FirstOrDefaultAsync();
@@ -31,6 +36,7 @@ namespace EffizyMusicSystem.Services
             try
             {
                 var apiKey = await GetApiKeyAsync();
+                //var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
@@ -55,6 +61,7 @@ namespace EffizyMusicSystem.Services
             try
             {
                 var apiKey = await GetApiKeyAsync();
+                //var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
@@ -79,6 +86,7 @@ namespace EffizyMusicSystem.Services
             try
             {
                 var apiKey = await GetApiKeyAsync();
+                //var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
