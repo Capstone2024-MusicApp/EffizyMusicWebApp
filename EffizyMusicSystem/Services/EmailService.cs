@@ -1,22 +1,37 @@
-﻿using SendGrid.Helpers.Mail;
+﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using SendGrid;
 using System;
 using System.Threading.Tasks;
+using EffizyMusicSystem.DAL;
 
 namespace EffizyMusicSystem.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly string _apiKey;
-        public EmailService()
+        private readonly EffizyMusicContext _context;
+
+        public EmailService(EffizyMusicContext context)
         {
-            _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            _context = context;
         }
+
+        public async Task<string> GetApiKeyAsync()
+        {
+            var apiKeyEntity = await _context.ApiKeys.FirstOrDefaultAsync();
+            if (apiKeyEntity == null)
+            {
+                throw new InvalidOperationException("API key not found in the database.");
+            }
+            return apiKeyEntity.Key;
+        }
+
         public async Task SendApprovalEmailAsync(string recipientEmail)
         {
             try
             {
-                var client = new SendGridClient(_apiKey);
+                var apiKey = await GetApiKeyAsync();
+                var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
                 var subject = "Approval Notification";
@@ -39,7 +54,8 @@ namespace EffizyMusicSystem.Services
         {
             try
             {
-                var client = new SendGridClient(_apiKey);
+                var apiKey = await GetApiKeyAsync();
+                var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
                 var subject = "Rejection Notification";
@@ -62,7 +78,8 @@ namespace EffizyMusicSystem.Services
         {
             try
             {
-                var client = new SendGridClient(_apiKey);
+                var apiKey = await GetApiKeyAsync();
+                var client = new SendGridClient(apiKey);
                 var from = new EmailAddress("efizzymusic.ca@gmail.com", "EfizzyMusic Administrator");
                 var to = new EmailAddress(recipientEmail);
                 var plainTextContent = message;
