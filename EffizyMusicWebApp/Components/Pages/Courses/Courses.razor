@@ -24,8 +24,8 @@
                 <th>Title</th>
                 <th>Course Code</th>
                 <th>Description</th>
-                <th>Instrument ID</th>
-                <th>Instructor ID</th>
+                <th>Instrument</th>
+                <th>Instructor</th>
                 <th>Skill Level</th>
                 <th>Estimated Time</th>
                 <th>Actions</th>
@@ -38,8 +38,8 @@
                     <td>@course.Title</td>
                     <td>@course.CourseCode</td>
                     <td>@course.CourseDescription</td>
-                    <td>@course.InstrumentID</td>
-                    <td>@course.InstructorID</td>
+                    <td>@course.Instrument.InstrumentType</td>
+                    <td>@course.Instructor.FirstName @course.Instructor.LastName</td>
                     <td>@course.SkillLevel</td>
                     <td>@course.EstimatedTime</td>
                     <td>
