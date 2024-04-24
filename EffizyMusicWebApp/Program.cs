@@ -28,7 +28,7 @@ builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 
-//builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 builder.Services.AddScoped<CourseService>();

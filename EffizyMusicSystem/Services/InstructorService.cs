@@ -43,7 +43,7 @@ namespace EffizyMusicSystem.Services
                 var instructor = await _context.Instructors.FindAsync(instructorId);
                 if (instructor != null)
                 {
-                    instructor.Status = "approved";
+                    instructor.Status = "Active";
                     await _context.SaveChangesAsync();
                     return true;
                 }

@@ -18,7 +18,7 @@ namespace EffizyMusicSystem.Services
 
         public async Task<string> GetApiKeyAsync()
         {
-            var apiKeyEntity = await _context.ApiKeys.FirstOrDefaultAsync();
+            var apiKeyEntity = await _context.ApiKeyConfig.FirstOrDefaultAsync();
             if (apiKeyEntity == null)
             {
                 throw new InvalidOperationException("API key not found in the database.");

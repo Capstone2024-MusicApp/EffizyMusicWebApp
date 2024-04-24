@@ -7,7 +7,9 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject IInstructorService InstructorService
+@inject IUserService UserService
 @inject NavigationManager NavigationManager
+@inject IEmailService EmailService
 
 @rendermode InteractiveServer
 
@@ -78,6 +80,7 @@ else
         try
         {
             await InstructorService.ApproveInstructorAsync(Instructor.InstructorID);
+            await SendApprovalEmailAsync(Instructor.UserID);
             Instructor.Status = "Active";
             NavigationManager.NavigateTo("/admin/view-instructors");
         }
@@ -98,6 +101,51 @@ else
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
+        }
+    }
+    private async Task SendApprovalEmailAsync(int userId)
+    {
+        try
+        {
+            var user = await UserService.GetUserByIdAsync(userId);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                string subject = "Approval Notification";
+                string message = "Congratulations! Your instructor account has been approved.";
+
+                await EmailService.SendEmailAsync(user.Email, subject, message);
+            }
+            else
+            {
+                throw new Exception("User or email address not found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending approval email: {ex.Message}");
+        }
+    }
+
+    private async Task SendRejectionEmailAsync(int userId)
+    {
+        try
+        {
+            var user = await UserService.GetUserByIdAsync(userId);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                string subject = "Rejection Notification";
+                string message = "We regret to inform you that your instructor application has been rejected.";
+
+                await EmailService.SendEmailAsync(user.Email, subject, message);
+            }
+            else
+            {
+                throw new Exception("User or email address not found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending rejection email: {ex.Message}");
         }
     }
 }
