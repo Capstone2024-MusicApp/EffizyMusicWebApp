@@ -3,17 +3,14 @@ using EffizyMusicSystem.DAL;
 using EffizyMusicSystem.Services;
 using EffizyMusicWebApp.Components;
 using Microsoft.EntityFrameworkCore;
-using Blazored.SessionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
+// Load environment variables from the .env file
+DotNetEnv.Env.Load(".sendgrid.env");
 
 // Add services to the container.
-var services = builder.Services;
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddBlazoredSessionStorage();
 
@@ -21,31 +18,18 @@ builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddDbContext<EffizyMusicContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EffizyMusicConnection")));
 
-// Register UserService
+// Register your services
 builder.Services.AddScoped<IUserService, UserService>();
-
-// Register Subscription
 builder.Services.AddScoped<SubscriptionService>();
-
-// PayPal Service
 builder.Services.AddScoped<PayPalService>();
-
 builder.Services.AddHttpClient<PayPalService>();
-
-// Register UserProfileService
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-
-// Register EffizyMusicApplicationService
 builder.Services.AddScoped<EffizyMusicApplicationService>();
-
-// Register EnrollmentService
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-
-builder.Services.AddScoped<EnrollmentService>();
-
-
-// Register CourseService
 builder.Services.AddScoped<ICourseService, CourseService>();
+
+//builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 builder.Services.AddScoped<CourseService>();
 
@@ -56,33 +40,29 @@ builder.Services.AddScoped<UserTypeService>();
 builder.Services.AddScoped<InstrumentService>();
 builder.Services.AddScoped<EffizyMusicApplicationService>();
 builder.Services.AddScoped<CourseService>();
+
 builder.Services.AddScoped<UserTypeService>();
 builder.Services.AddScoped<InstrumentService>();
-
 builder.Services.AddScoped<IEffizyMusicApplicationService, EffizyMusicApplicationService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IInstructorService, InstructorService>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
 
 var app = builder.Build();
+
+// Retrieve the API key from the environment variable
+var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-//app.UseSession();
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthorization();
-
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();
