@@ -116,7 +116,7 @@
         try
         {
             submitting = true;
-            LessonData.Module = SelectedModule;
+            // LessonData.Module = SelectedModule;
             await EffizyService.UpdateLesson(LessonData);
             NavigationManager.NavigateTo($"/lessons/{moduleId}");
         }
